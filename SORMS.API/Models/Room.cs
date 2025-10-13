@@ -6,26 +6,23 @@ namespace SORMS.API.Models
 {
     public class Room
     {
-        // ===== Khóa chính =====
-        [Key]   // Xác định Id là Primary Key
+        [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        // ===== Số phòng =====
-        [Required]
-        [MaxLength(20)]        // Ví dụ: A101, B205
+        [Required, MaxLength(20)]
         public string RoomNumber { get; set; }
 
-        // ===== Loại phòng =====
-        [Required]
-        [MaxLength(30)]        // Single, Double, VIP...
+        [Required, MaxLength(30)]
         public string Type { get; set; }
 
-        // ===== Trạng thái sử dụng =====
         [Required]
         public bool IsOccupied { get; set; }
 
-        // ===== Quan hệ 1-n với Resident =====
+        // 1 Room - N Residents
         public ICollection<Resident> Residents { get; set; } = new List<Resident>();
+
+        // 1 Room - N CheckInRecords
+        public ICollection<CheckInRecord> CheckInRecords { get; set; } = new List<CheckInRecord>();
     }
 }

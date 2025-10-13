@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SORMS.API.DTOs;
 using SORMS.API.Interfaces;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace SORMS.API.Controllers
 {
@@ -14,7 +15,7 @@ namespace SORMS.API.Controllers
         {
             _authService = authService;
         }
-      
+
         /// <summary>
         /// Đăng nhập và nhận JWT token
         /// </summary>
@@ -26,7 +27,7 @@ namespace SORMS.API.Controllers
 
             var token = await _authService.LoginAsync(loginDto);
             if (token == null)
-                return Unauthorized("Sai tên đăng nhập hoặc mật khẩu.");
+                return Unauthorized("Sai tên đăng nhập Email hoặc mật khẩu.");
 
             return Ok(new { Token = token });
         }
@@ -42,7 +43,7 @@ namespace SORMS.API.Controllers
 
             var success = await _authService.RegisterAsync(registerDto);
             if (!success)
-                return Conflict("Tên đăng nhập đã tồn tại.");
+                return Conflict("Tên hoặc Email đăng nhập đã tồn tại.");
 
             return Ok("Đăng ký thành công.");
         }
@@ -58,6 +59,56 @@ namespace SORMS.API.Controllers
                 return NotFound("Không tìm thấy người dùng.");
 
             return Ok(user);
+        }
+
+        // ================= Forgot Password Flow =================
+
+        /// <summary>
+        /// Gửi OTP về email để reset mật khẩu
+        /// </summary>
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var success = await _authService.SendOtpAsync(dto.Email);
+            if (!success)
+                return NotFound("Email không tồn tại trong hệ thống.");
+
+            return Ok("OTP đã được gửi về email.");
+        }
+
+        /// <summary>
+        /// Xác minh OTP
+        /// </summary>
+        [HttpPost("verify-otp")]
+        public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var isValid = await _authService.VerifyOtpAsync(dto.Email, dto.Otp);
+            if (!isValid)
+                return BadRequest("OTP không hợp lệ hoặc đã hết hạn.");
+
+            return Ok("Xác minh OTP thành công.");
+        }
+
+        /// <summary>
+        /// Reset mật khẩu bằng OTP
+        /// </summary>
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var success = await _authService.ResetPasswordAsync(dto.Email, dto.Otp, dto.NewPassword);
+            if (!success)
+                return BadRequest("Không thể reset mật khẩu. OTP sai hoặc đã hết hạn.");
+
+            return Ok("Đặt lại mật khẩu thành công.");
         }
     }
 }

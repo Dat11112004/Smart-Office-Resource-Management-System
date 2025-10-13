@@ -217,6 +217,26 @@ namespace SORMS.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Roles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "System administrator",
+                            Name = "Admin"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "Staff member",
+                            Name = "Staff"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "Dormitory resident",
+                            Name = "Resident"
+                        });
                 });
 
             modelBuilder.Entity("SORMS.API.Models.Room", b =>
@@ -309,6 +329,12 @@ namespace SORMS.API.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<string>("ResetOtp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ResetOtpExpiry")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.ToTable("Staffs");
@@ -322,12 +348,23 @@ namespace SORMS.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ResetOtp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ResetOtpExpiry")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
@@ -342,6 +379,17 @@ namespace SORMS.API.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Email = "admin@sorms.local",
+                            IsActive = true,
+                            PasswordHash = "admin@123",
+                            RoleId = 1,
+                            Username = "admin"
+                        });
                 });
 
             modelBuilder.Entity("SORMS.API.Models.Billing", b =>
@@ -358,13 +406,13 @@ namespace SORMS.API.Migrations
             modelBuilder.Entity("SORMS.API.Models.CheckInRecord", b =>
                 {
                     b.HasOne("SORMS.API.Models.Resident", "Resident")
-                        .WithMany()
+                        .WithMany("CheckInRecords")
                         .HasForeignKey("ResidentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("SORMS.API.Models.Room", "Room")
-                        .WithMany()
+                        .WithMany("CheckInRecords")
                         .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -377,7 +425,7 @@ namespace SORMS.API.Migrations
             modelBuilder.Entity("SORMS.API.Models.Notification", b =>
                 {
                     b.HasOne("SORMS.API.Models.Resident", "Resident")
-                        .WithMany()
+                        .WithMany("Notifications")
                         .HasForeignKey("ResidentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -430,6 +478,10 @@ namespace SORMS.API.Migrations
                 {
                     b.Navigation("Billings");
 
+                    b.Navigation("CheckInRecords");
+
+                    b.Navigation("Notifications");
+
                     b.Navigation("ServiceRequests");
                 });
 
@@ -440,6 +492,8 @@ namespace SORMS.API.Migrations
 
             modelBuilder.Entity("SORMS.API.Models.Room", b =>
                 {
+                    b.Navigation("CheckInRecords");
+
                     b.Navigation("Residents");
                 });
 

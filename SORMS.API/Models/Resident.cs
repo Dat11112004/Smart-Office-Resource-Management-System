@@ -7,49 +7,41 @@ namespace SORMS.API.Models
 {
     public class Resident
     {
-        // ===== Khóa chính =====
-        [Key]   // Xác định Id là Primary Key
+        [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        // ===== Thông tin cá nhân =====
-        [Required]
-        [MaxLength(100)]
+        [Required, MaxLength(100)]
         public string FullName { get; set; }
 
-        [Required]
-        [MaxLength(100)]
-        [EmailAddress]
+        [Required, MaxLength(100), EmailAddress]
         public string Email { get; set; }
 
-        [Required]
-        [MaxLength(15)]
-        [Phone]
+        [Required, MaxLength(15), Phone]
         public string Phone { get; set; }
 
-        [Required]
-        [MaxLength(20)]
+        [Required, MaxLength(20)]
         public string IdentityNumber { get; set; }
 
-        [Required]
-        [MaxLength(20)]
-        public string Role { get; set; } // Lecturer, Staff, Guest
+        [Required, MaxLength(20)]
+        public string Role { get; set; }
 
-        // ===== Ngày nhận & trả phòng =====
         [Required]
         public DateTime CheckInDate { get; set; }
 
         public DateTime? CheckOutDate { get; set; }
 
-        // ===== Khóa ngoại: liên kết với phòng =====
+        // FK: Room
         [Required]
         public int RoomId { get; set; }
 
         [ForeignKey(nameof(RoomId))]
         public Room Room { get; set; }
 
-        // ===== Quan hệ 1-n =====
+        // Navigation collections
         public ICollection<ServiceRequest> ServiceRequests { get; set; } = new List<ServiceRequest>();
         public ICollection<Billing> Billings { get; set; } = new List<Billing>();
+        public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+        public ICollection<CheckInRecord> CheckInRecords { get; set; } = new List<CheckInRecord>();
     }
 }

@@ -1,29 +1,34 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SORMS.API.Models
 {
     public class User
     {
-        // ===== Khóa chính =====
-        [Key]   // Primary Key
+        [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        // ===== Thông tin tài khoản =====
-        [Required]
-        [MaxLength(50)]
+        [Required, MaxLength(50)]
         public string Username { get; set; }
 
+        [Required, MaxLength(100), EmailAddress]
+        public string Email { get; set; }
+
         [Required]
-        public string PasswordHash { get; set; }  // Lưu chuỗi hash thay vì mật khẩu gốc
+        public string PasswordHash { get; set; }
 
-        // ===== Quan hệ =====
-        [ForeignKey(nameof(Role))]
+        // FK: Role
+        [Required]
         public int RoleId { get; set; }
-        public Role Role { get; set; }  // Mỗi User thuộc một Role
 
-        // ===== Trạng thái =====
-        public bool IsActive { get; set; } = true; // Mặc định tài khoản hoạt động
+        [ForeignKey(nameof(RoleId))]
+        public Role Role { get; set; }
+
+        public bool IsActive { get; set; } = true;
+
+        public string? ResetOtp { get; set; }
+        public DateTime? ResetOtpExpiry { get; set; }
     }
 }

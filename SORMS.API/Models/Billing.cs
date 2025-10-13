@@ -6,8 +6,7 @@ namespace SORMS.API.Models
 {
     public class Billing
     {
-        // ---- Khóa chính ----
-        [Key]   // Chỉ rõ đây là Primary Key, giữ nguyên tên Id
+        [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
@@ -15,12 +14,12 @@ namespace SORMS.API.Models
         public DateTime BillingDate { get; set; }
 
         [Required]
-        [Column(TypeName = "decimal(18,2)")] // kiểu tiền chính xác hơn
+        [Column(TypeName = "decimal(18,2)")]
         public decimal Amount { get; set; }
 
         public bool IsPaid { get; set; }
 
-        // ---- Khóa ngoại ----
+        // FK: Resident
         [Required]
         public int ResidentId { get; set; }
 

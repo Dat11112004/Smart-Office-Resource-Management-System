@@ -19,6 +19,8 @@ builder.Services.AddDbContext<SormsDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // 3. Đăng ký các service
+builder.Services.AddScoped<IEmailService, EmailService>();
+
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IResidentService, ResidentService>();
 builder.Services.AddScoped<IBillingService, BillingService>();
@@ -26,6 +28,7 @@ builder.Services.AddScoped<ICheckInService, CheckInService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IServiceRequestService, ServiceRequestService>();
+builder.Services.AddScoped<IRoomService, RoomService>();
 
 // 4. Cấu hình JWT Authentication
 var jwtSection = builder.Configuration.GetSection("Jwt");

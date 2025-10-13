@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -6,27 +7,23 @@ namespace SORMS.API.Models
 {
     public class Staff
     {
-        // ===== Khóa chính =====
-        [Key]   // Primary Key
+        [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        // ===== Thông tin nhân viên =====
-        [Required]
-        [MaxLength(100)]
+        [Required, MaxLength(100)]
         public string FullName { get; set; }
 
-        [Required]
-        [EmailAddress]           // Validate email format
-        [MaxLength(150)]
+        [Required, MaxLength(150), EmailAddress]
         public string Email { get; set; }
 
-        [Phone]                  // Validate phone format
-        [MaxLength(20)]
+        [MaxLength(20), Phone]
         public string Phone { get; set; }
 
-        // ===== Quan hệ =====
-        // Một nhân viên có thể được gán nhiều yêu cầu dịch vụ
-        public ICollection<ServiceRequest> AssignedRequests { get; set; }
+        // 1 Staff - N ServiceRequests
+        public ICollection<ServiceRequest> AssignedRequests { get; set; } = new List<ServiceRequest>();
+
+        public string? ResetOtp { get; set; }
+        public DateTime? ResetOtpExpiry { get; set; }
     }
 }
