@@ -107,17 +107,8 @@ namespace SORMS.API.Data
                 new Role { Id = 3, Name = "Resident", Description = "Dormitory resident" }
             );
 
-            modelBuilder.Entity<User>().HasData(
-                new User
-                {
-                    Id = 1,
-                    Username = "admin",
-                    Email = "admin@sorms.local",
-                    PasswordHash = "admin@123", // ⚠️ nên mã hóa bằng BCrypt hoặc SHA sau
-                    RoleId = 1,
-                    IsActive = true
-                }
-            );
+           
+            
         }
     }
 }

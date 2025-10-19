@@ -4,6 +4,7 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Serilog.Core;
 using SORMS.API.Configs; // namespace chứa JwtConfig
 using SORMS.API.Data;
 using SORMS.API.DTOs;
@@ -17,19 +18,25 @@ namespace SORMS.API.Services
         private readonly SormsDbContext _context;
         private readonly JwtConfig _jwtConfig;
         private readonly IEmailService _emailService;
+        private readonly IConfiguration _configuration;
+        private readonly ILogger<AuthService> _logger;
+       
 
-        public AuthService(SormsDbContext context, IOptions<JwtConfig> jwtOptions, IEmailService emailService)
+        public AuthService(SormsDbContext context, IOptions<JwtConfig> jwtOptions, IEmailService emailService, IConfiguration configuration, ILogger<AuthService>logger)
         {
             _context = context;
             _jwtConfig = jwtOptions.Value;
             _emailService = emailService;
+            _configuration = configuration;
+            _logger = logger;
+
         }
 
         public async Task<string> LoginAsync(LoginDto loginDto)
         {
-            var user = await _context.Users
-                .Include(u => u.Role)
-                .FirstOrDefaultAsync(u => u.Email == loginDto.Username);
+                var user = await _context.Users
+               .Include(u => u.Role)
+               .FirstOrDefaultAsync(u => u.Email == loginDto.Email);
 
             if (user == null || !VerifyPassword(loginDto.Password, user.PasswordHash))
                 return null;
@@ -83,7 +90,8 @@ namespace SORMS.API.Services
         public async Task<bool> SendOtpAsync(string email)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-            if (user == null) return false;
+            if (user == null) return false
+            ;
 
             var otp = new Random().Next(100000, 999999).ToString(); // 6 digits
             user.ResetOtp = otp;
@@ -128,28 +136,68 @@ namespace SORMS.API.Services
 
         // =================== JWT & Helpers ===================
 
-        private string GenerateJwtToken(User user)
+        public string GenerateJwtToken(User user)
         {
-            var claims = new[]
+            try
             {
-        new Claim(ClaimTypes.Name, user.Username),
-        new Claim(ClaimTypes.Role, user.Role.Name),
-        new Claim("UserId", user.Id.ToString())
-    };
+                // 1. Lấy secret key từ appsettings.json
+                var key = _configuration["Jwt:Key"];
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfig.Key));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+                if (string.IsNullOrEmpty(key) || key.Length < 32)
+                {
+                    throw new InvalidOperationException(
+                        "JWT Key must be configured in appsettings.json and be at least 32 characters long");
+                }
 
-            var token = new JwtSecurityToken(
-                issuer: _jwtConfig.Issuer,
-                audience: _jwtConfig.Audience,
-                claims: claims,
-                expires: DateTime.UtcNow.AddHours(_jwtConfig.ExpireHours),
-                signingCredentials: creds
-            );
+                // 2. Chuyển string key thành byte array
+                var keyBytes = Encoding.UTF8.GetBytes(key);
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+                // 3. Tạo security key
+                var securityKey = new SymmetricSecurityKey(keyBytes);
+
+                // 4. Tạo signing credentials (chữ ký token)
+                var credentials = new SigningCredentials(
+                    securityKey,
+                    SecurityAlgorithms.HmacSha256);
+
+                // 5. Tạo Claims (thông tin người dùng được lưu trong token)
+                var claims = new List<Claim>
+                {
+                    new Claim("sub", user.Id.ToString()),              // Subject (ID người dùng)
+                    new Claim("username", user.Username),              // Tên người dùng
+                    new Claim("email", user.Email),                    // Email
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())  // NameId
+                };
+
+                // 6. Đọc thông tin JWT từ appsettings.json
+                var issuer = _configuration["Jwt:Issuer"] ?? "ECommerceAPI";
+                var audience = _configuration["Jwt:Audience"] ?? "ECommerceClients";
+                var expiryMinutes = int.Parse(_configuration["Jwt:ExpiryMinutes"] ?? "1440");
+
+                // 7. Tạo JWT Token
+                var token = new JwtSecurityToken(
+                    issuer: issuer,                                    // Người phát hành token
+                    audience: audience,                                // Đối tượng sử dụng token
+                    claims: claims,                                    // Dữ liệu trong token
+                    expires: DateTime.UtcNow.AddMinutes(expiryMinutes),// Thời gian hết hạn
+                    signingCredentials: credentials                    // Chữ ký
+                );
+
+                // 8. Chuyển token thành string
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var tokenString = tokenHandler.WriteToken(token);
+
+                _logger.LogInformation($"Token generated for user: {user.Username}");
+
+                return tokenString;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error generating token: {ex.Message}");
+                throw;
+            }
         }
+
 
         private string HashPassword(string password)
         {

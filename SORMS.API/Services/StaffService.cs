@@ -1,0 +1,85 @@
+﻿using Microsoft.EntityFrameworkCore;
+using SORMS.API.Data;
+using SORMS.API.DTOs;
+using SORMS.API.Interfaces;
+using SORMS.API.Models;
+
+namespace SORMS.API.Services
+{
+    public class StaffService : IStaffService
+    {
+        private readonly SormsDbContext _context;
+
+        public StaffService(SormsDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<IEnumerable<StaffDto>> GetAllStaffAsync()
+        {
+            return await _context.Staffs
+                .Select(s => new StaffDto
+                {
+                    Id = s.Id,
+                    FullName = s.FullName,
+                    Email = s.Email,
+                    Phone = s.Phone
+                })
+                .ToListAsync();
+        }
+
+        public async Task<StaffDto> GetStaffByIdAsync(int id)
+        {
+            var staff = await _context.Staffs.FindAsync(id);
+            if (staff == null) return null;
+
+            return new StaffDto
+            {
+                Id = staff.Id,
+                FullName = staff.FullName,
+                Email = staff.Email,
+                Phone = staff.Phone
+            };
+        }
+
+        public async Task<StaffDto> CreateStaffAsync(StaffDto staffDto)
+        {
+            var staff = new Staff
+            {
+                FullName = staffDto.FullName,
+                Email = staffDto.Email,
+                Phone = staffDto.Phone
+            };
+
+            _context.Staffs.Add(staff);
+            await _context.SaveChangesAsync();
+
+            staffDto.Id = staff.Id;
+            return staffDto;
+        }
+
+        public async Task<bool> UpdateStaffAsync(int id, StaffDto staffDto)
+        {
+            var staff = await _context.Staffs.FindAsync(id);
+            if (staff == null) return false;
+
+            staff.FullName = staffDto.FullName;
+            staff.Email = staffDto.Email;
+            staff.Phone = staffDto.Phone;
+
+            _context.Staffs.Update(staff);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteStaffAsync(int id)
+        {
+            var staff = await _context.Staffs.FindAsync(id);
+            if (staff == null) return false;
+
+            _context.Staffs.Remove(staff);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+    }
+}
