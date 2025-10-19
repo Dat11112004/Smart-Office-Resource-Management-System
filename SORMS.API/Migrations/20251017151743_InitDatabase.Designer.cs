@@ -12,7 +12,7 @@ using SORMS.API.Data;
 namespace SORMS.API.Migrations
 {
     [DbContext(typeof(SormsDbContext))]
-    [Migration("20251012084914_InitDatabase")]
+    [Migration("20251017151743_InitDatabase")]
     partial class InitDatabase
     {
         /// <inheritdoc />

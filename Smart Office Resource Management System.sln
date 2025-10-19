@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36301.6 d17.14
+VisualStudioVersion = 17.14.36301.6
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SORMS.API", "SORMS.API\SORMS.API.csproj", "{C2CDF6A6-0B7C-42BE-AF30-B2FCC5B4CA2E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SORMS.FE", "SORMS.FE\SORMS.FE.csproj", "{70320A8F-E820-49A1-827E-206FC7998DB3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{C2CDF6A6-0B7C-42BE-AF30-B2FCC5B4CA2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C2CDF6A6-0B7C-42BE-AF30-B2FCC5B4CA2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C2CDF6A6-0B7C-42BE-AF30-B2FCC5B4CA2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70320A8F-E820-49A1-827E-206FC7998DB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70320A8F-E820-49A1-827E-206FC7998DB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70320A8F-E820-49A1-827E-206FC7998DB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70320A8F-E820-49A1-827E-206FC7998DB3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
