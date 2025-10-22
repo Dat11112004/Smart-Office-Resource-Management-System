@@ -33,7 +33,7 @@ namespace SORMS.API.Controllers
         }
 
         /// <summary>
-        /// Đăng ký tài khoản mới
+        /// Đăng ký tài khoản mới và nhận JWT token
         /// </summary>
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
@@ -41,11 +41,14 @@ namespace SORMS.API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var success = await _authService.RegisterAsync(registerDto);
-            if (!success)
+            var token = await _authService.RegisterAsync(registerDto);
+            if (token == null)
                 return Conflict("Tên hoặc Email đăng nhập đã tồn tại.");
 
-            return Ok("Đăng ký thành công.");
+            return Ok(new { 
+                Message = "Đăng ký thành công.", 
+                Token = token 
+            });
         }
 
         /// <summary>

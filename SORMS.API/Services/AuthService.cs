@@ -45,13 +45,13 @@ namespace SORMS.API.Services
             return token;
         }
 
-        public async Task<bool> RegisterAsync(RegisterDto registerDto)
+        public async Task<string> RegisterAsync(RegisterDto registerDto)
         {
             var existingUser = await _context.Users
                 .AnyAsync(u => u.Username == registerDto.Username || u.Email ==registerDto.Email);
 
             if (existingUser)
-                return false;
+                return null;
 
             var user = new User
             {
@@ -64,7 +64,10 @@ namespace SORMS.API.Services
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
-            return true;
+
+            // Tự động tạo token sau khi đăng ký thành công
+            var token = GenerateJwtToken(user);
+            return token;
         }
 
         public async Task<UserDto> GetUserByUsernameAsync(string username)
