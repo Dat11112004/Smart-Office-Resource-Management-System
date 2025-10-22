@@ -1,5 +1,5 @@
 ﻿@page
-@model 
+@model SORMS.FE.Pages.Auth.LoginModel
 @{
     ViewData["Title"] = "Đăng nhập";
 }
@@ -18,7 +18,7 @@
     <button type="submit">Đăng nhập</button>
 </form>
 
-@if (Model.Message != null)
+@if (!string.IsNullOrEmpty(Model.Message))
 {
     <p>@Model.Message</p>
 }

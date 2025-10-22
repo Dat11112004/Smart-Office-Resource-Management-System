@@ -1,6 +1,56 @@
-﻿namespace SORMS.FE.Pages.Auth
+﻿@page
+@model SORMS.FE.Pages.Auth.RegisterModel
+@{
+    ViewData["Title"] = "Đăng ký";
+}
+
+<h2>Đăng ký</h2>
+
+@if (Model.IsSuccess)
 {
-    public class Register
-    {
-    }
+    <div class="alert alert-success">
+        <h4>@Model.Message</h4>
+        <p>Token đã được tạo và lưu vào session. Bạn đã được đăng nhập tự động!</p>
+        @if (!string.IsNullOrEmpty(Model.Token))
+        {
+            <details>
+                <summary>Xem Token (chỉ để debug)</summary>
+                <small class="text-muted">@Model.Token</small>
+            </details>
+        }
+    </div>
+}
+else
+{
+    <form method="post">
+        <div class="mb-3">
+            <label asp-for="RegisterDto.Email" class="form-label">Email:</label>
+            <input asp-for="RegisterDto.Email" type="email" class="form-control" />
+            <span asp-validation-for="RegisterDto.Email" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="RegisterDto.Username" class="form-label">Tên người dùng:</label>
+            <input asp-for="RegisterDto.Username" class="form-control" />
+            <span asp-validation-for="RegisterDto.Username" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="RegisterDto.Password" class="form-label">Mật khẩu:</label>
+            <input asp-for="RegisterDto.Password" type="password" class="form-control" />
+            <span asp-validation-for="RegisterDto.Password" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="RegisterDto.RoleId" class="form-label">Role ID:</label>
+            <input asp-for="RegisterDto.RoleId" type="number" class="form-control" />
+            <span asp-validation-for="RegisterDto.RoleId" class="text-danger"></span>
+            <small class="form-text text-muted">1 = Admin, 2 = Staff, 3 = Resident</small>
+        </div>
+        <button type="submit" class="btn btn-primary">Đăng ký và nhận Token</button>
+    </form>
+}
+
+@if (!string.IsNullOrEmpty(Model.Message) && !Model.IsSuccess)
+{
+    <div class="alert alert-danger mt-3">
+        <p>@Model.Message</p>
+    </div>
 }
