@@ -1,0 +1,79 @@
+﻿@{
+    ViewData["Title"] = "Danh sách phòng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>Danh sách phòng</h3>
+        <div>
+            <a href="/Room/Create" class="btn btn-primary">+ Thêm phòng</a>
+            <a href="/Room/Available" class="btn btn-success ms-2">Phòng trống</a>
+        </div>
+    </div>
+
+    <table class="table table-striped" id="roomsTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tên phòng</th>
+                <th>Loại</th>
+                <th>Giá (VNĐ)</th>
+                <th>Trạng thái</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        async function loadRooms() {
+            const token = localStorage.getItem("token");
+            const res = await fetch('/api/Room', {
+                headers: { "Authorization": "Bearer " + token }
+            });
+            if (!res.ok) {
+                alert('Không thể tải danh sách phòng.');
+                return;
+            }
+            const rooms = await res.json();
+            const tbody = document.querySelector('#roomsTable tbody');
+            tbody.innerHTML = '';
+            rooms.forEach(r => {
+                tbody.insertAdjacentHTML('beforeend', `
+                    <tr>
+                        <td>${r.id}</td>
+                        <td>${r.name ?? ''}</td>
+                        <td>${r.type ?? ''}</td>
+                        <td>${r.price != null ? Number(r.price).toLocaleString() : '—'}</td>
+                        <td>${r.isAvailable ? '<span class="badge bg-success">Còn trống</span>' : '<span class="badge bg-danger">Đã thuê</span>'}</td>
+                        <td>
+                            <a href="/Room/Details/${r.id}" class="btn btn-sm btn-info">Xem</a>
+                            <a href="/Room/Edit/${r.id}" class="btn btn-sm btn-warning">Sửa</a>
+                            <button class="btn btn-sm btn-danger" onclick="deleteRoom(${r.id})">Xóa</button>
+                        </td>
+                    </tr>
+                `);
+            });
+        }
+
+        async function deleteRoom(id) {
+            if (!confirm('Bạn có chắc muốn xóa phòng này?')) return;
+            const token = localStorage.getItem("token");
+            const res = await fetch(`/api/Room/${id}`, {
+                method: 'DELETE',
+                headers: { "Authorization": "Bearer " + token }
+            });
+            if (res.ok) {
+                alert('Xóa phòng thành công.');
+                loadRooms();
+            } else {
+                const text = await res.text();
+                alert('Không thể xóa phòng: ' + (text || res.statusText));
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadRooms);
+    </script>
+}

@@ -1,26 +1,43 @@
-﻿//namespace SORMS.API.Middleware
-//{
-//    public class JwtMiddleware
-//    {
-//        private readonly RequestDelegate _next;
+﻿using Microsoft.AspNetCore.Http;
+using SORMS.API.Interfaces;
+using System.Linq;
+using System.Threading.Tasks;
 
-//        public JwtMiddleware(RequestDelegate next)
-//        {
-//            _next = next;
-//        }
+namespace SORMS.API.Middleware
+{
+    public class JwtMiddleware
+    {
+        private readonly RequestDelegate _next;
 
-//        public async Task Invoke(HttpContext context, IJwtService jwtService)
-//        {
-//            var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+        public JwtMiddleware(RequestDelegate next)
+        {
+            _next = next;
+        }
 
-//            if (token != null && jwtService.ValidateToken(token, out var userId))
-//            {
-//                // Gán thông tin người dùng vào context nếu cần
-//                context.Items["UserId"] = userId;
-//            }
+        public async Task Invoke(HttpContext context, IJwtService jwtService)
+        {
+            // Lấy token từ Header Authorization
+            var token = context.Request.Headers["Authorization"]
+                .FirstOrDefault()?.Split(" ").Last();
 
-//            await _next(context);
-//        }
-//    }
+            if (!string.IsNullOrEmpty(token))
+            {
+                try
+                {
+                    // Validate token → nếu hợp lệ thì gán UserId vào context
+                    if (jwtService.ValidateToken(token, out var userId))
+                    {
+                        // Lưu thông tin user vào HttpContext để controller hoặc service khác có thể dùng
+                        context.Items["UserId"] = userId;
+                    }
+                }
+                catch
+                {
+                    // Nếu token lỗi hoặc hết hạn, middleware không chặn — để controller xử lý Unauthorized
+                }
+            }
 
-//}
+            await _next(context);
+        }
+    }
+}

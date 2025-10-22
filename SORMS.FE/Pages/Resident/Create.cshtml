@@ -1,0 +1,53 @@
+﻿@{
+    ViewData["Title"] = "Thêm cư dân";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4" style="max-width: 600px;">
+    <h3 class="mb-4 text-center">Thêm cư dân mới</h3>
+    <form id="createForm">
+        <div class="mb-3">
+            <label>Họ và tên</label>
+            <input type="text" id="fullName" class="form-control" required />
+        </div>
+        <div class="mb-3">
+            <label>Email</label>
+            <input type="email" id="email" class="form-control" required />
+        </div>
+        <div class="mb-3">
+            <label>Số điện thoại</label>
+            <input type="text" id="phone" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label>Mã phòng (Room ID)</label>
+            <input type="number" id="roomId" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-success w-100">Tạo mới</button>
+        <a href="/Resident/Index" class="btn btn-secondary w-100 mt-2">Quay lại</a>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById("createForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const res = await fetch("/api/Resident", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + localStorage.getItem("token")
+                },
+                body: JSON.stringify({
+                    fullName: fullName.value,
+                    email: email.value,
+                    phone: phone.value,
+                    roomId: parseInt(roomId.value)
+                })
+            });
+            if (res.ok) {
+                alert("Thêm cư dân thành công!");
+                window.location.href = "/Resident/Index";
+            } else alert("Không thể tạo cư dân!");
+        });
+    </script>
+}

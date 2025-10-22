@@ -1,0 +1,83 @@
+﻿@{
+    ViewData["Title"] = "Sửa phòng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var id = Context.Request.RouteValues["id"];
+}
+<div class="container mt-4" style="max-width:720px;">
+    <h3>Chỉnh sửa phòng</h3>
+    <form id="editForm" class="mt-3">
+        <input type="hidden" id="roomId" value="@id" />
+        <div class="mb-3">
+            <label class="form-label">Tên phòng</label>
+            <input id="name" class="form-control" required />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Loại</label>
+            <input id="type" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Giá (VNĐ)</label>
+            <input id="price" type="number" class="form-control" min="0" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Trạng thái</label>
+            <select id="isAvailable" class="form-select">
+                <option value="true">Còn trống</option>
+                <option value="false">Đã thuê</option>
+            </select>
+        </div>
+        <button class="btn btn-warning" type="submit">Lưu thay đổi</button>
+        <a href="/Room/Index" class="btn btn-secondary ms-2">Hủy</a>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        const roomId = "@id";
+
+        async function loadRoom() {
+            const token = localStorage.getItem("token");
+            const res = await fetch(`/api/Room/${roomId}`, {
+                headers: { "Authorization": "Bearer " + token }
+            });
+            if (!res.ok) {
+                alert('Không lấy được thông tin phòng.');
+                return;
+            }
+            const r = await res.json();
+            document.getElementById('name').value = r.name ?? '';
+            document.getElementById('type').value = r.type ?? '';
+            document.getElementById('price').value = r.price ?? '';
+            document.getElementById('isAvailable').value = (r.isAvailable === true).toString();
+        }
+
+        document.getElementById('editForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = localStorage.getItem("token");
+            const payload = {
+                id: Number(roomId),
+                name: document.getElementById('name').value.trim(),
+                type: document.getElementById('type').value.trim(),
+                price: document.getElementById('price').value ? Number(document.getElementById('price').value) : null,
+                isAvailable: document.getElementById('isAvailable').value === 'true'
+            };
+            const res = await fetch(`/api/Room/${roomId}`, {
+                method: 'PUT',
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
+                },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                alert('Cập nhật thành công.');
+                window.location.href = '/Room/Index';
+            } else {
+                const t = await res.text();
+                alert('Lỗi: ' + (t || res.statusText));
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', loadRoom);
+    </script>
+}

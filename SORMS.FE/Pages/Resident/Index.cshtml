@@ -1,0 +1,67 @@
+﻿@{
+    ViewData["Title"] = "Danh sách cư dân";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>Danh sách cư dân</h3>
+        <a href="/Resident/Create" class="btn btn-primary">+ Thêm cư dân</a>
+    </div>
+
+    <table class="table table-striped" id="residentTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Họ và tên</th>
+                <th>Email</th>
+                <th>Phòng</th>
+                <th>SĐT</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        async function loadResidents() {
+            const res = await fetch("/api/Resident", {
+                headers: { "Authorization": "Bearer " + localStorage.getItem("token") }
+            });
+            const data = await res.json();
+            const tbody = document.querySelector("#residentTable tbody");
+            tbody.innerHTML = "";
+            data.forEach(r => {
+                tbody.innerHTML += `
+                <tr>
+                    <td>${r.id}</td>
+                    <td>${r.fullName}</td>
+                    <td>${r.email}</td>
+                    <td>${r.roomNumber ?? '—'}</td>
+                    <td>${r.phone ?? '—'}</td>
+                    <td>
+                        <a href="/Resident/Details/${r.id}" class="btn btn-sm btn-info">Xem</a>
+                        <a href="/Resident/Edit/${r.id}" class="btn btn-sm btn-warning">Sửa</a>
+                        <button class="btn btn-sm btn-danger" onclick="deleteResident(${r.id})">Xóa</button>
+                    </td>
+                </tr>`;
+            });
+        }
+
+        async function deleteResident(id) {
+            if (!confirm("Bạn có chắc muốn xóa cư dân này không?")) return;
+            const res = await fetch(`/api/Resident/${id}`, {
+                method: "DELETE",
+                headers: { "Authorization": "Bearer " + localStorage.getItem("token") }
+            });
+            if (res.ok) {
+                alert("Xóa thành công!");
+                loadResidents();
+            } else alert("Không thể xóa cư dân!");
+        }
+
+        loadResidents();
+    </script>
+}

@@ -10,6 +10,7 @@ using SORMS.API.Data;
 using SORMS.API.DTOs;
 using SORMS.API.Interfaces;
 using SORMS.API.Models;
+using static Org.BouncyCastle.Math.EC.ECCurve;
 
 namespace SORMS.API.Services
 {
@@ -143,54 +144,57 @@ namespace SORMS.API.Services
         {
             try
             {
-                // 1. Lấy secret key từ appsettings.json
-                var key = _configuration["Jwt:Key"];
+                // 1️⃣ Xác định vai trò dựa trên RoleId
+                string roleName = user.RoleId switch
+                {
+                    1 => "Admin",
+                    2 => "Staff",
+                    3 => "Resident",
+                    _ => "Resident" // mặc định nếu có lỗi hoặc null
+                };
 
+                // 2️⃣ Lấy secret key từ appsettings.json
+                var key = _configuration["Jwt:Key"];
                 if (string.IsNullOrEmpty(key) || key.Length < 32)
                 {
                     throw new InvalidOperationException(
                         "JWT Key must be configured in appsettings.json and be at least 32 characters long");
                 }
 
-                // 2. Chuyển string key thành byte array
                 var keyBytes = Encoding.UTF8.GetBytes(key);
-
-                // 3. Tạo security key
                 var securityKey = new SymmetricSecurityKey(keyBytes);
+                var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-                // 4. Tạo signing credentials (chữ ký token)
-                var credentials = new SigningCredentials(
-                    securityKey,
-                    SecurityAlgorithms.HmacSha256);
-
-                // 5. Tạo Claims (thông tin người dùng được lưu trong token)
                 var claims = new List<Claim>
-                {
-                    new Claim("sub", user.Id.ToString()),              // Subject (ID người dùng)
-                    new Claim("username", user.Username),              // Tên người dùng
-                    new Claim("email", user.Email),                    // Email
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())  // NameId
-                };
+{
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),   // "sub"
+                    new Claim("username", user.Username),
+                    new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),     // name id
+                    new Claim(ClaimTypes.Role, roleName),                         // schema role
+                    new Claim("role", roleName)                                   // plain "role" for compatibility
+};
 
-                // 6. Đọc thông tin JWT từ appsettings.json
-                var issuer = _configuration["Jwt:Issuer"] ?? "ECommerceAPI";
-                var audience = _configuration["Jwt:Audience"] ?? "ECommerceClients";
+
+                // 4️⃣ Đọc config JWT
+                var issuer = _configuration["Jwt:Issuer"] ?? "SORMS.API";
+                var audience = _configuration["Jwt:Audience"] ?? "SORMS.Client";
                 var expiryMinutes = int.Parse(_configuration["Jwt:ExpiryMinutes"] ?? "1440");
 
-                // 7. Tạo JWT Token
+                // 5️⃣ Sinh JWT token
                 var token = new JwtSecurityToken(
-                    issuer: issuer,                                    // Người phát hành token
-                    audience: audience,                                // Đối tượng sử dụng token
-                    claims: claims,                                    // Dữ liệu trong token
-                    expires: DateTime.UtcNow.AddMinutes(expiryMinutes),// Thời gian hết hạn
-                    signingCredentials: credentials                    // Chữ ký
+                    issuer: issuer,
+                    audience: audience,
+                    claims: claims,
+                    expires: DateTime.UtcNow.AddMinutes(expiryMinutes),
+                    signingCredentials: credentials
                 );
 
-                // 8. Chuyển token thành string
+                // 6️⃣ Chuyển token thành chuỗi
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var tokenString = tokenHandler.WriteToken(token);
 
-                _logger.LogInformation($"Token generated for user: {user.Username}");
+                _logger.LogInformation($"Token generated for user: {user.Username} with role {roleName}");
 
                 return tokenString;
             }
@@ -200,6 +204,32 @@ namespace SORMS.API.Services
                 throw;
             }
         }
+
+
+        //private string GenerateJwtToken(User user)
+        //{
+        //    var jwtSettings = _configuration.GetSection("JwtSettings");
+        //    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]));
+        //    var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        //    var claims = new[]
+        //    {
+        //        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString(), ClaimValueTypes.Integer64),
+        //        new Claim(JwtRegisteredClaimNames.Email, user.Email),
+        //        new Claim(ClaimTypes.Role, user.RoleId.ToString())
+
+
+        //    };
+
+        //    var token = new JwtSecurityToken(
+        //        issuer: jwtSettings["Issuer"],
+        //        audience: jwtSettings["Audience"],
+        //        claims: claims,
+        //        expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(jwtSettings["ExpireMinutes"])),
+        //        signingCredentials: creds
+        //    );
+
+        //    return new JwtSecurityTokenHandler().WriteToken(token);
+        //}
 
 
         private string HashPassword(string password)

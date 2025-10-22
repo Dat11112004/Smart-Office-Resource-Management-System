@@ -5,7 +5,7 @@ using SORMS.API.Interfaces;
 
 namespace SORMS.API.Controllers
 {
-    [Authorize (Roles = "1,2,3")]
+    [Authorize(Roles = "Admin,Staff")]
     [ApiController]
     [Route("api/[controller]")]
     public class StaffController : ControllerBase

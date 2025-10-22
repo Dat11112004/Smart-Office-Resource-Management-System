@@ -1,0 +1,57 @@
+﻿@{
+    ViewData["Title"] = "Phòng trống";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>Danh sách phòng trống</h3>
+        <a href="/Room/Index" class="btn btn-secondary">Quay lại</a>
+    </div>
+
+    <table class="table table-hover" id="availableTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tên phòng</th>
+                <th>Loại</th>
+                <th>Giá (VNĐ)</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        async function loadAvailable() {
+            const token = localStorage.getItem("token");
+            const res = await fetch('/api/Room/available', {
+                headers: { "Authorization": "Bearer " + token }
+            });
+            if (!res.ok) {
+                alert('Không thể tải phòng trống.');
+                return;
+            }
+            const rooms = await res.json();
+            const tbody = document.querySelector('#availableTable tbody');
+            tbody.innerHTML = '';
+            rooms.forEach(r => {
+                tbody.insertAdjacentHTML('beforeend', `
+                    <tr>
+                        <td>${r.id}</td>
+                        <td>${r.name ?? ''}</td>
+                        <td>${r.type ?? ''}</td>
+                        <td>${r.price != null ? Number(r.price).toLocaleString() : '—'}</td>
+                        <td>
+                            <a href="/Room/Details/${r.id}" class="btn btn-sm btn-info">Xem</a>
+                            <a href="/Room/Edit/${r.id}" class="btn btn-sm btn-warning">Sửa</a>
+                        </td>
+                    </tr>
+                `);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', loadAvailable);
+    </script>
+}

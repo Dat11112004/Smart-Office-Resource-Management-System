@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SORMS.API.DTOs;
 using SORMS.API.Interfaces;
 
 namespace SORMS.API.Controllers
 {
+    [Authorize(Roles = "Admin,Staff,Resident")]
     [ApiController]
     [Route("api/[controller]")]
     public class RoomController : ControllerBase
