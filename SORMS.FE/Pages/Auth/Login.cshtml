@@ -1,4 +1,6 @@
-﻿@{
+﻿@page
+@model SORMS.FE.Pages.Auth.LoginModel
+@{
     ViewData["Title"] = "Đăng nhập";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -27,24 +29,7 @@
     </div>
 </div>
 
-@section Scripts {
-    <script>
-        document.getElementById("loginForm").addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const res = await fetch("/api/Auth/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    email: email.value,
-                    password: password.value
-                })
-            });
-            const data = await res.json();
-            if (res.ok) {
-                alert("Đăng nhập thành công!");
-                localStorage.setItem("token", data.token);
-                window.location.href = "/";
-            } else alert(data || "Sai email hoặc mật khẩu!");
-        });
-    </script>
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <p>@Model.Message</p>
 }
