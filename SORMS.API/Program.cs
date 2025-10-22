@@ -1,4 +1,5 @@
-﻿    using System.Text;
+﻿using System.Security.Claims;
+using System.Text;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.IdentityModel.Tokens;
@@ -39,7 +40,7 @@
     // ========== 4. JWT AUTHENTICATION ==========
     var jwtIssuer = configuration["Jwt:Issuer"];
     var jwtAudience = configuration["Jwt:Audience"];
-    var jwtKey = builder.Configuration["JwtConfig:Secret"];
+    var jwtKey = builder.Configuration["JwtConfig:key"];
 
     if (string.IsNullOrEmpty(jwtKey) || jwtKey.Length < 32)
     {
@@ -54,47 +55,52 @@
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     })
-    .AddJwtBearer(options =>
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false; // Set to true in production
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        options.RequireHttpsMetadata = false; // Set to true in production
-        options.SaveToken = true;
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(key),
-            ValidateIssuer = true,
-            ValidIssuer = jwtIssuer,
-            ValidateAudience = true,
-            ValidAudience = jwtAudience,
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero
-        };
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = true,
+        ValidIssuer = jwtIssuer,
+        ValidateAudience = true,
+        ValidAudience = jwtAudience,
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero,
 
-        // Event handlers
-        options.Events = new JwtBearerEvents
-        {
-            OnTokenValidated = context =>
-            {
-                Log.Information("Token validated for user: {user}",
-                    context.Principal?.Identity?.Name);
-                return Task.CompletedTask;
-            },
-            OnAuthenticationFailed = context =>
-            {
-                Log.Warning("Authentication failed: {exception}",
-                    context.Exception?.Message);
-                return Task.CompletedTask;
-            },
-            OnChallenge = context =>
-            {
-                Log.Warning("Challenge issued");
-                return Task.CompletedTask;
-            }
-        };
-    });
+        // ---- Thêm 2 dòng sau để ASP.NET đọc role/name đúng ----
+        RoleClaimType = ClaimTypes.Role,
+        NameClaimType = ClaimTypes.NameIdentifier
+    };
 
-    // 5. Cấu hình Swagger có bảo mật
-    builder.Services.AddEndpointsApiExplorer();
+    // Event handlers (giữ nguyên, có thể bổ sung logging claims để debug)
+    options.Events = new JwtBearerEvents
+    {
+        OnTokenValidated = context =>
+        {
+            // Log tất cả claim (hữu ích khi debug)
+            var claims = string.Join(", ", context.Principal?.Claims.Select(c => $"{c.Type}:{c.Value}") ?? Array.Empty<string>());
+            Log.Information("Token validated for user: {user}. Claims: {claims}",
+                context.Principal?.Identity?.Name, claims);
+            return Task.CompletedTask;
+        },
+        OnAuthenticationFailed = context =>
+        {
+            Log.Warning("Authentication failed: {exception}", context.Exception?.Message);
+            return Task.CompletedTask;
+        },
+        OnChallenge = context =>
+        {
+            Log.Warning("Challenge issued");
+            return Task.CompletedTask;
+        }
+    };
+});
+
+// 5. Cấu hình Swagger có bảo mật
+builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen(c =>
     {
         c.SwaggerDoc("v1", new OpenApiInfo { Title = "SORMS API", Version = "v1" });

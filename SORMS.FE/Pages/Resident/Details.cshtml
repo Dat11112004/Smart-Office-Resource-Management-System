@@ -1,0 +1,36 @@
+﻿@{
+    ViewData["Title"] = "Chi tiết cư dân";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var id = Context.Request.RouteValues["id"];
+}
+
+<div class="container mt-4" style="max-width: 600px;">
+    <h3 class="mb-4 text-center">Thông tin cư dân</h3>
+    <div id="residentInfo" class="border rounded p-3 bg-light shadow-sm"></div>
+    <div class="mt-3 text-center">
+        <a href="/Resident/Edit/@id" class="btn btn-warning">Chỉnh sửa</a>
+        <a href="/Resident/Index" class="btn btn-secondary">Quay lại</a>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const id = "@id";
+        async function loadResident() {
+            const res = await fetch(`/api/Resident/${id}`, {
+                headers: { "Authorization": "Bearer " + localStorage.getItem("token") }
+            });
+            const r = await res.json();
+            const div = document.getElementById("residentInfo");
+            div.innerHTML = `
+                <p><b>ID:</b> ${r.id}</p>
+                <p><b>Họ và tên:</b> ${r.fullName}</p>
+                <p><b>Email:</b> ${r.email}</p>
+                <p><b>SĐT:</b> ${r.phone ?? '—'}</p>
+                <p><b>Phòng:</b> ${r.roomNumber ?? '—'}</p>
+                <p><b>Ngày tạo:</b> ${new Date(r.createdAt).toLocaleDateString() ?? '—'}</p>
+            `;
+        }
+        loadResident();
+    </script>
+}

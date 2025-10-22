@@ -1,0 +1,41 @@
+﻿@{
+    ViewData["Title"] = "Xác minh OTP";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var email = Context.Request.Query["email"];
+}
+
+<div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="card shadow-lg p-4" style="width: 400px;">
+        <h4 class="text-center mb-4">Xác minh OTP</h4>
+
+        <form id="otpForm">
+            <input type="hidden" id="email" value="@email" />
+            <div class="mb-3">
+                <label>Mã OTP</label>
+                <input type="text" id="otp" class="form-control" required />
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Xác minh</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById("otpForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const res = await fetch("/api/Auth/verify-otp", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    email: email.value,
+                    otp: otp.value
+                })
+            });
+            const msg = await res.text();
+            if (res.ok) {
+                alert("Xác minh OTP thành công!");
+                window.location.href = "/Auth/ResetPassword?email=" + email.value + "&otp=" + otp.value;
+            } else alert(msg);
+        });
+    </script>
+}
