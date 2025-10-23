@@ -9,7 +9,26 @@ namespace SORMS.FE
             // Add services to the container.
             builder.Services.AddRazorPages();
             
-            // Add HttpClient for API calls
+            // Add HttpClient for API calls với cấu hình đầy đủ
+            builder.Services.AddHttpClient("API", client =>
+            {
+                var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"] ?? "https://localhost:7001";
+                client.BaseAddress = new Uri(apiBaseUrl);
+                client.Timeout = TimeSpan.FromSeconds(30);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() =>
+            {
+                var handler = new HttpClientHandler();
+                if (builder.Environment.IsDevelopment())
+                {
+                    // Bỏ qua SSL certificate validation trong môi trường development
+                    handler.ServerCertificateCustomValidationCallback = 
+                        HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+                }
+                return handler;
+            });
+
+            // Đăng ký HttpClient mặc định (fallback)
             builder.Services.AddHttpClient();
             
             // Add Session support

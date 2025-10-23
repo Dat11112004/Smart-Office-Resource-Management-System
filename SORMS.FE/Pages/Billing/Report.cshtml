@@ -1,10 +1,10 @@
-﻿@model IEnumerable<SORMS.API.DTOs.BillingDto>
+﻿@page
+@model SORMS.FE.Pages.Billing.ReportModel
 @{
     ViewData["Title"] = "Báo cáo hóa đơn";
-    Layout = "~/Views/Shared/_Layout.cshtml";
 
-    var total = Model?.Sum(x => x.Amount) ?? 0;
-    var paid = Model?.Where(x => x.IsPaid).Sum(x => x.Amount) ?? 0;
+    var total = Model.Billings?.Sum(x => x.Amount) ?? 0;
+    var paid = Model.Billings?.Where(x => x.IsPaid).Sum(x => x.Amount) ?? 0;
     var unpaid = total - paid;
 }
 
@@ -42,15 +42,18 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var bill in Model)
+        @if (Model.Billings != null)
         {
-            <tr>
-                <td>@bill.Id</td>
-                <td>@bill.ResidentName</td>
-                <td>@bill.Amount.ToString("C")</td>
-                <td>@(bill.IsPaid ? "Đã thanh toán" : "Chưa thanh toán")</td>
-                <td>@bill.CreatedAt.ToString("dd/MM/yyyy")</td>
-            </tr>
+            @foreach (var bill in Model.Billings)
+            {
+                <tr>
+                    <td>@bill.Id</td>
+                    <td>@bill.ResidentName</td>
+                    <td>@bill.Amount.ToString("C")</td>
+                    <td>@(bill.IsPaid ? "Đã thanh toán" : "Chưa thanh toán")</td>
+                    <td>@bill.CreatedAt.ToString("dd/MM/yyyy")</td>
+                </tr>
+            }
         }
     </tbody>
 </table>
