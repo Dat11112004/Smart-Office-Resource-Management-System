@@ -1,0 +1,42 @@
+@model SORMS.FE.Models.UserInfo
+
+@if (Model.IsAuthenticated)
+{
+    <div class="user-info">
+        <div class="user-avatar">
+            <i class="fas fa-user-circle"></i>
+        </div>
+        <div class="user-details">
+            <span class="user-name">@Model.Username</span>
+            <span class="user-role">
+                @switch(Model.RoleId)
+                {
+                    case 1:
+                        @:Administrator
+                        break;
+                    case 2:
+                        @:Staff Member
+                        break;
+                    case 3:
+                        @:Resident
+                        break;
+                    default:
+                        @:User
+                        break;
+                }
+            </span>
+        </div>
+    </div>
+}
+else
+{
+    <div class="user-info">
+        <div class="user-avatar">
+            <i class="fas fa-user-circle"></i>
+        </div>
+        <div class="user-details">
+            <span class="user-name">Guest</span>
+            <span class="user-role">Not logged in</span>
+        </div>
+    </div>
+}
