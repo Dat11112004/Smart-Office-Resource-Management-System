@@ -1,0 +1,264 @@
+    @page
+@model SORMS.FE.Pages.IndexModel
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="dashboard-container">
+    <!-- Welcome Section -->
+    <div class="welcome-section mb-4">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="text-gradient mb-2">Chào mừng trở lại!</h1>
+                <p class="text-muted mb-0">Tổng quan hệ thống quản lý tài nguyên văn phòng thông minh</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <div class="date-time">
+                    <i class="fas fa-calendar-alt me-2"></i>
+                    <span id="currentDateTime"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-number">@Model.TotalResidents</div>
+                <div class="stat-label">Tổng số cư dân</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up me-1"></i>+12% so với tháng trước
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="stat-card success">
+                <div class="stat-icon">
+                    <i class="fas fa-door-open"></i>
+                </div>
+                <div class="stat-number">@Model.OccupiedRooms</div>
+                <div class="stat-label">Phòng đã thuê</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up me-1"></i>+8% so với tháng trước
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="stat-card warning">
+                <div class="stat-icon">
+                    <i class="fas fa-receipt"></i>
+                </div>
+                <div class="stat-number">@Model.PendingBills</div>
+                <div class="stat-label">Hóa đơn chờ xử lý</div>
+                <div class="stat-change negative">
+                    <i class="fas fa-arrow-down me-1"></i>-5% so với tháng trước
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="stat-card info">
+                <div class="stat-icon">
+                    <i class="fas fa-concierge-bell"></i>
+                </div>
+                <div class="stat-number">@Model.ActiveServices</div>
+                <div class="stat-label">Dịch vụ đang hoạt động</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up me-1"></i>+15% so với tháng trước
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts and Analytics -->
+    <div class="row mb-4">
+        <div class="col-xl-8 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Doanh thu theo tháng</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="revenueChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Tỷ lệ lấp đầy phòng</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="occupancyChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activities and Quick Actions -->
+    <div class="row">
+        <div class="col-xl-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Hoạt động gần đây</h5>
+                </div>
+                <div class="card-body">
+                    <div class="activity-list">
+                        @foreach (var activity in Model.RecentActivities)
+                        {
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="@activity.IconClass"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">@activity.Title</div>
+                                    <div class="activity-time">@activity.TimeAgo</div>
+                                </div>
+                                <div class="activity-status">
+                                    <span class="badge-status @activity.StatusClass">@activity.Status</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="/Activity" class="btn btn-outline-primary btn-sm">Xem tất cả</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Thao tác nhanh</h5>
+                </div>
+                <div class="card-body">
+                    <div class="quick-actions">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <a href="/Resident/Create" class="quick-action-btn">
+                                    <div class="quick-action-icon">
+                                        <i class="fas fa-user-plus"></i>
+                                    </div>
+                                    <div class="quick-action-text">Thêm cư dân</div>
+                                </a>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <a href="/Room/Create" class="quick-action-btn">
+                                    <div class="quick-action-icon">
+                                        <i class="fas fa-door-open"></i>
+                                    </div>
+                                    <div class="quick-action-text">Thêm phòng</div>
+                                </a>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <a href="/Billing/Create" class="quick-action-btn">
+                                    <div class="quick-action-icon">
+                                        <i class="fas fa-receipt"></i>
+                                    </div>
+                                    <div class="quick-action-text">Tạo hóa đơn</div>
+                                </a>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <a href="/ServiceRequest/Create" class="quick-action-btn">
+                                    <div class="quick-action-icon">
+                                        <i class="fas fa-concierge-bell"></i>
+                                    </div>
+                                    <div class="quick-action-text">Yêu cầu dịch vụ</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Status -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-server me-2"></i>Trạng thái hệ thống</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <div class="system-status">
+                                <div class="status-indicator active"></div>
+                                <div class="status-info">
+                                    <div class="status-title">Database</div>
+                                    <div class="status-desc">Hoạt động bình thường</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="system-status">
+                                <div class="status-indicator active"></div>
+                                <div class="status-info">
+                                    <div class="status-title">API Services</div>
+                                    <div class="status-desc">Tất cả dịch vụ hoạt động</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="system-status">
+                                <div class="status-indicator warning"></div>
+                                <div class="status-info">
+                                    <div class="status-title">Email Service</div>
+                                    <div class="status-desc">Có thể có độ trễ</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="system-status">
+                                <div class="status-indicator active"></div>
+                                <div class="status-info">
+                                    <div class="status-title">Backup</div>
+                                    <div class="status-desc">Sao lưu thành công</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Update current date and time
+        function updateDateTime() {
+            const now = new Date();
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            document.getElementById('currentDateTime').textContent = now.toLocaleDateString('vi-VN', options);
+        }
+        
+        // Update every minute
+        updateDateTime();
+        setInterval(updateDateTime, 60000);
+        
+        // Initialize charts when page loads
+        $(document).ready(function() {
+            initializeCharts();
+        });
+    </script>
+}
+
+
+

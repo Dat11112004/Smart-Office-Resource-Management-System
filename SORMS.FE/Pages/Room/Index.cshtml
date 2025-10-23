@@ -1,79 +1,338 @@
-﻿@{
-    ViewData["Title"] = "Danh sách phòng";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+﻿@page
+@model SORMS.FE.Pages.Room.IndexModel
+@{
+    ViewData["Title"] = "Quản lý Phòng";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
 }
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3>Danh sách phòng</h3>
-        <div>
-            <a href="/Room/Create" class="btn btn-primary">+ Thêm phòng</a>
-            <a href="/Room/Available" class="btn btn-success ms-2">Phòng trống</a>
+
+<div class="page-header mb-4">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1 class="text-gradient mb-2">
+                <i class="fas fa-door-open me-2"></i>
+                Quản lý Phòng
+            </h1>
+            <p class="text-muted mb-0">Danh sách và quản lý thông tin phòng trong hệ thống</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <div class="btn-group">
+                <a href="/Room/Create" class="btn btn-primary btn-modern">
+                    <i class="fas fa-plus me-2"></i>
+                    Thêm phòng mới
+                </a>
+                <a href="/Room/Available" class="btn btn-success btn-modern">
+                    <i class="fas fa-check-circle me-2"></i>
+                    Phòng trống
+                </a>
+            </div>
         </div>
     </div>
+</div>
 
-    <table class="table table-striped" id="roomsTable">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Tên phòng</th>
-                <th>Loại</th>
-                <th>Giá (VNĐ)</th>
-                <th>Trạng thái</th>
-                <th>Hành động</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-door-open"></i>
+            </div>
+            <div class="stat-number">@Model.TotalRooms</div>
+            <div class="stat-label">Tổng số phòng</div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="stat-card success">
+            <div class="stat-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-number">@Model.AvailableRooms</div>
+            <div class="stat-label">Phòng trống</div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="stat-card warning">
+            <div class="stat-icon">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="stat-number">@Model.OccupiedRooms</div>
+            <div class="stat-label">Phòng đã thuê</div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="stat-card info">
+            <div class="stat-icon">
+                <i class="fas fa-percentage"></i>
+            </div>
+            <div class="stat-number">@Model.OccupancyRate%</div>
+            <div class="stat-label">Tỷ lệ lấp đầy</div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters and Search -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" class="form-control" placeholder="Tìm kiếm theo số phòng..." id="searchInput">
+                </div>
+            </div>
+            <div class="col-md-2 mb-3">
+                <select class="form-control" id="statusFilter">
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="available">Trống</option>
+                    <option value="occupied">Đã thuê</option>
+                    <option value="maintenance">Bảo trì</option>
+                </select>
+            </div>
+            <div class="col-md-2 mb-3">
+                <select class="form-control" id="floorFilter">
+                    <option value="">Tất cả tầng</option>
+                    <option value="1">Tầng 1</option>
+                    <option value="2">Tầng 2</option>
+                    <option value="3">Tầng 3</option>
+                </select>
+            </div>
+            <div class="col-md-2 mb-3">
+                <select class="form-control" id="typeFilter">
+                    <option value="">Tất cả loại</option>
+                    <option value="standard">Tiêu chuẩn</option>
+                    <option value="deluxe">Deluxe</option>
+                    <option value="suite">Suite</option>
+                </select>
+            </div>
+            <div class="col-md-2 mb-3">
+                <select class="form-control" id="priceFilter">
+                    <option value="">Tất cả giá</option>
+                    <option value="low">Dưới 5M</option>
+                    <option value="medium">5M - 10M</option>
+                    <option value="high">Trên 10M</option>
+                </select>
+            </div>
+            <div class="col-md-1 mb-3">
+                <button class="btn btn-outline-secondary w-100" id="clearFilters">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Rooms Grid View -->
+<div class="row" id="roomsGrid">
+    @foreach (var room in Model.Rooms)
+    {
+        <div class="col-xl-3 col-lg-4 col-md-6 mb-4 room-card" 
+             data-room-number="@room.RoomNumber" 
+             data-status="@(room.IsAvailable ? "available" : "occupied")"
+             data-floor="@room.Floor"
+             data-type="@room.RoomType"
+             data-price="@room.MonthlyRent">
+            <div class="card room-card-item @(room.IsAvailable ? "available" : "occupied")">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">
+                        <i class="fas fa-door-open me-2"></i>
+                        Phòng @room.RoomNumber
+                    </h6>
+                    <span class="badge-status @(room.IsAvailable ? "active" : "inactive")">
+                        @(room.IsAvailable ? "Trống" : "Đã thuê")
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="room-info">
+                        <div class="info-item">
+                            <i class="fas fa-layer-group text-primary me-2"></i>
+                            <span>Tầng @room.Floor</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-tag text-success me-2"></i>
+                            <span>@room.RoomType</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-dollar-sign text-warning me-2"></i>
+                            <span>@room.MonthlyRent.ToString("N0") VNĐ/tháng</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-expand-arrows-alt text-info me-2"></i>
+                            <span>@room.Area m²</span>
+                        </div>
+                    </div>
+                    
+                    @if (!room.IsAvailable && !string.IsNullOrEmpty(room.CurrentResident))
+                    {
+                        <div class="current-resident mt-3">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-user text-muted me-2"></i>
+                                <div>
+                                    <div class="fw-bold">@room.CurrentResident</div>
+                                    <small class="text-muted">Cư dân hiện tại</small>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="card-footer">
+                    <div class="btn-group w-100" role="group">
+                        <a href="/Room/Details/@room.Id" class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="/Room/Edit/@room.Id" class="btn btn-outline-warning btn-sm">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        @if (room.IsAvailable)
+                        {
+                            <a href="/Resident/Create?roomId=@room.Id" class="btn btn-outline-success btn-sm">
+                                <i class="fas fa-user-plus"></i>
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="/Room/CheckOut/@room.Id" class="btn btn-outline-danger btn-sm">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Empty State -->
+<div class="text-center py-5" id="emptyState" style="display: none;">
+    <i class="fas fa-door-open text-muted" style="font-size: 4rem;"></i>
+    <h4 class="text-muted mt-3">Không tìm thấy phòng nào</h4>
+    <p class="text-muted">Hãy thử điều chỉnh bộ lọc hoặc tìm kiếm khác</p>
+    <button class="btn btn-outline-secondary" id="resetFilters">
+        <i class="fas fa-refresh me-2"></i>
+        Đặt lại bộ lọc
+    </button>
+</div>
+
+<!-- View Toggle -->
+<div class="view-toggle mb-3">
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-outline-primary active" id="gridView">
+            <i class="fas fa-th"></i>
+        </button>
+        <button type="button" class="btn btn-outline-primary" id="listView">
+            <i class="fas fa-list"></i>
+        </button>
+    </div>
 </div>
 
 @section Scripts {
     <script>
-        async function loadRooms() {
-            const token = localStorage.getItem("token");
-            const res = await fetch('/api/Room', {
-                headers: { "Authorization": "Bearer " + token }
+        $(document).ready(function() {
+            // Search functionality
+            $('#searchInput').on('keyup', function() {
+                const searchTerm = $(this).val().toLowerCase();
+                filterRooms();
             });
-            if (!res.ok) {
-                alert('Không thể tải danh sách phòng.');
-                return;
-            }
-            const rooms = await res.json();
-            const tbody = document.querySelector('#roomsTable tbody');
-            tbody.innerHTML = '';
-            rooms.forEach(r => {
-                tbody.insertAdjacentHTML('beforeend', `
-                    <tr>
-                        <td>${r.id}</td>
-                        <td>${r.name ?? ''}</td>
-                        <td>${r.type ?? ''}</td>
-                        <td>${r.price != null ? Number(r.price).toLocaleString() : '—'}</td>
-                        <td>${r.isAvailable ? '<span class="badge bg-success">Còn trống</span>' : '<span class="badge bg-danger">Đã thuê</span>'}</td>
-                        <td>
-                            <a href="/Room/Details/${r.id}" class="btn btn-sm btn-info">Xem</a>
-                            <a href="/Room/Edit/${r.id}" class="btn btn-sm btn-warning">Sửa</a>
-                            <button class="btn btn-sm btn-danger" onclick="deleteRoom(${r.id})">Xóa</button>
-                        </td>
-                    </tr>
-                `);
-            });
-        }
 
-        async function deleteRoom(id) {
-            if (!confirm('Bạn có chắc muốn xóa phòng này?')) return;
-            const token = localStorage.getItem("token");
-            const res = await fetch(`/api/Room/${id}`, {
-                method: 'DELETE',
-                headers: { "Authorization": "Bearer " + token }
+            // Filter functionality
+            $('#statusFilter, #floorFilter, #typeFilter, #priceFilter').on('change', function() {
+                filterRooms();
             });
-            if (res.ok) {
-                alert('Xóa phòng thành công.');
-                loadRooms();
-            } else {
-                const text = await res.text();
-                alert('Không thể xóa phòng: ' + (text || res.statusText));
-            }
-        }
 
-        document.addEventListener('DOMContentLoaded', loadRooms);
+            function filterRooms() {
+                const searchTerm = $('#searchInput').val().toLowerCase();
+                const statusFilter = $('#statusFilter').val();
+                const floorFilter = $('#floorFilter').val();
+                const typeFilter = $('#typeFilter').val();
+                const priceFilter = $('#priceFilter').val();
+                
+                let visibleCount = 0;
+                
+                $('.room-card').each(function() {
+                    let showCard = true;
+                    const $card = $(this);
+                    
+                    // Search filter
+                    if (searchTerm && !$card.data('room-number').toString().includes(searchTerm)) {
+                        showCard = false;
+                    }
+                    
+                    // Status filter
+                    if (statusFilter && $card.data('status') !== statusFilter) {
+                        showCard = false;
+                    }
+                    
+                    // Floor filter
+                    if (floorFilter && $card.data('floor').toString() !== floorFilter) {
+                        showCard = false;
+                    }
+                    
+                    // Type filter
+                    if (typeFilter && $card.data('type') !== typeFilter) {
+                        showCard = false;
+                    }
+                    
+                    // Price filter
+                    if (priceFilter && showCard) {
+                        const price = $card.data('price');
+                        switch(priceFilter) {
+                            case 'low':
+                                if (price >= 5000000) showCard = false;
+                                break;
+                            case 'medium':
+                                if (price < 5000000 || price > 10000000) showCard = false;
+                                break;
+                            case 'high':
+                                if (price <= 10000000) showCard = false;
+                                break;
+                        }
+                    }
+                    
+                    $card.toggle(showCard);
+                    if (showCard) visibleCount++;
+                });
+                
+                // Show/hide empty state
+                $('#emptyState').toggle(visibleCount === 0);
+            }
+
+            // Clear filters
+            $('#clearFilters').on('click', function() {
+                $('#searchInput').val('');
+                $('#statusFilter').val('');
+                $('#floorFilter').val('');
+                $('#typeFilter').val('');
+                $('#priceFilter').val('');
+                filterRooms();
+            });
+
+            // Reset filters
+            $('#resetFilters').on('click', function() {
+                $('#clearFilters').click();
+            });
+
+            // View toggle
+            $('#gridView').on('click', function() {
+                $(this).addClass('active');
+                $('#listView').removeClass('active');
+                $('#roomsGrid').removeClass('list-view').addClass('grid-view');
+            });
+
+            $('#listView').on('click', function() {
+                $(this).addClass('active');
+                $('#gridView').removeClass('active');
+                $('#roomsGrid').removeClass('grid-view').addClass('list-view');
+            });
+
+            // Room card hover effects
+            $('.room-card-item').hover(
+                function() {
+                    $(this).addClass('shadow-lg');
+                },
+                function() {
+                    $(this).removeClass('shadow-lg');
+                }
+            );
+        });
     </script>
 }

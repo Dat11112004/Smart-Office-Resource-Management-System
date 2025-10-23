@@ -1,26 +1,41 @@
-﻿@{
+﻿@page
+@model SORMS.FE.Pages.Billing.CreateModel
+@{
     ViewData["Title"] = "Tạo hóa đơn";
-    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h2 class="text-center mb-4">Tạo hóa đơn mới</h2>
 
 <div class="card shadow-sm p-4 mx-auto" style="max-width: 600px;">
-    @using (Html.BeginForm("Create", "Billing", FormMethod.Post))
-    {
+    <form method="post">
         <div class="form-group mb-3">
-            <label for="ResidentName">Tên cư dân</label>
-            @Html.TextBoxFor(m => m.ResidentName, new { @class = "form-control", placeholder = "Nhập tên cư dân" })
+            <label asp-for="BillingDto.ResidentId" class="form-label">ID Cư dân</label>
+            <input asp-for="BillingDto.ResidentId" class="form-control" placeholder="Nhập ID cư dân" />
+            <span asp-validation-for="BillingDto.ResidentId" class="text-danger"></span>
         </div>
 
         <div class="form-group mb-3">
-            <label for="Amount">Số tiền</label>
-            @Html.TextBoxFor(m => m.Amount, new { @class = "form-control", type = "number", step = "0.01", placeholder = "Nhập số tiền" })
+            <label asp-for="BillingDto.Amount" class="form-label">Số tiền</label>
+            <input asp-for="BillingDto.Amount" class="form-control" type="number" step="0.01" placeholder="Nhập số tiền" />
+            <span asp-validation-for="BillingDto.Amount" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="BillingDto.BillingDate" class="form-label">Ngày hóa đơn</label>
+            <input asp-for="BillingDto.BillingDate" class="form-control" type="date" />
+            <span asp-validation-for="BillingDto.BillingDate" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <div class="form-check">
+                <input asp-for="BillingDto.IsPaid" class="form-check-input" type="checkbox" />
+                <label asp-for="BillingDto.IsPaid" class="form-check-label">Đã thanh toán</label>
+            </div>
         </div>
 
         <div class="text-center mt-3">
             <button type="submit" class="btn btn-success px-4">Tạo mới</button>
-            <a asp-action="Index" class="btn btn-secondary px-4">Quay lại</a>
+            <a asp-page="Index" class="btn btn-secondary px-4">Quay lại</a>
         </div>
-    }
+    </form>
 </div>

@@ -2,9 +2,9 @@
 {
     public class RegisterDto
     {
-        public string Email { get; set; } // 🔹 thêm trường Email
-        public string Username { get; set; }
-        public string Password { get; set; }
+        public string Email { get; set; } = string.Empty;
+        public string Username { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
         public int RoleId { get; set; }
     }
 }
