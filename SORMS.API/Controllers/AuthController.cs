@@ -20,6 +20,7 @@ namespace SORMS.API.Controllers
         /// <summary>
         /// Đăng nhập và nhận JWT token
         /// </summary>
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
@@ -36,6 +37,7 @@ namespace SORMS.API.Controllers
         /// <summary>
         /// Đăng ký tài khoản mới và nhận JWT token
         /// </summary>
+        [AllowAnonymous]
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
@@ -70,6 +72,7 @@ namespace SORMS.API.Controllers
         /// <summary>
         /// Gửi OTP về email để reset mật khẩu
         /// </summary>
+        [AllowAnonymous]
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
         {
@@ -86,6 +89,7 @@ namespace SORMS.API.Controllers
         /// <summary>
         /// Xác minh OTP
         /// </summary>
+        [AllowAnonymous]
         [HttpPost("verify-otp")]
         public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpDto dto)
         {
@@ -102,6 +106,7 @@ namespace SORMS.API.Controllers
         /// <summary>
         /// Reset mật khẩu bằng OTP
         /// </summary>
+        [AllowAnonymous]
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
         {
