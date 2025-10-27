@@ -95,7 +95,13 @@
                     <option value="1">Tầng 1</option>
                     <option value="2">Tầng 2</option>
                     <option value="3">Tầng 3</option>
+                    <option value="4">Tầng 4</option>
+                    <option value="5">Tầng 5</option>
+                    <option value="custom">Tầng khác...</option>
                 </select>
+            </div>
+            <div class="col-md-1 mb-3" id="customFloorInput" style="display: none;">
+                <input type="number" class="form-control" id="customFloor" placeholder="Tầng" min="1" max="99">
             </div>
             <div class="col-md-2 mb-3">
                 <select class="form-control" id="typeFilter">
@@ -228,6 +234,22 @@
 @section Scripts {
     <script>
         $(document).ready(function() {
+            // Show/hide custom floor input
+            $('#floorFilter').on('change', function() {
+                if ($(this).val() === 'custom') {
+                    $('#customFloorInput').slideDown(200);
+                } else {
+                    $('#customFloorInput').slideUp(200);
+                    $('#customFloor').val('');
+                }
+                filterRooms();
+            });
+
+            // Custom floor input change
+            $('#customFloor').on('input', function() {
+                filterRooms();
+            });
+
             // Search functionality
             $('#searchInput').on('keyup', function() {
                 const searchTerm = $(this).val().toLowerCase();
@@ -242,9 +264,14 @@
             function filterRooms() {
                 const searchTerm = $('#searchInput').val().toLowerCase();
                 const statusFilter = $('#statusFilter').val();
-                const floorFilter = $('#floorFilter').val();
+                let floorFilter = $('#floorFilter').val();
                 const typeFilter = $('#typeFilter').val();
                 const priceFilter = $('#priceFilter').val();
+                
+                // Handle custom floor input
+                if (floorFilter === 'custom') {
+                    floorFilter = $('#customFloor').val();
+                }
                 
                 let visibleCount = 0;
                 
@@ -301,6 +328,8 @@
                 $('#searchInput').val('');
                 $('#statusFilter').val('');
                 $('#floorFilter').val('');
+                $('#customFloor').val('');
+                $('#customFloorInput').hide();
                 $('#typeFilter').val('');
                 $('#priceFilter').val('');
                 filterRooms();
