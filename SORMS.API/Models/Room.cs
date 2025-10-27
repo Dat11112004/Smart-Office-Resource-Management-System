@@ -11,18 +11,28 @@ namespace SORMS.API.Models
         public int Id { get; set; }
 
         [Required, MaxLength(20)]
-        public string RoomNumber { get; set; }
+        public string RoomNumber { get; set; } = string.Empty;
 
         [Required, MaxLength(30)]
-        public string Type { get; set; }
+        public string Type { get; set; } = string.Empty;
 
-        [Required]
+        public int Floor { get; set; }
+
+        public decimal MonthlyRent { get; set; }
+
+        public decimal Area { get; set; }
+
         public bool IsOccupied { get; set; }
 
-        // 1 Room - N Residents
-        public ICollection<Resident> Residents { get; set; } = new List<Resident>();
+        public bool IsAvailable { get; set; }
 
-        // 1 Room - N CheckInRecords
+        public string? Description { get; set; }
+
+        public string? CurrentResident { get; set; }
+
+        public bool IsActive { get; set; } = true;
+
+        public ICollection<Resident> Residents { get; set; } = new List<Resident>();
         public ICollection<CheckInRecord> CheckInRecords { get; set; } = new List<CheckInRecord>();
     }
 }

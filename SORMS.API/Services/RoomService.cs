@@ -24,7 +24,15 @@ namespace SORMS.API.Services
                 Id = r.Id,
                 RoomNumber = r.RoomNumber,
                 Type = r.Type,
-                IsOccupied = r.IsOccupied
+                RoomType = r.Type, // Alias
+                Floor = r.Floor,
+                MonthlyRent = r.MonthlyRent,
+                Area = r.Area,
+                IsOccupied = r.IsOccupied,
+                IsAvailable = r.IsAvailable,
+                CurrentResident = r.CurrentResident,
+                Description = r.Description,
+                IsActive = r.IsActive
             });
         }
 
@@ -38,7 +46,15 @@ namespace SORMS.API.Services
                 Id = room.Id,
                 RoomNumber = room.RoomNumber,
                 Type = room.Type,
-                IsOccupied = room.IsOccupied
+                RoomType = room.Type, // Alias
+                Floor = room.Floor,
+                MonthlyRent = room.MonthlyRent,
+                Area = room.Area,
+                IsOccupied = room.IsOccupied,
+                IsAvailable = room.IsAvailable,
+                CurrentResident = room.CurrentResident,
+                Description = room.Description,
+                IsActive = room.IsActive
             };
         }
 
@@ -48,7 +64,14 @@ namespace SORMS.API.Services
             {
                 RoomNumber = roomDto.RoomNumber,
                 Type = roomDto.Type,
-                IsOccupied = roomDto.IsOccupied
+                Floor = roomDto.Floor,
+                MonthlyRent = roomDto.MonthlyRent,
+                Area = roomDto.Area,
+                IsOccupied = roomDto.IsOccupied,
+                IsAvailable = roomDto.IsAvailable,
+                Description = roomDto.Description,
+                CurrentResident = roomDto.CurrentResident,
+                IsActive = roomDto.IsActive
             };
 
             _context.Rooms.Add(room);
@@ -92,7 +115,15 @@ namespace SORMS.API.Services
                 Id = r.Id,
                 RoomNumber = r.RoomNumber,
                 Type = r.Type,
-                IsOccupied = r.IsOccupied
+                RoomType = r.Type, // Alias
+                Floor = r.Floor,
+                MonthlyRent = r.MonthlyRent,
+                Area = r.Area,
+                IsOccupied = r.IsOccupied,
+                IsAvailable = r.IsAvailable,
+                CurrentResident = r.CurrentResident,
+                Description = r.Description,
+                IsActive = r.IsActive
             });
         }
     }
