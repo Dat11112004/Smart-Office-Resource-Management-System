@@ -5,6 +5,25 @@
     Layout = "~/Pages/Shared/_Layout.cshtml";
 }
 
+@* Success/Error Messages *@
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
 <div class="page-header mb-4">
     <div class="row align-items-center">
         <div class="col-md-8">
@@ -199,6 +218,13 @@
                         {
                             <a href="/Room/CheckOut/@room.Id" class="btn btn-outline-danger btn-sm">
                                 <i class="fas fa-sign-out-alt"></i>
+                            </a>
+                        }
+                        @* Chỉ Admin mới thấy nút Delete *@
+                        @if (HttpContext.Session.GetString("UserRole") == "Admin")
+                        {
+                            <a href="/Room/Delete/@room.Id" class="btn btn-outline-danger btn-sm" title="Xóa phòng">
+                                <i class="fas fa-trash-alt"></i>
                             </a>
                         }
                     </div>

@@ -169,6 +169,16 @@
         border-color: #ced4da;
         color: #495057;
     }
+    .btn-delete {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        border: none;
+        color: white;
+    }
+    .btn-delete:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4);
+        color: white;
+    }
     .empty-description {
         color: #95a5a6;
         font-style: italic;
@@ -340,6 +350,14 @@
                     <a href="/Resident/Create?roomId=@Model.Room.Id" class="btn btn-success btn-modern">
                         <i class="fas fa-user-plus"></i>
                         Thêm cư dân
+                    </a>
+                }
+                @* Chỉ Admin mới thấy nút Delete *@
+                @if (HttpContext.Session.GetString("UserRole") == "Admin")
+                {
+                    <a href="/Room/Delete/@Model.Room.Id" class="btn btn-delete btn-modern">
+                        <i class="fas fa-trash-alt"></i>
+                        Xóa phòng
                     </a>
                 }
             </div>

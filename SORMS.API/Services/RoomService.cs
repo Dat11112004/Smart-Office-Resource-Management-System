@@ -88,7 +88,14 @@ namespace SORMS.API.Services
 
             room.RoomNumber = roomDto.RoomNumber;
             room.Type = roomDto.Type;
+            room.Floor = roomDto.Floor;
+            room.MonthlyRent = roomDto.MonthlyRent;
+            room.Area = roomDto.Area;
             room.IsOccupied = roomDto.IsOccupied;
+            room.IsAvailable = roomDto.IsAvailable;
+            room.Description = roomDto.Description;
+            room.CurrentResident = roomDto.CurrentResident;
+            room.IsActive = roomDto.IsActive;
 
             await _context.SaveChangesAsync();
             return true;
@@ -99,7 +106,33 @@ namespace SORMS.API.Services
             var room = await _context.Rooms.FindAsync(id);
             if (room == null) return false;
 
-            _context.Rooms.Remove(room);
+            // Kiểm tra xem phòng có đang được thuê không
+            if (room.IsOccupied)
+            {
+                // Nếu đang có người thuê -> Soft Delete (đánh dấu không hoạt động)
+                room.IsActive = false;
+                room.IsAvailable = false;
+                _context.Rooms.Update(room);
+            }
+            else
+            {
+                // Kiểm tra xem có lịch sử check-in không
+                var hasCheckInHistory = await _context.CheckInRecords.AnyAsync(c => c.RoomId == id);
+
+                if (hasCheckInHistory)
+                {
+                    // Nếu có lịch sử -> Soft Delete (giữ lại dữ liệu)
+                    room.IsActive = false;
+                    room.IsAvailable = false;
+                    _context.Rooms.Update(room);
+                }
+                else
+                {
+                    // Nếu không có lịch sử gì -> Hard Delete (xóa hẳn khỏi database)
+                    _context.Rooms.Remove(room);
+                }
+            }
+
             await _context.SaveChangesAsync();
             return true;
         }
