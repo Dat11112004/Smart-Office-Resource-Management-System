@@ -7,6 +7,7 @@ namespace SORMS.API.Interfaces
         Task<string> LoginAsync(LoginDto loginDto);
         Task<string> RegisterAsync(RegisterDto registerDto);
         Task<UserDto> GetUserByUsernameAsync(string username);
+        Task<UserDto> GetUserByEmailAsync(string email);
 
         Task<bool> SendOtpAsync(string email);
 

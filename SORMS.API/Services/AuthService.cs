@@ -83,7 +83,26 @@ namespace SORMS.API.Services
             {
                 Id = user.Id,
                 Username = user.Username,
-                Role = user.Role.Name,
+                RoleName = user.Role.Name,
+                Email = user.Email,
+                IsActive = user.IsActive
+            };
+        }
+
+        public async Task<UserDto> GetUserByEmailAsync(string email)
+        {
+            var user = await _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Email == email);
+
+            if (user == null) return null;
+
+            return new UserDto
+            {
+                Id = user.Id,
+                Username = user.Username,
+                RoleName = user.Role.Name,
+                Email = user.Email,
                 IsActive = user.IsActive
             };
         }

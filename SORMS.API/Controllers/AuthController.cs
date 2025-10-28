@@ -27,11 +27,21 @@ namespace SORMS.API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var token = await _authService.LoginAsync(loginDto);
-            if (token == null)
+            var result = await _authService.LoginAsync(loginDto);
+            if (result == null)
                 return Unauthorized("Sai tên đăng nhập Email hoặc mật khẩu.");
 
-            return Ok(new { Token = token });
+            // Lấy thông tin user để trả về Role (tìm theo Email)
+            var user = await _authService.GetUserByEmailAsync(loginDto.Email);
+            
+            return Ok(new { 
+                Token = result,
+                UserId = user?.Id,
+                UserRole = user?.RoleName,
+                Username = user?.Username,
+                Email = user?.Email,
+                Message = "Đăng nhập thành công"
+            });
         }
 
         /// <summary>

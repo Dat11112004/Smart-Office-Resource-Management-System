@@ -91,6 +91,24 @@ namespace SORMS.FE.Pages.Auth
                         // Lưu token vào session
                         HttpContext.Session.SetString("JWTToken", result.Token);
                         
+                        // Lưu thông tin user vào session
+                        if (!string.IsNullOrEmpty(result.UserRole))
+                        {
+                            HttpContext.Session.SetString("UserRole", result.UserRole);
+                            Console.WriteLine($"UserRole saved to session: {result.UserRole}");
+                        }
+                        
+                        if (result.UserId.HasValue)
+                        {
+                            HttpContext.Session.SetInt32("UserId", result.UserId.Value);
+                            Console.WriteLine($"UserId saved to session: {result.UserId.Value}");
+                        }
+                        
+                        if (!string.IsNullOrEmpty(result.Username))
+                        {
+                            HttpContext.Session.SetString("Username", result.Username);
+                        }
+                        
                         Console.WriteLine($"Token saved to session: {result.Token.Substring(0, 20)}...");
                         
                         // Redirect đến trang chính
@@ -122,5 +140,9 @@ namespace SORMS.FE.Pages.Auth
     {
         public string Message { get; set; } = string.Empty;
         public string Token { get; set; } = string.Empty;
+        public int? UserId { get; set; }
+        public string? UserRole { get; set; }
+        public string? Username { get; set; }
+        public string? Email { get; set; }
     }
 }
