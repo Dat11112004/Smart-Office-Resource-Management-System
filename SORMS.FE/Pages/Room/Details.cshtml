@@ -337,15 +337,20 @@
 
             <!-- Action Buttons -->
             <div class="action-buttons">
-                <a href="/Room/Edit/@Model.Room.Id" class="btn btn-edit btn-modern">
-                    <i class="fas fa-edit"></i>
-                    Chỉnh sửa thông tin
-                </a>
+                @* Chỉ Admin và Staff mới thấy nút Edit *@
+                @if (HttpContext.Session.GetString("UserRole") == "Admin" || HttpContext.Session.GetString("UserRole") == "Staff")
+                {
+                    <a href="/Room/Edit/@Model.Room.Id" class="btn btn-edit btn-modern">
+                        <i class="fas fa-edit"></i>
+                        Chỉnh sửa thông tin
+                    </a>
+                }
                 <a href="/Room/Index" class="btn btn-back btn-modern">
                     <i class="fas fa-arrow-left"></i>
                     Quay lại danh sách
                 </a>
-                @if (Model.Room.IsAvailable)
+                @* Chỉ Admin và Staff mới thấy nút Add Resident *@
+                @if (Model.Room.IsAvailable && (HttpContext.Session.GetString("UserRole") == "Admin" || HttpContext.Session.GetString("UserRole") == "Staff"))
                 {
                     <a href="/Resident/Create?roomId=@Model.Room.Id" class="btn btn-success btn-modern">
                         <i class="fas fa-user-plus"></i>

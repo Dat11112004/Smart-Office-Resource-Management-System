@@ -1,11 +1,18 @@
+@{
+    var userRole = Context.Session.GetString("UserRole");
+}
+
 <li>
     <a href="#roomsSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
         <i class="fas fa-door-open"></i>
-        <span>Rooms</span>
+        <span>Quản lý phòng</span>
     </a>
     <ul class="collapse list-unstyled" id="roomsSubmenu">
-        <li><a href="/Room" class="nav-link"><i class="fas fa-list"></i> Danh sách</a></li>
-        <li><a href="/Room/Create" class="nav-link"><i class="fas fa-plus"></i> Thêm mới</a></li>
+        <li><a href="/Room" class="nav-link"><i class="fas fa-list"></i> Danh sách phòng</a></li>
+        @if (userRole == "Admin" || userRole == "Staff")
+        {
+            <li><a href="/Room/Create" class="nav-link"><i class="fas fa-plus"></i> Thêm phòng mới</a></li>
+        }
         <li><a href="/Room/Available" class="nav-link"><i class="fas fa-check-circle"></i> Phòng trống</a></li>
     </ul>
 </li>

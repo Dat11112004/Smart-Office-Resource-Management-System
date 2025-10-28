@@ -35,10 +35,14 @@
         </div>
         <div class="col-md-4 text-end">
             <div class="btn-group">
-                <a href="/Room/Create" class="btn btn-primary btn-modern">
-                    <i class="fas fa-plus me-2"></i>
-                    Thêm phòng mới
-                </a>
+                @* Chỉ Admin và Staff mới thấy nút Create *@
+                @if (HttpContext.Session.GetString("UserRole") == "Admin" || HttpContext.Session.GetString("UserRole") == "Staff")
+                {
+                    <a href="/Room/Create" class="btn btn-primary btn-modern">
+                        <i class="fas fa-plus me-2"></i>
+                        Thêm phòng mới
+                    </a>
+                }
                 <a href="/Room/Available" class="btn btn-success btn-modern">
                     <i class="fas fa-check-circle me-2"></i>
                     Phòng trống
@@ -205,20 +209,28 @@
                         <a href="/Room/Details/@room.Id" class="btn btn-outline-info btn-sm">
                             <i class="fas fa-eye"></i>
                         </a>
-                        <a href="/Room/Edit/@room.Id" class="btn btn-outline-warning btn-sm">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        @if (room.IsAvailable)
+                        @* Chỉ Admin và Staff mới thấy nút Edit *@
+                        @if (HttpContext.Session.GetString("UserRole") == "Admin" || HttpContext.Session.GetString("UserRole") == "Staff")
                         {
-                            <a href="/Resident/Create?roomId=@room.Id" class="btn btn-outline-success btn-sm">
-                                <i class="fas fa-user-plus"></i>
+                            <a href="/Room/Edit/@room.Id" class="btn btn-outline-warning btn-sm">
+                                <i class="fas fa-edit"></i>
                             </a>
                         }
-                        else
+                        @* Chỉ Admin và Staff mới thấy nút Add Resident/CheckOut *@
+                        @if (HttpContext.Session.GetString("UserRole") == "Admin" || HttpContext.Session.GetString("UserRole") == "Staff")
                         {
-                            <a href="/Room/CheckOut/@room.Id" class="btn btn-outline-danger btn-sm">
-                                <i class="fas fa-sign-out-alt"></i>
-                            </a>
+                            @if (room.IsAvailable)
+                            {
+                                <a href="/Resident/Create?roomId=@room.Id" class="btn btn-outline-success btn-sm">
+                                    <i class="fas fa-user-plus"></i>
+                                </a>
+                            }
+                            else
+                            {
+                                <a href="/Room/CheckOut/@room.Id" class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                </a>
+                            }
                         }
                         @* Chỉ Admin mới thấy nút Delete *@
                         @if (HttpContext.Session.GetString("UserRole") == "Admin")
