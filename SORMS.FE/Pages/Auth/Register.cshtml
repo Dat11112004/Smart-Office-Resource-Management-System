@@ -62,6 +62,20 @@
 
                 <form method="post" class="auth-form">
                     @Html.AntiForgeryToken()
+                    
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-user"></i>
+                            </span>
+                            <input name="FullName" id="FullName" type="text" class="form-control" placeholder="Họ và tên đầy đủ" />
+                        </div>
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Tùy chọn - Tên sẽ hiển thị trong hồ sơ cư dân
+                        </small>
+                    </div>
+
                     <div class="form-group">
                         <div class="input-group">
                             <span class="input-group-text">
@@ -75,9 +89,9 @@
                     <div class="form-group">
                         <div class="input-group">
                             <span class="input-group-text">
-                                <i class="fas fa-user"></i>
+                                <i class="fas fa-user-circle"></i>
                             </span>
-                            <input name="Username" id="Username" type="text" class="form-control" placeholder="Tên người dùng" required />
+                            <input name="Username" id="Username" type="text" class="form-control" placeholder="Tên đăng nhập" required />
                         </div>
                         <span class="text-danger" id="username-error"></span>
                     </div>
@@ -98,6 +112,46 @@
                     <div class="form-group">
                         <div class="input-group">
                             <span class="input-group-text">
+                                <i class="fas fa-phone"></i>
+                            </span>
+                            <input name="Phone" id="Phone" type="tel" class="form-control" placeholder="Số điện thoại" />
+                        </div>
+                        <small class="form-text text-muted">Tùy chọn</small>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-id-card"></i>
+                            </span>
+                            <input name="IdentityNumber" id="IdentityNumber" type="text" class="form-control" placeholder="CCCD/CMND" />
+                        </div>
+                        <small class="form-text text-muted">Tùy chọn</small>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </span>
+                            <input name="Address" id="Address" type="text" class="form-control" placeholder="Địa chỉ thường trú" />
+                        </div>
+                        <small class="form-text text-muted">Tùy chọn</small>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-phone-square"></i>
+                            </span>
+                            <input name="EmergencyContact" id="EmergencyContact" type="tel" class="form-control" placeholder="SĐT khẩn cấp" />
+                        </div>
+                        <small class="form-text text-muted">Tùy chọn - Số điện thoại người thân</small>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-text">
                                 <i class="fas fa-user-tag"></i>
                             </span>
                             <select name="RoleId" id="RoleId" class="form-control" required>
@@ -109,7 +163,7 @@
                         <span class="text-danger" id="roleid-error"></span>
                         <small class="form-text text-muted">
                             <i class="fas fa-info-circle me-1"></i>
-                            Mặc định đăng ký là Resident
+                            Mặc định đăng ký là Resident - Hồ sơ cư dân sẽ tự động được tạo
                         </small>
                     </div>
 

@@ -20,6 +20,22 @@ namespace SORMS.FE.Pages.Auth
 
         [BindProperty]
         public int RoleId { get; set; } = 3; // Default là Resident
+        
+        // 🔥 NEW: Thông tin bổ sung cho Resident profile
+        [BindProperty]
+        public string? FullName { get; set; }
+        
+        [BindProperty]
+        public string? Phone { get; set; }
+        
+        [BindProperty]
+        public string? IdentityNumber { get; set; }
+        
+        [BindProperty]
+        public string? Address { get; set; }
+        
+        [BindProperty]
+        public string? EmergencyContact { get; set; }
 
         public string? Message { get; set; }
         public string? Token { get; set; }
@@ -88,7 +104,12 @@ namespace SORMS.FE.Pages.Auth
                     Email = Email,
                     Username = Username,
                     Password = Password,
-                    RoleId = RoleId
+                    RoleId = RoleId,
+                    FullName = FullName,
+                    Phone = Phone,
+                    IdentityNumber = IdentityNumber,
+                    Address = Address,
+                    EmergencyContact = EmergencyContact
                 };
                 
                 var httpClient = _httpClientFactory.CreateClient("API");
