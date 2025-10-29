@@ -49,22 +49,49 @@ namespace SORMS.API.Services
         public async Task<string> RegisterAsync(RegisterDto registerDto)
         {
             var existingUser = await _context.Users
-                .AnyAsync(u => u.Username == registerDto.Username || u.Email ==registerDto.Email);
+                .AnyAsync(u => u.Username == registerDto.Username || u.Email == registerDto.Email);
 
             if (existingUser)
                 return null;
 
+            // Tạo User account
             var user = new User
             {
                 Username = registerDto.Username,
                 PasswordHash = HashPassword(registerDto.Password),
                 RoleId = registerDto.RoleId,
                 IsActive = true,
-                Email = registerDto.Email // 🔹 nhớ thêm Email khi đăng ký
+                Email = registerDto.Email
             };
 
             _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(); // Save để lấy user.Id
+
+            // � TỰ ĐỘNG TẠO RESIDENT PROFILE nếu role = 3 (Resident)
+            if (user.RoleId == 3)
+            {
+                var resident = new Resident
+                {
+                    UserId = user.Id,
+                    FullName = registerDto.FullName ?? user.Username, // Nếu có FullName thì dùng, không thì dùng Username
+                    Email = user.Email,
+                    Phone = registerDto.Phone ?? "",
+                    IdentityNumber = registerDto.IdentityNumber ?? "",
+                    Role = null, // Sẽ được cập nhật sau (Lecturer/Staff/Guest)
+                    RoomId = null, // Chưa có phòng
+                    CheckInDate = DateTime.Now,
+                    CheckOutDate = null,
+                    Address = registerDto.Address,
+                    EmergencyContact = registerDto.EmergencyContact,
+                    Notes = "Auto-created during user registration",
+                    IsActive = true
+                };
+
+                _context.Residents.Add(resident);
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation($"Auto-created Resident profile for user: {user.Username} (ID: {user.Id})");
+            }
 
             // Tự động tạo token sau khi đăng ký thành công
             var token = GenerateJwtToken(user);
