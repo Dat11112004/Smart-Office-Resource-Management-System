@@ -1,0 +1,331 @@
+@page
+@model SORMS.FE.Pages.Resident.MyProfileModel
+@{
+    ViewData["Title"] = "Hồ sơ của tôi";
+}
+
+<style>
+    .profile-container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .profile-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 15px 15px 0 0;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        text-align: center;
+    }
+
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: white;
+        color: #667eea;
+        font-size: 48px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .profile-header h1 {
+        margin: 0;
+        font-size: 32px;
+        font-weight: 600;
+    }
+
+    .profile-header p {
+        margin: 10px 0 0;
+        opacity: 0.9;
+        font-size: 16px;
+    }
+
+    .profile-body {
+        background: white;
+        padding: 40px;
+        border-radius: 0 0 15px 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .info-section {
+        margin-bottom: 35px;
+        padding-bottom: 30px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .info-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+
+    .section-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #667eea;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .section-title i {
+        font-size: 24px;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+    }
+
+    .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .info-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #718096;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .info-value {
+        font-size: 16px;
+        color: #2d3748;
+        padding: 12px 15px;
+        background: #f7fafc;
+        border-radius: 8px;
+        border-left: 3px solid #667eea;
+    }
+
+    .info-value.empty {
+        color: #a0aec0;
+        font-style: italic;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .status-active {
+        background: #c6f6d5;
+        color: #22543d;
+    }
+
+    .status-inactive {
+        background: #fed7d7;
+        color: #742a2a;
+    }
+
+    .alert-info-custom {
+        background: #ebf8ff;
+        border: 2px solid #90cdf4;
+        color: #2c5282;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .alert-info-custom i {
+        font-size: 24px;
+    }
+
+    .alert-error-custom {
+        background: #fff5f5;
+        border: 2px solid #fc8181;
+        color: #742a2a;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .alert-error-custom i {
+        font-size: 24px;
+    }
+
+    @@media (max-width: 768px) {
+        .profile-container {
+            margin: 20px auto;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .profile-header h1 {
+            font-size: 24px;
+        }
+    }
+</style>
+
+<div class="profile-container">
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert-error-custom">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>Lỗi:</strong> @Model.ErrorMessage
+            </div>
+        </div>
+    }
+    else if (Model.Profile != null)
+    {
+        <div class="profile-header">
+            <div class="profile-avatar">
+                @Model.Profile.FullName.Substring(0, 1).ToUpper()
+            </div>
+            <h1>@Model.Profile.FullName</h1>
+            <p>
+                <i class="fas fa-envelope"></i> @Model.Profile.Email
+            </p>
+        </div>
+
+        <div class="profile-body">
+            <!-- Thông tin cá nhân -->
+            <div class="info-section">
+                <div class="section-title">
+                    <i class="fas fa-user"></i>
+                    Thông tin cá nhân
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Họ và tên</div>
+                        <div class="info-value">@Model.Profile.FullName</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Email</div>
+                        <div class="info-value">@Model.Profile.Email</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Số điện thoại</div>
+                        <div class="info-value">@Model.Profile.Phone</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">CCCD/CMND</div>
+                        <div class="info-value">@Model.Profile.IdentityNumber</div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.Profile.Address))
+                    {
+                        <div class="info-item" style="grid-column: 1 / -1;">
+                            <div class="info-label">Địa chỉ thường trú</div>
+                            <div class="info-value">@Model.Profile.Address</div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.Profile.EmergencyContact))
+                    {
+                        <div class="info-item">
+                            <div class="info-label">Liên hệ khẩn cấp</div>
+                            <div class="info-value">@Model.Profile.EmergencyContact</div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.Profile.Role))
+                    {
+                        <div class="info-item">
+                            <div class="info-label">Vai trò</div>
+                            <div class="info-value">@Model.Profile.Role</div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Thông tin phòng -->
+            <div class="info-section">
+                <div class="section-title">
+                    <i class="fas fa-door-open"></i>
+                    Thông tin phòng
+                </div>
+
+                @if (Model.Profile.RoomId.HasValue)
+                {
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Số phòng</div>
+                            <div class="info-value">@Model.Profile.RoomNumber</div>
+                        </div>
+
+                        <div class="info-item">
+                            <div class="info-label">Trạng thái</div>
+                            <div class="info-value">
+                                <span class="status-badge @(Model.Profile.IsActive == true ? "status-active" : "status-inactive")">
+                                    @(Model.Profile.IsActive == true ? "Đang hoạt động" : "Không hoạt động")
+                                </span>
+                            </div>
+                        </div>
+
+                        @if (Model.Profile.CheckInDate.HasValue)
+                        {
+                            <div class="info-item">
+                                <div class="info-label">Ngày check-in</div>
+                                <div class="info-value">@Model.Profile.CheckInDate.Value.ToString("dd/MM/yyyy")</div>
+                            </div>
+                        }
+
+                        @if (Model.Profile.CheckOutDate.HasValue)
+                        {
+                            <div class="info-item">
+                                <div class="info-label">Ngày check-out (dự kiến)</div>
+                                <div class="info-value">@Model.Profile.CheckOutDate.Value.ToString("dd/MM/yyyy")</div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="alert-info-custom">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            Bạn chưa được phân phòng. Vui lòng xem <a href="/Room/Available" style="color: #2c5282; font-weight: 600;">danh sách phòng trống</a> để đăng ký thuê.
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Ghi chú -->
+            @if (!string.IsNullOrEmpty(Model.Profile.Notes))
+            {
+                <div class="info-section">
+                    <div class="section-title">
+                        <i class="fas fa-sticky-note"></i>
+                        Ghi chú
+                    </div>
+
+                    <div class="info-value">@Model.Profile.Notes</div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert-info-custom">
+            <i class="fas fa-spinner fa-spin"></i>
+            <div>Đang tải thông tin...</div>
+        </div>
+    }
+</div>
