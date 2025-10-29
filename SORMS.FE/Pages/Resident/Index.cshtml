@@ -178,10 +178,10 @@
                                 <span class="badge-modern bg-primary">@resident.RoomNumber</span>
                             </td>
                             <td>
-                                <span class="text-muted">@resident.CheckInDate.ToString("dd/MM/yyyy")</span>
+                                <span class="text-muted">@(resident.CheckInDate?.ToString("dd/MM/yyyy") ?? "N/A")</span>
                             </td>
                             <td>
-                                @if (resident.IsActive)
+                                @if (resident.IsActive == true)
                                 {
                                     <span class="badge-status active">
                                         <i class="fas fa-check-circle me-1"></i>

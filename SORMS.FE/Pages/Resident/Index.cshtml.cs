@@ -26,8 +26,20 @@ namespace SORMS.FE.Pages.Resident
         {
             try
             {
-                // Tạo HttpClient từ factory với cấu hình đã setup
+                // Lấy JWT token từ session
+                var token = HttpContext.Session.GetString("JWTToken");
+                
+                if (string.IsNullOrEmpty(token))
+                {
+                    Console.WriteLine("No JWT token found - user not authenticated");
+                    Residents = new List<ResidentDto>();
+                    return;
+                }
+                
+                // Tạo HttpClient với Authorization header
                 var httpClient = _httpClientFactory.CreateClient("API");
+                httpClient.DefaultRequestHeaders.Authorization = 
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 
                 // Gọi API để lấy danh sách residents
                 var response = await httpClient.GetAsync("/api/resident");
@@ -47,85 +59,31 @@ namespace SORMS.FE.Pages.Resident
                 }
                 else
                 {
-                    // Fallback to mock data if API fails
-                    Residents = GetMockResidents();
+                    Console.WriteLine($"API call failed with status: {response.StatusCode}");
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Error: {errorContent}");
+                    Residents = new List<ResidentDto>();
                 }
 
                 // Calculate statistics
                 TotalResidents = Residents.Count;
-                ActiveResidents = Residents.Count(r => r.IsActive);
-                PendingResidents = Residents.Count(r => !r.IsActive);
-                NewThisMonth = Residents.Count(r => r.CheckInDate >= DateTime.Now.AddDays(-30));
+                ActiveResidents = Residents.Count(r => r.IsActive == true);
+                PendingResidents = Residents.Count(r => r.IsActive != true);
+                NewThisMonth = Residents.Count(r => r.CheckInDate.HasValue && r.CheckInDate.Value >= DateTime.Now.AddDays(-30));
             }
             catch (Exception ex)
             {
-                // Handle error - use mock data as fallback
+                // Handle error - log and show empty list
                 Console.WriteLine($"Error loading residents: {ex.Message}");
-                Residents = GetMockResidents();
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                Residents = new List<ResidentDto>();
                 
-                // Calculate statistics
-                TotalResidents = Residents.Count;
-                ActiveResidents = Residents.Count(r => r.IsActive);
-                PendingResidents = Residents.Count(r => !r.IsActive);
-                NewThisMonth = Residents.Count(r => r.CheckInDate >= DateTime.Now.AddDays(-30));
+                // Calculate statistics (all zeros)
+                TotalResidents = 0;
+                ActiveResidents = 0;
+                PendingResidents = 0;
+                NewThisMonth = 0;
             }
-        }
-
-        private List<ResidentDto> GetMockResidents()
-        {
-            return new List<ResidentDto>
-            {
-                new ResidentDto
-                {
-                    Id = 1,
-                    FullName = "Nguyễn Văn An",
-                    Email = "nguyenvanan@email.com",
-                    PhoneNumber = "0123456789",
-                    RoomNumber = "101",
-                    CheckInDate = DateTime.Now.AddDays(-30),
-                    IsActive = true
-                },
-                new ResidentDto
-                {
-                    Id = 2,
-                    FullName = "Trần Thị Bình",
-                    Email = "tranthibinh@email.com",
-                    PhoneNumber = "0987654321",
-                    RoomNumber = "102",
-                    CheckInDate = DateTime.Now.AddDays(-15),
-                    IsActive = true
-                },
-                new ResidentDto
-                {
-                    Id = 3,
-                    FullName = "Lê Văn Cường",
-                    Email = "levancuong@email.com",
-                    PhoneNumber = "0369852147",
-                    RoomNumber = "103",
-                    CheckInDate = DateTime.Now.AddDays(-7),
-                    IsActive = false
-                },
-                new ResidentDto
-                {
-                    Id = 4,
-                    FullName = "Phạm Thị Dung",
-                    Email = "phamthidung@email.com",
-                    PhoneNumber = "0741258963",
-                    RoomNumber = "201",
-                    CheckInDate = DateTime.Now.AddDays(-45),
-                    IsActive = true
-                },
-                new ResidentDto
-                {
-                    Id = 5,
-                    FullName = "Hoàng Văn Em",
-                    Email = "hoangvanem@email.com",
-                    PhoneNumber = "0852147963",
-                    RoomNumber = "202",
-                    CheckInDate = DateTime.Now.AddDays(-20),
-                    IsActive = true
-                }
-            };
         }
     }
 }

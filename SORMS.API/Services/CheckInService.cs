@@ -23,14 +23,18 @@
             if (resident == null || resident.CheckInDate != default)
                 return false;
 
-            var room = await _context.Rooms.FindAsync(resident.RoomId);
+            // Kiểm tra resident có RoomId không
+            if (!resident.RoomId.HasValue)
+                return false;
+
+            var room = await _context.Rooms.FindAsync(resident.RoomId.Value);
             if (room == null || room.IsOccupied)
                 return false;
 
             var record = new CheckInRecord
             {
                 ResidentId = residentId,
-                RoomId = resident.RoomId,
+                RoomId = resident.RoomId.Value,
                 CheckInTime = DateTime.UtcNow,
                 Status = "CheckedIn",
                 Method = "QR",
