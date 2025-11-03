@@ -1,0 +1,518 @@
+@page
+@model SORMS.FE.Pages.Resident.SettingsModel
+@{
+    ViewData["Title"] = "Cài đặt";
+}
+
+<style>
+    .settings-container {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .settings-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 35px 40px;
+        border-radius: 15px 15px 0 0;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .settings-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+
+    .settings-header::after {
+        content: '';
+        position: absolute;
+        bottom: -30%;
+        left: -5%;
+        width: 200px;
+        height: 200px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 50%;
+    }
+
+    .settings-header h1 {
+        margin: 0;
+        font-size: 32px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .settings-header h1 i {
+        font-size: 36px;
+        animation: rotate 3s linear infinite;
+    }
+
+    @@keyframes rotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .settings-body {
+        background: white;
+        border-radius: 0 0 15px 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-tabs {
+        border-bottom: 2px solid #e9ecef;
+        padding: 0;
+        margin: 0;
+        background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
+        list-style: none;
+        display: flex;
+    }
+
+    .nav-tabs .nav-item {
+        list-style: none;
+        margin: 0;
+    }
+
+    .nav-tabs .nav-link {
+        border: none;
+        color: #6c757d;
+        font-weight: 500;
+        padding: 20px 40px;
+        transition: all 0.3s;
+        border-radius: 0;
+        margin-bottom: -2px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .nav-tabs .nav-link::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 0;
+        height: 3px;
+        background: #667eea;
+        transition: all 0.3s ease;
+        transform: translateX(-50%);
+    }
+
+    .nav-tabs .nav-link:hover {
+        color: #667eea;
+        background: rgba(102, 126, 234, 0.05);
+    }
+
+    .nav-tabs .nav-link:hover::after {
+        width: 80%;
+    }
+
+    .nav-tabs .nav-link.active {
+        color: #667eea;
+        background: white;
+        font-weight: 600;
+    }
+
+    .nav-tabs .nav-link.active::after {
+        width: 100%;
+    }
+
+    .nav-tabs .nav-link i {
+        font-size: 18px;
+        margin-right: 8px;
+    }
+
+    .tab-content {
+        padding: 35px 40px 40px 40px;
+        min-height: 400px;
+    }
+
+    .form-section {
+        margin-bottom: 35px;
+        padding: 30px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        border-radius: 12px;
+        border-left: 5px solid #667eea;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+    }
+
+    .form-section:hover {
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .form-section h3 {
+        color: #667eea;
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .form-section h3 i {
+        font-size: 22px;
+    }
+
+    .form-group-modern {
+        margin-bottom: 25px;
+        position: relative;
+    }
+
+    .form-label-modern {
+        display: block;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 10px;
+        font-size: 14px;
+        letter-spacing: 0.3px;
+    }
+
+    .form-control-modern {
+        width: 100%;
+        padding: 14px 18px;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .form-control-modern:hover {
+        border-color: #cbd5e0;
+    }
+
+    .form-control-modern:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        background: #f8f9ff;
+    }
+
+    .btn-save {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 14px 35px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 15px;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 4px 10px rgba(102, 126, 234, 0.2);
+    }
+
+    .btn-save:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-save:active {
+        transform: translateY(-1px);
+        box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-save i {
+        font-size: 16px;
+    }
+
+    .alert-modern {
+        padding: 18px 25px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 500;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        animation: slideDown 0.4s ease;
+    }
+
+    @@keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .alert-success {
+        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        color: #155724;
+        border-left: 5px solid #28a745;
+    }
+
+    .alert-success i {
+        color: #28a745;
+        font-size: 20px;
+    }
+
+    .alert-error {
+        background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+        color: #721c24;
+        border-left: 5px solid #dc3545;
+    }
+
+    .alert-error i {
+        color: #dc3545;
+        font-size: 20px;
+    }
+
+    .text-danger {
+        color: #dc3545;
+        font-size: 13px;
+        margin-top: 5px;
+        display: block;
+    }
+
+    textarea.form-control-modern {
+        resize: vertical;
+        min-height: 120px;
+        font-family: inherit;
+        line-height: 1.6;
+    }
+
+    /* Responsive Design */
+    @@media (max-width: 768px) {
+        .settings-container {
+            margin: 20px auto;
+            padding: 0 10px;
+        }
+
+        .settings-header {
+            padding: 25px 20px;
+        }
+
+        .settings-header h1 {
+            font-size: 24px;
+        }
+
+        .nav-tabs .nav-link {
+            padding: 15px 20px;
+            font-size: 14px;
+        }
+
+        .tab-content {
+            padding: 20px 15px;
+        }
+
+        .form-section {
+            padding: 20px;
+        }
+
+        .btn-save {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    /* Smooth transitions */
+    * {
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+</style>
+
+<div class="settings-container">
+    <div class="settings-header">
+        <h1>
+            <i class="fas fa-cog"></i>
+            Cài đặt
+        </h1>
+    </div>
+
+    <div class="settings-body">
+        @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+        {
+            <div class="alert-modern alert-success" style="margin: 20px 40px 0;">
+                <i class="fas fa-check-circle"></i>
+                <span>@Model.SuccessMessage</span>
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert-modern alert-error" style="margin: 20px 40px 0;">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>@Model.ErrorMessage</span>
+            </div>
+        }
+
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" data-bs-toggle="tab" href="#account-tab">
+                    <i class="fas fa-user-lock me-2"></i>
+                    Tài khoản
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#profile-tab">
+                    <i class="fas fa-id-card me-2"></i>
+                    Hồ sơ cá nhân
+                </a>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <!-- Tab 1: Account Settings -->
+            <div id="account-tab" class="tab-pane fade show active">
+                <!-- Change Password -->
+                <div class="form-section">
+                    <h3>
+                        <i class="fas fa-key"></i>
+                        Đổi mật khẩu
+                    </h3>
+                    <form method="post" action="/Resident/Settings?handler=ChangePassword">
+                        @Html.AntiForgeryToken()
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">Mật khẩu hiện tại *</label>
+                            <input name="CurrentPassword" type="password" class="form-control-modern" placeholder="Nhập mật khẩu hiện tại" required />
+                            <span class="text-danger"></span>
+                        </div>
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">Mật khẩu mới *</label>
+                            <input name="NewPassword" type="password" class="form-control-modern" placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)" required minlength="6" />
+                            <span class="text-danger"></span>
+                        </div>
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">Xác nhận mật khẩu mới *</label>
+                            <input name="ConfirmPassword" type="password" class="form-control-modern" placeholder="Nhập lại mật khẩu mới" required />
+                            <span class="text-danger"></span>
+                        </div>
+                        <button type="submit" class="btn-save">
+                            <i class="fas fa-save"></i>
+                            Đổi mật khẩu
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Update Email & Phone -->
+                <div class="form-section">
+                    <h3>
+                        <i class="fas fa-envelope"></i>
+                        Thông tin liên hệ
+                    </h3>
+                    <form method="post" action="/Resident/Settings?handler=UpdateAccount">
+                        @Html.AntiForgeryToken()
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">Email</label>
+                            <input name="Email" type="email" class="form-control-modern" placeholder="example@email.com" value="@(Model.Email ?? "")" />
+                            <span class="text-danger"></span>
+                        </div>
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">Số điện thoại</label>
+                            <input name="Phone" type="tel" class="form-control-modern" placeholder="0912345678" value="@(Model.Phone ?? "")" />
+                            <span class="text-danger"></span>
+                        </div>
+                        <button type="submit" class="btn-save">
+                            <i class="fas fa-save"></i>
+                            Cập nhật thông tin
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tab 2: Profile Settings (Resident only) -->
+            <div id="profile-tab" class="tab-pane fade">
+                <div class="form-section">
+                    <h3>
+                        <i class="fas fa-home"></i>
+                        Thông tin cá nhân
+                    </h3>
+                    <form method="post" action="/Resident/Settings?handler=UpdateProfile">
+                        @Html.AntiForgeryToken()
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">Địa chỉ thường trú</label>
+                            <input name="Address" class="form-control-modern" placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố" value="@(Model.Address ?? "")" />
+                            <span class="text-danger"></span>
+                        </div>
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">Số điện thoại khẩn cấp</label>
+                            <input name="EmergencyContact" type="tel" class="form-control-modern" placeholder="Số điện thoại người thân (0912345678)" value="@(Model.EmergencyContact ?? "")" />
+                            <span class="text-danger"></span>
+                        </div>
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">Ghi chú</label>
+                            <textarea name="Notes" class="form-control-modern" placeholder="Thông tin bổ sung về bạn...">@(Model.Notes ?? "")</textarea>
+                            <span class="text-danger"></span>
+                        </div>
+                        <button type="submit" class="btn-save">
+                            <i class="fas fa-save"></i>
+                            Cập nhật hồ sơ
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('✅ Settings page loaded');
+        
+        // Force form submissions to work properly in tabs
+        var updateProfileForm = document.querySelector('form[action*="UpdateProfile"]');
+        if (!updateProfileForm) {
+            // If no action attribute, find form with UpdateProfile handler
+            var allForms = document.querySelectorAll('form');
+            allForms.forEach(function(f) {
+                if (f.querySelector('input[name="Address"]')) {
+                    updateProfileForm = f;
+                }
+            });
+        }
+        
+        if (updateProfileForm) {
+            console.log('✅ Found UpdateProfile form');
+            
+            // Remove any existing submit handlers that might interfere
+            var newForm = updateProfileForm.cloneNode(true);
+            updateProfileForm.parentNode.replaceChild(newForm, updateProfileForm);
+            updateProfileForm = newForm;
+            
+            // Force correct action URL
+            updateProfileForm.action = '/Resident/Settings?handler=UpdateProfile';
+            updateProfileForm.method = 'post';
+            
+            console.log('Form action set to: ' + updateProfileForm.action);
+            
+            // Handle submit button click
+            var submitBtn = updateProfileForm.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('🔵 Submit button clicked - forcing POST');
+                    updateProfileForm.submit();
+                });
+            }
+        } else {
+            console.error('❌ UpdateProfile form not found!');
+        }
+    });
+</script>
+}
