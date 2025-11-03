@@ -1,0 +1,295 @@
+﻿@page
+@model SORMS.FE.Pages.Admin.DashboardModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<style>
+    .dashboard-header {
+        background: linear-gradient(135deg, #ee5a6f 0%, #f29263 100%);
+        border-radius: 20px;
+        padding: 40px;
+        margin-bottom: 30px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dashboard-header::before {
+        content: '';
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        top: -100px;
+        right: -100px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+
+    .stat-card .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: white;
+        margin-bottom: 15px;
+    }
+
+    .stat-card.primary .stat-icon {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .stat-card.success .stat-icon {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+
+    .stat-card.warning .stat-icon {
+        background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+    }
+
+    .stat-card.danger .stat-icon {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    }
+
+    .stat-number {
+        font-size: 32px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        color: #6b7280;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .quick-action-btn {
+        display: block;
+        padding: 20px;
+        background: white;
+        border-radius: 12px;
+        text-decoration: none;
+        color: #1f2937;
+        transition: all 0.3s ease;
+        border: 2px solid #e5e7eb;
+        text-align: center;
+    }
+
+    .quick-action-btn:hover {
+        border-color: #ee5a6f;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(238, 90, 111, 0.2);
+        color: #ee5a6f;
+    }
+
+    .quick-action-btn i {
+        font-size: 32px;
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    .activity-item {
+        padding: 15px;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #ee5a6f 0%, #f29263 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .activity-time {
+        color: #6b7280;
+        font-size: 13px;
+    }
+</style>
+
+<div class="dashboard-header">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1 class="mb-2" style="font-weight: 700;">🛡️ Admin Dashboard</h1>
+            <p class="mb-0" style="opacity: 0.9;">Quản lý toàn bộ hệ thống Smart Office</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <div style="font-size: 14px; opacity: 0.9;">
+                <i class="fas fa-calendar-alt me-2"></i>
+                <span id="currentDateTime"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stat-card primary">
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-number">247</div>
+            <div class="stat-label">Tổng số cư dân</div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stat-card success">
+            <div class="stat-icon">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            <div class="stat-number">12</div>
+            <div class="stat-label">Nhân viên</div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stat-card warning">
+            <div class="stat-icon">
+                <i class="fas fa-door-open"></i>
+            </div>
+            <div class="stat-number">156</div>
+            <div class="stat-label">Phòng đang thuê</div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stat-card danger">
+            <div class="stat-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="stat-number">8</div>
+            <div class="stat-label">Yêu cầu chờ xử lý</div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Thao tác nhanh</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <a href="/Resident/Index" class="quick-action-btn">
+                            <i class="fas fa-users"></i>
+                            <div>Quản lý cư dân</div>
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="/Staff/Index" class="quick-action-btn">
+                            <i class="fas fa-user-tie"></i>
+                            <div>Quản lý nhân viên</div>
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="/Room/Index" class="quick-action-btn">
+                            <i class="fas fa-door-open"></i>
+                            <div>Quản lý phòng</div>
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="/Report/Index" class="quick-action-btn">
+                            <i class="fas fa-chart-bar"></i>
+                            <div>Báo cáo thống kê</div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activities -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Hoạt động gần đây</h5>
+            </div>
+            <div class="card-body">
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="fw-semibold">Cư dân mới đăng ký</div>
+                        <div class="activity-time">Nguyễn Văn A - 5 phút trước</div>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="fw-semibold">Hóa đơn mới được tạo</div>
+                        <div class="activity-time">Phòng 302 - 15 phút trước</div>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="fw-semibold">Yêu cầu dịch vụ</div>
+                        <div class="activity-time">Sửa chữa điện - 1 giờ trước</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function updateDateTime() {
+            const now = new Date();
+            const options = {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            document.getElementById('currentDateTime').textContent = now.toLocaleDateString('vi-VN', options);
+        }
+        
+        updateDateTime();
+        setInterval(updateDateTime, 60000);
+    </script>
+}
