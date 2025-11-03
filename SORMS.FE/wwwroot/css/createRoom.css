@@ -1,0 +1,165 @@
+﻿
+.create-room-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+}
+
+.create-room-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    padding: 2.5rem;
+}
+
+.form-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+    .form-header h3 {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-header p {
+        color: #7f8c8d;
+        margin: 0;
+    }
+
+.form-section {
+    margin-bottom: 2rem;
+}
+
+.form-section-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #34495e;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+    .form-section-title i {
+        color: #667eea;
+    }
+
+.form-label {
+    font-weight: 500;
+    color: #34495e;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.form-control, .form-select {
+    border: 2px solid #e0e6ed;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102,126,234,0.15);
+    }
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.input-group-text {
+    background: #f8f9fa;
+    border: 2px solid #e0e6ed;
+    border-right: none;
+    border-radius: 10px 0 0 10px;
+    color: #667eea;
+}
+
+.input-group .form-control {
+    border-left: none;
+    border-radius: 0 10px 10px 0;
+}
+
+.btn-group-custom {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid #f0f0f0;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+    .btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102,126,234,0.4);
+    }
+
+.btn-secondary {
+    background: #f8f9fa;
+    color: #6c757d;
+    border: 2px solid #e0e6ed;
+    padding: 0.75rem 2rem;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+    .btn-secondary:hover {
+        background: #e9ecef;
+        color: #495057;
+        border-color: #ced4da;
+    }
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .create-room-card {
+        padding: 1.5rem;
+    }
+}
+
+.required-asterisk {
+    color: #e74c3c;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.status-available {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-occupied {
+    background: #f8d7da;
+    color: #721c24;
+}
+

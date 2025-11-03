@@ -36,9 +36,14 @@ using System.Text;
     builder.Services.AddScoped<IReportService, ReportService>();
     builder.Services.AddScoped<IServiceRequestService, ServiceRequestService>();
     builder.Services.AddScoped<IRoomService, RoomService>();
+    builder.Services.AddControllers()
+        .AddJsonOptions(opts =>
+        {
+            opts.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+        });
 
-    // ========== 4. JWT AUTHENTICATION ==========
-    var jwtIssuer = configuration["Jwt:Issuer"];
+// ========== 4. JWT AUTHENTICATION ==========
+var jwtIssuer = configuration["Jwt:Issuer"];
     var jwtAudience = configuration["Jwt:Audience"];
     var jwtKey = builder.Configuration["JwtConfig:key"];
 

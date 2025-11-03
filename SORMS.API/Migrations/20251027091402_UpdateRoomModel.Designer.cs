@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SORMS.API.Data;
 
@@ -11,9 +12,11 @@ using SORMS.API.Data;
 namespace SORMS.API.Migrations
 {
     [DbContext(typeof(SormsDbContext))]
-    partial class SormsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251027091402_UpdateRoomModel")]
+    partial class UpdateRoomModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -155,10 +158,6 @@ namespace SORMS.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Address")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
                     b.Property<DateTime>("CheckInDate")
                         .HasColumnType("datetime2");
 
@@ -170,10 +169,6 @@ namespace SORMS.API.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("EmergencyContact")
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
-
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -184,35 +179,22 @@ namespace SORMS.API.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Notes")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
                     b.Property<string>("Phone")
                         .IsRequired()
                         .HasMaxLength(15)
                         .HasColumnType("nvarchar(15)");
 
                     b.Property<string>("Role")
+                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<int?>("RoomId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("UserId")
+                    b.Property<int>("RoomId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("RoomId");
-
-                    b.HasIndex("UserId")
-                        .IsUnique()
-                        .HasFilter("[UserId] IS NOT NULL");
 
                     b.ToTable("Residents");
                 });
@@ -469,15 +451,10 @@ namespace SORMS.API.Migrations
                     b.HasOne("SORMS.API.Models.Room", "Room")
                         .WithMany("Residents")
                         .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("SORMS.API.Models.User", "User")
-                        .WithOne("ResidentProfile")
-                        .HasForeignKey("SORMS.API.Models.Resident", "UserId");
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Room");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SORMS.API.Models.ServiceRequest", b =>
@@ -536,11 +513,6 @@ namespace SORMS.API.Migrations
             modelBuilder.Entity("SORMS.API.Models.Staff", b =>
                 {
                     b.Navigation("AssignedRequests");
-                });
-
-            modelBuilder.Entity("SORMS.API.Models.User", b =>
-                {
-                    b.Navigation("ResidentProfile");
                 });
 #pragma warning restore 612, 618
         }

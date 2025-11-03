@@ -5,7 +5,6 @@ using SORMS.API.Interfaces;
 
 namespace SORMS.API.Controllers
 {
-    [Authorize(Roles = "Admin,Staff,Resident")]
     [ApiController]
     [Route("api/[controller]")]
     public class RoomController : ControllerBase
@@ -18,9 +17,10 @@ namespace SORMS.API.Controllers
         }
 
         /// <summary>
-        /// Lấy danh sách tất cả phòng
+        /// Lấy danh sách tất cả phòng - Tất cả roles có thể xem
         /// </summary>
         [HttpGet]
+        [Authorize(Roles = "Admin,Staff,Resident")]
         public async Task<IActionResult> GetAll()
         {
             var rooms = await _roomService.GetAllRoomsAsync();
@@ -28,9 +28,10 @@ namespace SORMS.API.Controllers
         }
 
         /// <summary>
-        /// Lấy thông tin phòng theo ID
+        /// Lấy thông tin phòng theo ID - Tất cả roles có thể xem
         /// </summary>
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin,Staff,Resident")]
         public async Task<IActionResult> GetById(int id)
         {
             var room = await _roomService.GetRoomByIdAsync(id);
@@ -41,9 +42,10 @@ namespace SORMS.API.Controllers
         }
 
         /// <summary>
-        /// Tạo phòng mới
+        /// Tạo phòng mới - Chỉ Admin và Staff
         /// </summary>
         [HttpPost]
+        [Authorize(Roles = "Admin,Staff")]
         public async Task<IActionResult> Create([FromBody] RoomDto roomDto)
         {
             if (!ModelState.IsValid)
@@ -54,9 +56,10 @@ namespace SORMS.API.Controllers
         }
 
         /// <summary>
-        /// Cập nhật thông tin phòng
+        /// Cập nhật thông tin phòng - Chỉ Admin và Staff
         /// </summary>
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin,Staff")]
         public async Task<IActionResult> Update(int id, [FromBody] RoomDto roomDto)
         {
             var success = await _roomService.UpdateRoomAsync(id, roomDto);
@@ -67,9 +70,10 @@ namespace SORMS.API.Controllers
         }
 
         /// <summary>
-        /// Xóa phòng
+        /// Xóa phòng - CHỈ ADMIN
         /// </summary>
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var success = await _roomService.DeleteRoomAsync(id);
@@ -80,9 +84,10 @@ namespace SORMS.API.Controllers
         }
 
         /// <summary>
-        /// Lấy danh sách phòng trống
+        /// Lấy danh sách phòng trống - Tất cả roles có thể xem
         /// </summary>
         [HttpGet("available")]
+        [Authorize(Roles = "Admin,Staff,Resident")]
         public async Task<IActionResult> GetAvailableRooms()
         {
             var rooms = await _roomService.GetAvailableRoomsAsync();

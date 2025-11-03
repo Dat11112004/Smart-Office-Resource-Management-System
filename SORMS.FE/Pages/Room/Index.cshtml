@@ -5,6 +5,25 @@
     Layout = "~/Pages/Shared/_Layout.cshtml";
 }
 
+@* Success/Error Messages *@
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
 <div class="page-header mb-4">
     <div class="row align-items-center">
         <div class="col-md-8">
@@ -16,10 +35,14 @@
         </div>
         <div class="col-md-4 text-end">
             <div class="btn-group">
-                <a href="/Room/Create" class="btn btn-primary btn-modern">
-                    <i class="fas fa-plus me-2"></i>
-                    Thêm phòng mới
-                </a>
+                @* Chỉ Admin và Staff mới thấy nút Create *@
+                @if (HttpContext.Session.GetString("UserRole") == "Admin" || HttpContext.Session.GetString("UserRole") == "Staff")
+                {
+                    <a href="/Room/Create" class="btn btn-primary btn-modern">
+                        <i class="fas fa-plus me-2"></i>
+                        Thêm phòng mới
+                    </a>
+                }
                 <a href="/Room/Available" class="btn btn-success btn-modern">
                     <i class="fas fa-check-circle me-2"></i>
                     Phòng trống
@@ -95,7 +118,13 @@
                     <option value="1">Tầng 1</option>
                     <option value="2">Tầng 2</option>
                     <option value="3">Tầng 3</option>
+                    <option value="4">Tầng 4</option>
+                    <option value="5">Tầng 5</option>
+                    <option value="custom">Tầng khác...</option>
                 </select>
+            </div>
+            <div class="col-md-1 mb-3" id="customFloorInput" style="display: none;">
+                <input type="number" class="form-control" id="customFloor" placeholder="Tầng" min="1" max="99">
             </div>
             <div class="col-md-2 mb-3">
                 <select class="form-control" id="typeFilter">
@@ -180,19 +209,34 @@
                         <a href="/Room/Details/@room.Id" class="btn btn-outline-info btn-sm">
                             <i class="fas fa-eye"></i>
                         </a>
-                        <a href="/Room/Edit/@room.Id" class="btn btn-outline-warning btn-sm">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        @if (room.IsAvailable)
+                        @* Chỉ Admin và Staff mới thấy nút Edit *@
+                        @if (HttpContext.Session.GetString("UserRole") == "Admin" || HttpContext.Session.GetString("UserRole") == "Staff")
                         {
-                            <a href="/Resident/Create?roomId=@room.Id" class="btn btn-outline-success btn-sm">
-                                <i class="fas fa-user-plus"></i>
+                            <a href="/Room/Edit/@room.Id" class="btn btn-outline-warning btn-sm">
+                                <i class="fas fa-edit"></i>
                             </a>
                         }
-                        else
+                        @* Chỉ Admin và Staff mới thấy nút Add Resident/CheckOut *@
+                        @if (HttpContext.Session.GetString("UserRole") == "Admin" || HttpContext.Session.GetString("UserRole") == "Staff")
                         {
-                            <a href="/Room/CheckOut/@room.Id" class="btn btn-outline-danger btn-sm">
-                                <i class="fas fa-sign-out-alt"></i>
+                            @if (room.IsAvailable)
+                            {
+                                <a href="/Resident/Create?roomId=@room.Id" class="btn btn-outline-success btn-sm">
+                                    <i class="fas fa-user-plus"></i>
+                                </a>
+                            }
+                            else
+                            {
+                                <a href="/Room/CheckOut/@room.Id" class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                </a>
+                            }
+                        }
+                        @* Chỉ Admin mới thấy nút Delete *@
+                        @if (HttpContext.Session.GetString("UserRole") == "Admin")
+                        {
+                            <a href="/Room/Delete/@room.Id" class="btn btn-outline-danger btn-sm" title="Xóa phòng">
+                                <i class="fas fa-trash-alt"></i>
                             </a>
                         }
                     </div>
@@ -228,6 +272,22 @@
 @section Scripts {
     <script>
         $(document).ready(function() {
+            // Show/hide custom floor input
+            $('#floorFilter').on('change', function() {
+                if ($(this).val() === 'custom') {
+                    $('#customFloorInput').slideDown(200);
+                } else {
+                    $('#customFloorInput').slideUp(200);
+                    $('#customFloor').val('');
+                }
+                filterRooms();
+            });
+
+            // Custom floor input change
+            $('#customFloor').on('input', function() {
+                filterRooms();
+            });
+
             // Search functionality
             $('#searchInput').on('keyup', function() {
                 const searchTerm = $(this).val().toLowerCase();
@@ -242,9 +302,14 @@
             function filterRooms() {
                 const searchTerm = $('#searchInput').val().toLowerCase();
                 const statusFilter = $('#statusFilter').val();
-                const floorFilter = $('#floorFilter').val();
+                let floorFilter = $('#floorFilter').val();
                 const typeFilter = $('#typeFilter').val();
                 const priceFilter = $('#priceFilter').val();
+                
+                // Handle custom floor input
+                if (floorFilter === 'custom') {
+                    floorFilter = $('#customFloor').val();
+                }
                 
                 let visibleCount = 0;
                 
@@ -301,6 +366,8 @@
                 $('#searchInput').val('');
                 $('#statusFilter').val('');
                 $('#floorFilter').val('');
+                $('#customFloor').val('');
+                $('#customFloorInput').hide();
                 $('#typeFilter').val('');
                 $('#priceFilter').val('');
                 filterRooms();

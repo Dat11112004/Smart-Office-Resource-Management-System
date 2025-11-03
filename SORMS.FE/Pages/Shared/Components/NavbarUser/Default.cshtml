@@ -2,14 +2,30 @@
 
 @if (Model.IsAuthenticated)
 {
+    var profileUrl = Model.RoleId switch
+    {
+        1 => "/Admin/MyProfile",
+        2 => "/Staff/MyProfile",
+        3 => "/Resident/MyProfile",
+        _ => "#"
+    };
+    
+    var settingsUrl = Model.RoleId switch
+    {
+        1 => "/Admin/Settings",
+        2 => "/Staff/Settings",
+        3 => "/Resident/Settings",
+        _ => "#"
+    };
+    
     <div class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
             <i class="fas fa-user-circle"></i>
             @Model.Username
         </a>
         <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Profile</a></li>
-            <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
+            <li><a class="dropdown-item" href="@profileUrl"><i class="fas fa-user me-2"></i>Profile</a></li>
+            <li><a class="dropdown-item" href="@settingsUrl"><i class="fas fa-cog me-2"></i>Settings</a></li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="/Auth/Login"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
         </ul>

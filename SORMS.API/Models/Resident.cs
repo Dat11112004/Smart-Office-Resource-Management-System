@@ -11,6 +11,12 @@ namespace SORMS.API.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
+        // Link với User account (nullable - có thể tạo resident không có account)
+        public int? UserId { get; set; }
+
+        [ForeignKey(nameof(UserId))]
+        public User? User { get; set; }
+
         [Required, MaxLength(100)]
         public string FullName { get; set; }
 
@@ -23,20 +29,32 @@ namespace SORMS.API.Models
         [Required, MaxLength(20)]
         public string IdentityNumber { get; set; }
 
-        [Required, MaxLength(20)]
-        public string Role { get; set; }
+        // Role của resident: Lecturer, Staff, Guest (không phải User Role)
+        [MaxLength(20)]
+        public string? Role { get; set; }
 
         [Required]
         public DateTime CheckInDate { get; set; }
 
         public DateTime? CheckOutDate { get; set; }
 
-        // FK: Room
-        [Required]
-        public int RoomId { get; set; }
+        // FK: Room (nullable - có thể chưa được assign phòng)
+        public int? RoomId { get; set; }
 
         [ForeignKey(nameof(RoomId))]
-        public Room Room { get; set; }
+        public Room? Room { get; set; }
+
+        // Thông tin bổ sung
+        [MaxLength(200)]
+        public string? Address { get; set; }
+
+        [MaxLength(15)]
+        public string? EmergencyContact { get; set; }
+
+        [MaxLength(500)]
+        public string? Notes { get; set; }
+
+        public bool IsActive { get; set; } = true;
 
         // Navigation collections
         public ICollection<ServiceRequest> ServiceRequests { get; set; } = new List<ServiceRequest>();

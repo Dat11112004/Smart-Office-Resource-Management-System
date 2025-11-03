@@ -49,22 +49,49 @@ namespace SORMS.API.Services
         public async Task<string> RegisterAsync(RegisterDto registerDto)
         {
             var existingUser = await _context.Users
-                .AnyAsync(u => u.Username == registerDto.Username || u.Email ==registerDto.Email);
+                .AnyAsync(u => u.Username == registerDto.Username || u.Email == registerDto.Email);
 
             if (existingUser)
                 return null;
 
+            // Tạo User account
             var user = new User
             {
                 Username = registerDto.Username,
                 PasswordHash = HashPassword(registerDto.Password),
                 RoleId = registerDto.RoleId,
                 IsActive = true,
-                Email = registerDto.Email // 🔹 nhớ thêm Email khi đăng ký
+                Email = registerDto.Email
             };
 
             _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(); // Save để lấy user.Id
+
+            // � TỰ ĐỘNG TẠO RESIDENT PROFILE nếu role = 3 (Resident)
+            if (user.RoleId == 3)
+            {
+                var resident = new Resident
+                {
+                    UserId = user.Id,
+                    FullName = registerDto.FullName ?? user.Username, // Nếu có FullName thì dùng, không thì dùng Username
+                    Email = user.Email,
+                    Phone = registerDto.Phone ?? "",
+                    IdentityNumber = registerDto.IdentityNumber ?? "",
+                    Role = null, // Sẽ được cập nhật sau (Lecturer/Staff/Guest)
+                    RoomId = null, // Chưa có phòng
+                    CheckInDate = DateTime.Now,
+                    CheckOutDate = null,
+                    Address = registerDto.Address,
+                    EmergencyContact = registerDto.EmergencyContact,
+                    Notes = "Auto-created during user registration",
+                    IsActive = true
+                };
+
+                _context.Residents.Add(resident);
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation($"Auto-created Resident profile for user: {user.Username} (ID: {user.Id})");
+            }
 
             // Tự động tạo token sau khi đăng ký thành công
             var token = GenerateJwtToken(user);
@@ -83,7 +110,26 @@ namespace SORMS.API.Services
             {
                 Id = user.Id,
                 Username = user.Username,
-                Role = user.Role.Name,
+                RoleName = user.Role.Name,
+                Email = user.Email,
+                IsActive = user.IsActive
+            };
+        }
+
+        public async Task<UserDto> GetUserByEmailAsync(string email)
+        {
+            var user = await _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Email == email);
+
+            if (user == null) return null;
+
+            return new UserDto
+            {
+                Id = user.Id,
+                Username = user.Username,
+                RoleName = user.Role.Name,
+                Email = user.Email,
                 IsActive = user.IsActive
             };
         }
@@ -240,6 +286,44 @@ namespace SORMS.API.Services
         private bool VerifyPassword(string password, string hash)
         {
             return BCrypt.Net.BCrypt.Verify(password, hash);
+        }
+
+        // =================== CHANGE PASSWORD (Authenticated User) ===================
+        public async Task<bool> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return false;
+
+            // Verify current password
+            if (!VerifyPassword(currentPassword, user.PasswordHash))
+                return false;
+
+            // Update with new password
+            user.PasswordHash = HashPassword(newPassword);
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation($"Password changed successfully for user ID: {userId}");
+            return true;
+        }
+
+        // =================== UPDATE EMAIL ===================
+        public async Task<bool> UpdateEmailAsync(int userId, string newEmail)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return false;
+
+            // Check if email is already taken by another user
+            var existingUser = await _context.Users
+                .AnyAsync(u => u.Email == newEmail && u.Id != userId);
+
+            if (existingUser)
+                return false;
+
+            user.Email = newEmail;
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation($"Email updated successfully for user ID: {userId}");
+            return true;
         }
     }
 }

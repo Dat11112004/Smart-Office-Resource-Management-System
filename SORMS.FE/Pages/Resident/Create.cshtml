@@ -1,53 +1,433 @@
-﻿@{
-    ViewData["Title"] = "Thêm cư dân";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+﻿@page
+@model SORMS.FE.Pages.Resident.CreateModel
+@{
+    ViewData["Title"] = "Thêm cư dân mới";
 }
 
-<div class="container mt-4" style="max-width: 600px;">
-    <h3 class="mb-4 text-center">Thêm cư dân mới</h3>
-    <form id="createForm">
-        <div class="mb-3">
-            <label>Họ và tên</label>
-            <input type="text" id="fullName" class="form-control" required />
-        </div>
-        <div class="mb-3">
-            <label>Email</label>
-            <input type="email" id="email" class="form-control" required />
-        </div>
-        <div class="mb-3">
-            <label>Số điện thoại</label>
-            <input type="text" id="phone" class="form-control" />
-        </div>
-        <div class="mb-3">
-            <label>Mã phòng (Room ID)</label>
-            <input type="number" id="roomId" class="form-control" />
-        </div>
-        <button type="submit" class="btn btn-success w-100">Tạo mới</button>
-        <a href="/Resident/Index" class="btn btn-secondary w-100 mt-2">Quay lại</a>
-    </form>
+<style>
+    .create-resident-container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .create-resident-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 15px 15px 0 0;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        margin-bottom: 0;
+    }
+
+    .create-resident-header h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .create-resident-header h1 i {
+        font-size: 32px;
+    }
+
+    .create-resident-header p {
+        margin: 10px 0 0 0;
+        opacity: 0.9;
+    }
+
+    .create-resident-form {
+        background: white;
+        padding: 40px;
+        border-radius: 0 0 15px 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-section {
+        margin-bottom: 30px;
+        padding-bottom: 25px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .form-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+
+    .section-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #667eea;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .section-title i {
+        font-size: 20px;
+    }
+
+    .form-group-modern {
+        margin-bottom: 20px;
+    }
+
+    .form-label-modern {
+        display: block;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+
+    .form-label-modern i {
+        color: #667eea;
+        margin-right: 8px;
+        width: 20px;
+    }
+
+    .form-control-modern {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e0e6ed;
+        border-radius: 10px;
+        font-size: 15px;
+        transition: all 0.3s ease;
+    }
+
+    .form-control-modern:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-select-modern {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e0e6ed;
+        border-radius: 10px;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .form-select-modern:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .alert-modern {
+        padding: 15px 20px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .alert-modern i {
+        font-size: 20px;
+    }
+
+    .alert-error {
+        background: #fff5f5;
+        border: 2px solid #feb2b2;
+        color: #c53030;
+    }
+
+    .alert-success {
+        background: #f0fff4;
+        border: 2px solid #9ae6b4;
+        color: #22543d;
+    }
+
+    .btn-group-modern {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .btn-create {
+        flex: 1;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 14px 30px;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .btn-create:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-cancel {
+        flex: 1;
+        background: white;
+        color: #6c757d;
+        padding: 14px 30px;
+        border: 2px solid #dee2e6;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        text-decoration: none;
+    }
+
+    .btn-cancel:hover {
+        background: #f8f9fa;
+        border-color: #adb5bd;
+        color: #495057;
+    }
+
+    .required-mark {
+        color: #e53e3e;
+        margin-left: 4px;
+    }
+
+    .helper-text {
+        font-size: 13px;
+        color: #718096;
+        margin-top: 5px;
+    }
+
+    @@media (max-width: 768px) {
+        .create-resident-container {
+            margin: 20px auto;
+        }
+
+        .create-resident-header h1 {
+            font-size: 22px;
+        }
+
+        .create-resident-form {
+            padding: 25px;
+        }
+
+        .form-grid-2 {
+            grid-template-columns: 1fr;
+        }
+
+        .btn-group-modern {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="create-resident-container">
+    <div class="create-resident-header">
+        <h1>
+            <i class="fas fa-user-plus"></i>
+            Thêm cư dân mới
+        </h1>
+        <p>Điền thông tin để thêm cư dân vào hệ thống</p>
+    </div>
+
+    <div class="create-resident-form">
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert-modern alert-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>@Model.ErrorMessage</span>
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+        {
+            <div class="alert-modern alert-success">
+                <i class="fas fa-check-circle"></i>
+                <span>@Model.SuccessMessage</span>
+            </div>
+        }
+
+        <form method="post">
+            @Html.AntiForgeryToken()
+
+            <!-- Thông tin cơ bản -->
+            <div class="form-section">
+                <div class="section-title">
+                    <i class="fas fa-id-card"></i>
+                    Thông tin cơ bản
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-group-modern">
+                        <label class="form-label-modern">
+                            <i class="fas fa-user"></i>
+                            Họ và tên <span class="required-mark">*</span>
+                        </label>
+                        <input asp-for="FullName" name="FullName" class="form-control-modern" placeholder="Nguyễn Văn A" required />
+                        <span asp-validation-for="FullName" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label class="form-label-modern">
+                            <i class="fas fa-id-badge"></i>
+                            CCCD/CMND <span class="required-mark">*</span>
+                        </label>
+                        <input asp-for="IdentityNumber" name="IdentityNumber" class="form-control-modern" placeholder="001234567890" required />
+                        <span asp-validation-for="IdentityNumber" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-group-modern">
+                        <label class="form-label-modern">
+                            <i class="fas fa-envelope"></i>
+                            Email <span class="required-mark">*</span>
+                        </label>
+                        <input asp-for="Email" name="Email" type="email" class="form-control-modern" placeholder="example@email.com" required />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label class="form-label-modern">
+                            <i class="fas fa-phone"></i>
+                            Số điện thoại <span class="required-mark">*</span>
+                        </label>
+                        <input asp-for="Phone" name="Phone" class="form-control-modern" placeholder="0912345678" required />
+                        <span asp-validation-for="Phone" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group-modern">
+                    <label class="form-label-modern">
+                        <i class="fas fa-map-marker-alt"></i>
+                        Địa chỉ thường trú
+                    </label>
+                    <input asp-for="Address" name="Address" class="form-control-modern" placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố" />
+                    <span asp-validation-for="Address" class="text-danger"></span>
+                </div>
+
+                <div class="form-group-modern">
+                    <label class="form-label-modern">
+                        <i class="fas fa-phone-square"></i>
+                        Số điện thoại khẩn cấp
+                    </label>
+                    <input asp-for="EmergencyContact" name="EmergencyContact" class="form-control-modern" placeholder="Số điện thoại người thân (nếu có)" />
+                    <span asp-validation-for="EmergencyContact" class="text-danger"></span>
+                </div>
+            </div>
+
+            <!-- Vai trò và phòng -->
+            <div class="form-section">
+                <div class="section-title">
+                    <i class="fas fa-user-tag"></i>
+                    Vai trò và phân phòng
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-group-modern">
+                        <label class="form-label-modern">
+                            <i class="fas fa-briefcase"></i>
+                            Vai trò <span class="required-mark">*</span>
+                        </label>
+                        <select asp-for="Role" name="Role" class="form-select-modern" required>
+                            <option value="">-- Chọn vai trò --</option>
+                            <option value="Lecturer">Giảng viên (Lecturer)</option>
+                            <option value="Staff">Nhân viên (Staff)</option>
+                            <option value="Guest">Khách (Guest)</option>
+                        </select>
+                        <span asp-validation-for="Role" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label class="form-label-modern">
+                            <i class="fas fa-door-open"></i>
+                            Phòng
+                        </label>
+                        <select asp-for="RoomId" name="RoomId" asp-items="Model.AvailableRooms" class="form-select-modern">
+                        </select>
+                        <span asp-validation-for="RoomId" class="text-danger"></span>
+                        <div class="helper-text">Để trống nếu chưa có phòng</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Thời gian thuê -->
+            <div class="form-section">
+                <div class="section-title">
+                    <i class="fas fa-calendar-alt"></i>
+                    Thời gian thuê
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-group-modern">
+                        <label class="form-label-modern">
+                            <i class="fas fa-calendar-check"></i>
+                            Ngày check-in <span class="required-mark">*</span>
+                        </label>
+                        <input asp-for="CheckInDate" name="CheckInDate" type="date" class="form-control-modern" required />
+                        <span asp-validation-for="CheckInDate" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label class="form-label-modern">
+                            <i class="fas fa-calendar-times"></i>
+                            Ngày check-out (dự kiến)
+                        </label>
+                        <input asp-for="CheckOutDate" name="CheckOutDate" type="date" class="form-control-modern" />
+                        <span asp-validation-for="CheckOutDate" class="text-danger"></span>
+                        <div class="helper-text">Để trống nếu chưa xác định</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ghi chú -->
+            <div class="form-section">
+                <div class="section-title">
+                    <i class="fas fa-sticky-note"></i>
+                    Ghi chú
+                </div>
+
+                <div class="form-group-modern">
+                    <label class="form-label-modern">
+                        <i class="fas fa-sticky-note"></i>
+                        Ghi chú
+                    </label>
+                    <textarea asp-for="Notes" name="Notes" class="form-control-modern" rows="4" placeholder="Thông tin bổ sung về cư dân..."></textarea>
+                    <span asp-validation-for="Notes" class="text-danger"></span>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="btn-group-modern">
+                <button type="submit" class="btn-create">
+                    <i class="fas fa-save"></i>
+                    Tạo cư dân mới
+                </button>
+                <a href="/Resident/Index" class="btn-cancel">
+                    <i class="fas fa-times"></i>
+                    Hủy bỏ
+                </a>
+            </div>
+        </form>
+    </div>
 </div>
 
 @section Scripts {
-    <script>
-        document.getElementById("createForm").addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const res = await fetch("/api/Resident", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer " + localStorage.getItem("token")
-                },
-                body: JSON.stringify({
-                    fullName: fullName.value,
-                    email: email.value,
-                    phone: phone.value,
-                    roomId: parseInt(roomId.value)
-                })
-            });
-            if (res.ok) {
-                alert("Thêm cư dân thành công!");
-                window.location.href = "/Resident/Index";
-            } else alert("Không thể tạo cư dân!");
-        });
-    </script>
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 }

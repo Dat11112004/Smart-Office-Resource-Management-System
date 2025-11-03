@@ -30,5 +30,8 @@ namespace SORMS.API.Models
 
         public string? ResetOtp { get; set; }
         public DateTime? ResetOtpExpiry { get; set; }
+
+        // Navigation: Resident profile (nếu user có role Resident)
+        public Resident? ResidentProfile { get; set; }
     }
 }
