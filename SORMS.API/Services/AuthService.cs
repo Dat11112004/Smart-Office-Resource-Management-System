@@ -67,7 +67,23 @@ namespace SORMS.API.Services
             _context.Users.Add(user);
             await _context.SaveChangesAsync(); // Save để lấy user.Id
 
-            // � TỰ ĐỘNG TẠO RESIDENT PROFILE nếu role = 3 (Resident)
+            // ✅ TỰ ĐỘNG TẠO STAFF PROFILE nếu role = 2 (Staff)
+            if (user.RoleId == 2)
+            {
+                var staff = new Staff
+                {
+                    FullName = registerDto.FullName ?? user.Username,
+                    Email = user.Email,
+                    Phone = registerDto.Phone ?? ""
+                };
+
+                _context.Staffs.Add(staff);
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation($"Auto-created Staff profile for user: {user.Username} (ID: {user.Id})");
+            }
+
+            // ✅ TỰ ĐỘNG TẠO RESIDENT PROFILE nếu role = 3 (Resident)
             if (user.RoleId == 3)
             {
                 var resident = new Resident
