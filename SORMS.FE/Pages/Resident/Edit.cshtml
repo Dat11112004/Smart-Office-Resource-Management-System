@@ -1,69 +1,420 @@
-﻿@{
-    ViewData["Title"] = "Cập nhật cư dân";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    var id = Context.Request.RouteValues["id"];
+﻿@page "{id:int}"
+@model SORMS.FE.Pages.Resident.EditModel
+@{
+    ViewData["Title"] = "Chỉnh sửa cư dân";
 }
 
-<div class="container mt-4" style="max-width: 600px;">
-    <h3 class="mb-4 text-center">Cập nhật thông tin cư dân</h3>
-    <form id="editForm">
-        <div class="mb-3">
-            <label>Họ và tên</label>
-            <input type="text" id="fullName" class="form-control" required />
-        </div>
-        <div class="mb-3">
-            <label>Email</label>
-            <input type="email" id="email" class="form-control" required />
-        </div>
-        <div class="mb-3">
-            <label>Số điện thoại</label>
-            <input type="text" id="phone" class="form-control" />
-        </div>
-        <div class="mb-3">
-            <label>Mã phòng</label>
-            <input type="number" id="roomId" class="form-control" />
-        </div>
-        <button type="submit" class="btn btn-warning w-100">Lưu thay đổi</button>
-        <a href="/Resident/Index" class="btn btn-secondary w-100 mt-2">Quay lại</a>
-    </form>
-</div>
+<style>
+    .edit-container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
 
-@section Scripts {
-    <script>
-        const id = "@id";
+    .edit-header {
+        background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+        color: white;
+        padding: 35px 40px;
+        border-radius: 15px 15px 0 0;
+        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
 
-        async function loadResident() {
-            const res = await fetch(`/api/Resident/${id}`, {
-                headers: { "Authorization": "Bearer " + localStorage.getItem("token") }
-            });
-            const r = await res.json();
-            fullName.value = r.fullName;
-            email.value = r.email;
-            phone.value = r.phone;
-            roomId.value = r.roomId;
+    .edit-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+
+    .edit-header h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .edit-header h1 i {
+        font-size: 32px;
+    }
+
+    .edit-body {
+        background: white;
+        border-radius: 0 0 15px 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        padding: 40px;
+    }
+
+    .form-section {
+        margin-bottom: 30px;
+    }
+
+    .form-section h3 {
+        color: #f59e0b;
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #e9ecef;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+    }
+
+    .form-group-modern {
+        margin-bottom: 0;
+    }
+
+    .form-label-modern {
+        display: block;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 10px;
+        font-size: 14px;
+        letter-spacing: 0.3px;
+    }
+
+    .form-label-modern .required {
+        color: #ef4444;
+        margin-left: 3px;
+    }
+
+    .form-control-modern {
+        width: 100%;
+        padding: 14px 18px;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .form-control-modern:hover {
+        border-color: #cbd5e0;
+    }
+
+    .form-control-modern:focus {
+        outline: none;
+        border-color: #f59e0b;
+        box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1);
+        background: #fffbf0;
+    }
+
+    textarea.form-control-modern {
+        resize: vertical;
+        min-height: 100px;
+        font-family: inherit;
+        line-height: 1.6;
+    }
+
+    .alert-modern {
+        padding: 18px 25px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 500;
+        animation: slideDown 0.4s ease;
+    }
+
+    @@keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .alert-error {
+        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+        color: #991b1b;
+        border-left: 5px solid #ef4444;
+    }
+
+    .alert-error i {
+        color: #ef4444;
+        font-size: 20px;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 35px;
+        padding-top: 30px;
+        border-top: 2px solid #e9ecef;
+    }
+
+    .btn-action {
+        padding: 14px 35px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 15px;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-save {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+    }
+
+    .btn-save:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        color: white;
+    }
+
+    .btn-cancel {
+        background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+        color: white;
+        box-shadow: 0 4px 10px rgba(107, 114, 128, 0.2);
+    }
+
+    .btn-cancel:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(107, 114, 128, 0.4);
+        color: white;
+    }
+
+    .text-danger {
+        color: #ef4444;
+        font-size: 13px;
+        margin-top: 5px;
+        display: block;
+    }
+
+    @@media (max-width: 768px) {
+        .edit-container {
+            margin: 20px auto;
         }
 
-        document.getElementById("editForm").addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const res = await fetch(`/api/Resident/${id}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer " + localStorage.getItem("token")
-                },
-                body: JSON.stringify({
-                    fullName: fullName.value,
-                    email: email.value,
-                    phone: phone.value,
-                    roomId: parseInt(roomId.value)
-                })
-            });
-            if (res.ok) {
-                alert("Cập nhật thành công!");
-                window.location.href = "/Resident/Index";
-            } else alert("Không thể cập nhật cư dân!");
-        });
+        .edit-header {
+            padding: 25px 20px;
+        }
 
-        loadResident();
-    </script>
-}
+        .edit-body {
+            padding: 25px;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn-action {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="edit-container">
+    <div class="edit-header">
+        <h1>
+            <i class="fas fa-user-edit"></i>
+            Chỉnh sửa thông tin cư dân
+        </h1>
+    </div>
+
+    <div class="edit-body">
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert-modern alert-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>@Model.ErrorMessage</span>
+            </div>
+        }
+
+        @if (Model.Resident != null)
+        {
+            <form method="post">
+                @Html.AntiForgeryToken()
+
+                <!-- Personal Information -->
+                <div class="form-section">
+                    <h3>
+                        <i class="fas fa-id-card"></i>
+                        Thông tin cá nhân
+                    </h3>
+                    <div class="form-grid">
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">
+                                Họ và tên <span class="required">*</span>
+                            </label>
+                            <input type="text" name="Resident.FullName" class="form-control-modern" 
+                                   value="@Model.Resident.FullName" placeholder="Nguyễn Văn A" required />
+                            <span class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">
+                                Số CMND/CCCD <span class="required">*</span>
+                            </label>
+                            <input type="text" name="Resident.IdentityNumber" class="form-control-modern" 
+                                   value="@Model.Resident.IdentityNumber" placeholder="079123456789" required />
+                            <span class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">
+                                Vai trò
+                            </label>
+                            <select name="Resident.Role" class="form-control-modern">
+                                <option value="">-- Chọn vai trò --</option>
+                                <option value="Lecturer" @(Model.Resident.Role == "Lecturer" ? "selected" : "")>Giảng viên</option>
+                                <option value="Staff" @(Model.Resident.Role == "Staff" ? "selected" : "")>Nhân viên</option>
+                                <option value="Guest" @(Model.Resident.Role == "Guest" ? "selected" : "")>Khách</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">
+                                Ngày check-in
+                            </label>
+                            <input type="date" name="Resident.CheckInDate" class="form-control-modern" 
+                                   value="@(Model.Resident.CheckInDate?.ToString("yyyy-MM-dd") ?? "")" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="form-section">
+                    <h3>
+                        <i class="fas fa-address-book"></i>
+                        Thông tin liên hệ
+                    </h3>
+                    <div class="form-grid">
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">
+                                Email <span class="required">*</span>
+                            </label>
+                            <input type="email" name="Resident.Email" class="form-control-modern" 
+                                   value="@Model.Resident.Email" placeholder="email@example.com" required />
+                            <span class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">
+                                Số điện thoại <span class="required">*</span>
+                            </label>
+                            <input type="tel" name="Resident.Phone" class="form-control-modern" 
+                                   value="@Model.Resident.Phone" placeholder="0912345678" required />
+                            <span class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">
+                                Địa chỉ
+                            </label>
+                            <input type="text" name="Resident.Address" class="form-control-modern" 
+                                   value="@(Model.Resident.Address ?? "")" placeholder="123 Đường ABC, Quận XYZ" />
+                        </div>
+
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">
+                                Liên hệ khẩn cấp
+                            </label>
+                            <input type="tel" name="Resident.EmergencyContact" class="form-control-modern" 
+                                   value="@(Model.Resident.EmergencyContact ?? "")" placeholder="0987654321" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Room Information -->
+                <div class="form-section">
+                    <h3>
+                        <i class="fas fa-home"></i>
+                        Thông tin phòng
+                    </h3>
+                    <div class="form-grid">
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">
+                                Mã phòng (Room ID)
+                            </label>
+                            <input type="number" name="Resident.RoomId" class="form-control-modern" 
+                                   value="@(Model.Resident.RoomId?.ToString() ?? "")" placeholder="Nhập ID phòng" />
+                            <small class="text-muted">Để trống nếu chưa phân phòng</small>
+                        </div>
+
+                        <div class="form-group-modern">
+                            <label class="form-label-modern">
+                                Trạng thái
+                            </label>
+                            <select name="Resident.IsActive" class="form-control-modern">
+                                <option value="true" @(Model.Resident.IsActive == true ? "selected" : "")>Đang hoạt động</option>
+                                <option value="false" @(Model.Resident.IsActive == false ? "selected" : "")>Ngừng hoạt động</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group-modern" style="grid-column: 1 / -1;">
+                            <label class="form-label-modern">
+                                Ghi chú
+                            </label>
+                            <textarea name="Resident.Notes" class="form-control-modern" 
+                                      placeholder="Nhập ghi chú (nếu có)...">@(Model.Resident.Notes ?? "")</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hidden fields -->
+                <input type="hidden" name="Resident.Id" value="@Model.Resident.Id" />
+                <input type="hidden" name="Resident.UserId" value="@Model.Resident.UserId" />
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button type="submit" class="btn-action btn-save">
+                        <i class="fas fa-save"></i>
+                        Lưu thay đổi
+                    </button>
+                    <a href="/Resident/Details/@Model.Resident.Id" class="btn-action btn-cancel">
+                        <i class="fas fa-times"></i>
+                        Hủy bỏ
+                    </a>
+                </div>
+            </form>
+        }
+        else
+        {
+            <div class="alert-modern alert-error">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>Không tìm thấy thông tin cư dân.</span>
+            </div>
+            <div class="text-center mt-4">
+                <a href="/Resident/Index" class="btn-action btn-cancel">
+                    <i class="fas fa-arrow-left"></i>
+                    Quay lại danh sách
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
