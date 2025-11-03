@@ -36,6 +36,7 @@ using System.Text;
     builder.Services.AddScoped<IReportService, ReportService>();
     builder.Services.AddScoped<IServiceRequestService, ServiceRequestService>();
     builder.Services.AddScoped<IRoomService, RoomService>();
+    builder.Services.AddScoped<IStaffService, StaffService>();
     builder.Services.AddControllers()
         .AddJsonOptions(opts =>
         {
