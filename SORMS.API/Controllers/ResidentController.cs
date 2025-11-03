@@ -57,9 +57,8 @@ namespace SORMS.API.Controllers
                 return Unauthorized("Không thể xác định người dùng.");
             }
 
-            // Tìm resident theo UserId
-            var residents = await _residentService.GetAllResidentsAsync();
-            var myResident = residents.FirstOrDefault(r => r.UserId == userId);
+            // Tìm resident theo UserId (sử dụng method mới)
+            var myResident = await _residentService.GetResidentByUserIdAsync(userId);
 
             if (myResident == null)
             {
@@ -148,6 +147,76 @@ namespace SORMS.API.Controllers
                 return BadRequest("Không thể check-out.");
 
             return Ok("Check-out thành công.");
+        }
+
+        /// <summary>
+        /// Update email and phone for Resident (Settings page)
+        /// </summary>
+        [HttpPut("update-account")]
+        [Authorize(Roles = "Resident")]
+        public async Task<IActionResult> UpdateAccount([FromBody] UpdateResidentAccountDto dto)
+        {
+            Console.WriteLine($"[API UpdateAccount] Received - Email: {dto.Email}, Phone: {dto.Phone}");
+            
+            if (!ModelState.IsValid)
+            {
+                Console.WriteLine("[API UpdateAccount] ModelState invalid:");
+                foreach (var error in ModelState)
+                {
+                    Console.WriteLine($"  Key: {error.Key}, Errors: {string.Join(", ", error.Value.Errors.Select(e => e.ErrorMessage))}");
+                }
+                return BadRequest(ModelState);
+            }
+
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            Console.WriteLine($"[API UpdateAccount] UserId from token: {userIdClaim}");
+            
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+            {
+                Console.WriteLine("[API UpdateAccount] Invalid token - userId not found");
+                return Unauthorized("Invalid token");
+            }
+
+            var success = await _residentService.UpdateResidentAccountAsync(userId, dto.Email, dto.Phone);
+            Console.WriteLine($"[API UpdateAccount] Update result: {success}");
+            
+            if (!success)
+                return NotFound("Không tìm thấy hồ sơ cư dân");
+
+            return Ok("Cập nhật tài khoản thành công");
+        }
+
+        /// <summary>
+        /// Update profile info for Resident (Settings page)
+        /// </summary>
+        [HttpPut("update-profile")]
+        [Authorize(Roles = "Resident")]
+        public async Task<IActionResult> UpdateProfile([FromBody] UpdateResidentProfileDto dto)
+        {
+            Console.WriteLine($"[API UpdateProfile] Received - Address: {dto.Address}, EmergencyContact: {dto.EmergencyContact}, Notes: {dto.Notes}");
+            
+            if (!ModelState.IsValid)
+            {
+                Console.WriteLine("[API UpdateProfile] ModelState invalid");
+                return BadRequest(ModelState);
+            }
+
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            Console.WriteLine($"[API UpdateProfile] UserId from token: {userIdClaim}");
+            
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+            {
+                Console.WriteLine("[API UpdateProfile] Invalid token");
+                return Unauthorized("Invalid token");
+            }
+
+            var success = await _residentService.UpdateResidentProfileAsync(userId, dto.Address, dto.EmergencyContact, dto.Notes);
+            Console.WriteLine($"[API UpdateProfile] Update result: {success}");
+            
+            if (!success)
+                return NotFound("Không tìm thấy hồ sơ cư dân");
+
+            return Ok("Cập nhật hồ sơ thành công");
         }
     }
 }

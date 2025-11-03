@@ -182,6 +182,66 @@
             await _context.SaveChangesAsync();
             return true;
         }
+
+        // =================== Settings Methods ===================
+
+        public async Task<ResidentDto> GetResidentByUserIdAsync(int userId)
+        {
+            var resident = await _context.Residents
+                .Include(r => r.Room)
+                .Include(r => r.User)
+                .FirstOrDefaultAsync(r => r.UserId == userId && r.IsActive);
+
+            if (resident == null) return null;
+
+            return new ResidentDto
+            {
+                Id = resident.Id,
+                UserId = resident.UserId,
+                FullName = resident.FullName,
+                Email = resident.Email,
+                Phone = resident.Phone,
+                IdentityNumber = resident.IdentityNumber,
+                Role = resident.Role,
+                RoomId = resident.RoomId,
+                RoomNumber = resident.Room?.RoomNumber,
+                CheckInDate = resident.CheckInDate,
+                CheckOutDate = resident.CheckOutDate,
+                Address = resident.Address,
+                EmergencyContact = resident.EmergencyContact,
+                Notes = resident.Notes,
+                IsActive = resident.IsActive
+            };
+        }
+
+        public async Task<bool> UpdateResidentAccountAsync(int userId, string email, string phone)
+        {
+            var resident = await _context.Residents
+                .FirstOrDefaultAsync(r => r.UserId == userId && r.IsActive);
+
+            if (resident == null) return false;
+
+            resident.Email = email;
+            resident.Phone = phone ?? "";
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> UpdateResidentProfileAsync(int userId, string? address, string? emergencyContact, string? notes)
+        {
+            var resident = await _context.Residents
+                .FirstOrDefaultAsync(r => r.UserId == userId && r.IsActive);
+
+            if (resident == null) return false;
+
+            resident.Address = address;
+            resident.EmergencyContact = emergencyContact;
+            resident.Notes = notes;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 
 }

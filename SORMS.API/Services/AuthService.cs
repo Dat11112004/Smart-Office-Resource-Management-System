@@ -287,5 +287,43 @@ namespace SORMS.API.Services
         {
             return BCrypt.Net.BCrypt.Verify(password, hash);
         }
+
+        // =================== CHANGE PASSWORD (Authenticated User) ===================
+        public async Task<bool> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return false;
+
+            // Verify current password
+            if (!VerifyPassword(currentPassword, user.PasswordHash))
+                return false;
+
+            // Update with new password
+            user.PasswordHash = HashPassword(newPassword);
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation($"Password changed successfully for user ID: {userId}");
+            return true;
+        }
+
+        // =================== UPDATE EMAIL ===================
+        public async Task<bool> UpdateEmailAsync(int userId, string newEmail)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return false;
+
+            // Check if email is already taken by another user
+            var existingUser = await _context.Users
+                .AnyAsync(u => u.Email == newEmail && u.Id != userId);
+
+            if (existingUser)
+                return false;
+
+            user.Email = newEmail;
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation($"Email updated successfully for user ID: {userId}");
+            return true;
+        }
     }
 }

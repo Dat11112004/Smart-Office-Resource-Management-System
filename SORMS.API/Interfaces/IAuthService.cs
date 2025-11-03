@@ -15,6 +15,9 @@ namespace SORMS.API.Interfaces
 
         Task<bool> ResetPasswordAsync(string email, string otp, string newPassword);
 
+        Task<bool> ChangePasswordAsync(int userId, string currentPassword, string newPassword);
+
+        Task<bool> UpdateEmailAsync(int userId, string newEmail);
 
     }
 
