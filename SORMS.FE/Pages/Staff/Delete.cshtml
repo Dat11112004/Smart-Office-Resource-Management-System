@@ -1,7 +1,7 @@
 ﻿@page "{id:int}"
-@model SORMS.FE.Pages.Resident.DeleteModel
+@model SORMS.FE.Pages.Staff.DeleteModel
 @{
-    ViewData["Title"] = "Xóa cư dân";
+    ViewData["Title"] = "Xóa nhân viên";
 }
 
 <style>
@@ -227,7 +227,7 @@
     <div class="delete-header">
         <h1>
             <i class="fas fa-trash-alt"></i>
-            Xác nhận xóa cư dân
+            Xác nhận xóa nhân viên
         </h1>
     </div>
 
@@ -245,49 +245,33 @@
             <div class="warning-content">
                 <h3>Cảnh báo!</h3>
                 <p>
-                    Bạn có chắc chắn muốn xóa cư dân này không? 
+                    Bạn có chắc chắn muốn xóa nhân viên này không? 
                     <strong>Hành động này không thể hoàn tác.</strong>
-                    Tất cả dữ liệu liên quan đến cư dân sẽ bị xóa vĩnh viễn.
+                    Tất cả dữ liệu liên quan đến nhân viên sẽ bị xóa vĩnh viễn.
                 </p>
             </div>
         </div>
 
-        @if (Model.Resident != null)
+        @if (Model.Staff != null)
         {
             <div class="info-section">
-                <h3>Thông tin cư dân sẽ bị xóa</h3>
+                <h3>Thông tin nhân viên sẽ bị xóa</h3>
                 <div class="info-grid">
                     <div class="info-item">
                         <span class="info-label">ID</span>
-                        <span class="info-value">@Model.Resident.Id</span>
+                        <span class="info-value">@Model.Staff.Id</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Họ và tên</span>
-                        <span class="info-value">@Model.Resident.FullName</span>
+                        <span class="info-value">@Model.Staff.FullName</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Email</span>
-                        <span class="info-value">@Model.Resident.Email</span>
+                        <span class="info-value">@Model.Staff.Email</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Số điện thoại</span>
-                        <span class="info-value">@(Model.Resident.Phone ?? "N/A")</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">CMND/CCCD</span>
-                        <span class="info-value">@Model.Resident.IdentityNumber</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Số phòng</span>
-                        <span class="info-value">@(Model.Resident.RoomNumber ?? "Chưa phân phòng")</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Vai trò</span>
-                        <span class="info-value">@(Model.Resident.Role ?? "N/A")</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Ngày tạo</span>
-                        <span class="info-value">@(Model.Resident.CreatedAt?.ToString("dd/MM/yyyy") ?? "N/A")</span>
+                        <span class="info-value">@(Model.Staff.Phone ?? "N/A")</span>
                     </div>
                 </div>
             </div>
@@ -299,7 +283,7 @@
                         <i class="fas fa-trash-alt"></i>
                         Xác nhận xóa
                     </button>
-                    <a href="/Resident/Details/@Model.Resident.Id" class="btn-action btn-cancel">
+                    <a href="/Staff/Details/@Model.Staff.Id" class="btn-action btn-cancel">
                         <i class="fas fa-times"></i>
                         Hủy bỏ
                     </a>
@@ -310,10 +294,10 @@
         {
             <div class="alert-modern alert-error">
                 <i class="fas fa-exclamation-triangle"></i>
-                <span>Không tìm thấy thông tin cư dân.</span>
+                <span>Không tìm thấy thông tin nhân viên.</span>
             </div>
             <div class="text-center mt-4">
-                <a href="/Resident/Index" class="btn-action btn-cancel">
+                <a href="/Staff/Index" class="btn-action btn-cancel">
                     <i class="fas fa-arrow-left"></i>
                     Quay lại danh sách
                 </a>

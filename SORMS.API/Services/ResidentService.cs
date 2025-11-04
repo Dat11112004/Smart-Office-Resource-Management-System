@@ -130,6 +130,14 @@
             var resident = await _context.Residents.FindAsync(id);
             if (resident == null) return false;
 
+            // Find and delete the corresponding User account with the same email
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == resident.Email);
+            if (user != null)
+            {
+                _context.Users.Remove(user);
+            }
+
+            // Delete the resident record
             _context.Residents.Remove(resident);
             await _context.SaveChangesAsync();
             return true;

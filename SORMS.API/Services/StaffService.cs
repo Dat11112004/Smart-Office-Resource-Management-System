@@ -77,6 +77,14 @@ namespace SORMS.API.Services
             var staff = await _context.Staffs.FindAsync(id);
             if (staff == null) return false;
 
+            // Find and delete the corresponding User account with the same email
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == staff.Email);
+            if (user != null)
+            {
+                _context.Users.Remove(user);
+            }
+
+            // Delete the staff record
             _context.Staffs.Remove(staff);
             await _context.SaveChangesAsync();
             return true;

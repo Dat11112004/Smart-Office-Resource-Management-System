@@ -1,36 +1,383 @@
-﻿@{
+﻿@page "{id:int}"
+@model SORMS.FE.Pages.Resident.DetailsModel
+@{
     ViewData["Title"] = "Chi tiết cư dân";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    var id = Context.Request.RouteValues["id"];
 }
 
-<div class="container mt-4" style="max-width: 600px;">
-    <h3 class="mb-4 text-center">Thông tin cư dân</h3>
-    <div id="residentInfo" class="border rounded p-3 bg-light shadow-sm"></div>
-    <div class="mt-3 text-center">
-        <a href="/Resident/Edit/@id" class="btn btn-warning">Chỉnh sửa</a>
-        <a href="/Resident/Index" class="btn btn-secondary">Quay lại</a>
+<style>
+    .details-container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .details-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 35px 40px;
+        border-radius: 15px 15px 0 0;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .details-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+
+    .details-header h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .details-header h1 i {
+        font-size: 32px;
+    }
+
+    .details-body {
+        background: white;
+        border-radius: 0 0 15px 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        padding: 40px;
+    }
+
+    .info-section {
+        margin-bottom: 30px;
+    }
+
+    .info-section h3 {
+        color: #667eea;
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #e9ecef;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .info-item {
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        padding: 20px;
+        border-radius: 10px;
+        border-left: 4px solid #667eea;
+        transition: all 0.3s ease;
+    }
+
+    .info-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+    }
+
+    .info-label {
+        font-size: 13px;
+        color: #6c757d;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .info-label i {
+        color: #667eea;
+        font-size: 14px;
+    }
+
+    .info-value {
+        font-size: 16px;
+        color: #2d3748;
+        font-weight: 500;
+    }
+
+    .info-value.empty {
+        color: #cbd5e0;
+        font-style: italic;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 30px;
+        padding-top: 30px;
+        border-top: 2px solid #e9ecef;
+    }
+
+    .btn-action {
+        padding: 14px 30px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 15px;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-edit {
+        background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+        color: white;
+        box-shadow: 0 4px 10px rgba(245, 158, 11, 0.2);
+    }
+
+    .btn-edit:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+        color: white;
+    }
+
+    .btn-delete {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        box-shadow: 0 4px 10px rgba(239, 68, 68, 0.2);
+    }
+
+    .btn-delete:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+        color: white;
+    }
+
+    .btn-back {
+        background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+        color: white;
+        box-shadow: 0 4px 10px rgba(107, 114, 128, 0.2);
+    }
+
+    .btn-back:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(107, 114, 128, 0.4);
+        color: white;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+    }
+
+    @@media (max-width: 768px) {
+        .details-container {
+            margin: 20px auto;
+        }
+
+        .details-header {
+            padding: 25px 20px;
+        }
+
+        .details-body {
+            padding: 25px;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn-action {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="details-container">
+    <div class="details-header">
+        <h1>
+            <i class="fas fa-user-circle"></i>
+            Chi tiết cư dân
+        </h1>
+    </div>
+
+    <div class="details-body">
+        @if (Model.Resident != null)
+        {
+            <!-- Personal Information -->
+            <div class="info-section">
+                <h3>
+                    <i class="fas fa-id-card"></i>
+                    Thông tin cá nhân
+                </h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-hashtag"></i>
+                            ID
+                        </div>
+                        <div class="info-value">@Model.Resident.Id</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-user"></i>
+                            Họ và tên
+                        </div>
+                        <div class="info-value">@Model.Resident.FullName</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-venus-mars"></i>
+                            Giới tính
+                        </div>
+                        <div class="info-value">@(Model.Resident.Gender ?? "Chưa cập nhật")</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-birthday-cake"></i>
+                            Ngày sinh
+                        </div>
+                        <div class="info-value">
+                            @(Model.Resident.DateOfBirth?.ToString("dd/MM/yyyy") ?? "Chưa cập nhật")
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="info-section">
+                <h3>
+                    <i class="fas fa-address-book"></i>
+                    Thông tin liên hệ
+                </h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-envelope"></i>
+                            Email
+                        </div>
+                        <div class="info-value">@Model.Resident.Email</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-phone"></i>
+                            Số điện thoại
+                        </div>
+                        <div class="info-value @(string.IsNullOrEmpty(Model.Resident.Phone) ? "empty" : "")">
+                            @(Model.Resident.Phone ?? "Chưa cập nhật")
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Địa chỉ
+                        </div>
+                        <div class="info-value @(string.IsNullOrEmpty(Model.Resident.Address) ? "empty" : "")">
+                            @(Model.Resident.Address ?? "Chưa cập nhật")
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-phone-square-alt"></i>
+                            Liên hệ khẩn cấp
+                        </div>
+                        <div class="info-value @(string.IsNullOrEmpty(Model.Resident.EmergencyContact) ? "empty" : "")">
+                            @(Model.Resident.EmergencyContact ?? "Chưa cập nhật")
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Room & System Information -->
+            <div class="info-section">
+                <h3>
+                    <i class="fas fa-home"></i>
+                    Thông tin phòng & hệ thống
+                </h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-door-open"></i>
+                            Số phòng
+                        </div>
+                        <div class="info-value @(string.IsNullOrEmpty(Model.Resident.RoomNumber) ? "empty" : "")">
+                            @(Model.Resident.RoomNumber ?? "Chưa phân phòng")
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-calendar-plus"></i>
+                            Ngày tạo
+                        </div>
+                        <div class="info-value">
+                            @(Model.Resident.CreatedAt?.ToString("dd/MM/yyyy HH:mm") ?? "N/A")
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-sticky-note"></i>
+                            Ghi chú
+                        </div>
+                        <div class="info-value @(string.IsNullOrEmpty(Model.Resident.Notes) ? "empty" : "")">
+                            @(Model.Resident.Notes ?? "Không có ghi chú")
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-check-circle"></i>
+                            Trạng thái
+                        </div>
+                        <div class="info-value">
+                            <span class="status-badge">Đang hoạt động</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a href="/Resident/Edit/@Model.Resident.Id" class="btn-action btn-edit">
+                    <i class="fas fa-edit"></i>
+                    Chỉnh sửa
+                </a>
+                <a href="/Resident/Delete/@Model.Resident.Id" class="btn-action btn-delete">
+                    <i class="fas fa-trash-alt"></i>
+                    Xóa
+                </a>
+                <a href="/Resident/Index" class="btn-action btn-back">
+                    <i class="fas fa-arrow-left"></i>
+                    Quay lại
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                Không tìm thấy thông tin cư dân.
+            </div>
+        }
     </div>
 </div>
 
-@section Scripts {
-    <script>
-        const id = "@id";
-        async function loadResident() {
-            const res = await fetch(`/api/Resident/${id}`, {
-                headers: { "Authorization": "Bearer " + localStorage.getItem("token") }
-            });
-            const r = await res.json();
-            const div = document.getElementById("residentInfo");
-            div.innerHTML = `
-                <p><b>ID:</b> ${r.id}</p>
-                <p><b>Họ và tên:</b> ${r.fullName}</p>
-                <p><b>Email:</b> ${r.email}</p>
-                <p><b>SĐT:</b> ${r.phone ?? '—'}</p>
-                <p><b>Phòng:</b> ${r.roomNumber ?? '—'}</p>
-                <p><b>Ngày tạo:</b> ${new Date(r.createdAt).toLocaleDateString() ?? '—'}</p>
-            `;
-        }
-        loadResident();
-    </script>
-}
