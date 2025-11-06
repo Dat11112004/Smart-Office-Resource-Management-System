@@ -1,0 +1,177 @@
+﻿@page
+@model SORMS.FE.Pages.Report.DetailsModel
+@{
+    ViewData["Title"] = "Chi Tiết Báo Cáo";
+}
+
+<style>
+    .details-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+    .details-header h1 {
+        color: white;
+        font-weight: 700;
+        margin-bottom: 0;
+    }
+    .info-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        overflow: hidden;
+    }
+    .info-row {
+        padding: 1.5rem;
+        border-bottom: 1px solid #f1f3f5;
+    }
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    .info-label {
+        color: #667eea;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+    .info-value {
+        color: #2d3748;
+        font-size: 1.1rem;
+    }
+    .content-box {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 2rem;
+        border-radius: 12px;
+        border-left: 4px solid #667eea;
+        line-height: 1.8;
+    }
+    .feedback-box {
+        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border-left: 4px solid #10b981;
+        margin-top: 2rem;
+    }
+</style>
+
+<div class="details-header">
+    <h1>
+        <i class="fas fa-file-alt me-3"></i>Chi Tiết Báo Cáo
+    </h1>
+</div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-left: 4px solid #ef4444;">
+        <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="info-card">
+    <div class="card-header" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-bottom: 2px solid #667eea;">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0" style="color: #667eea; font-weight: 700;">
+                <i class="fas fa-info-circle me-2"></i>Thông Tin Báo Cáo
+            </h5>
+            @if (Model.Report.Status == "Pending")
+            {
+                <span class="badge" style="background: linear-gradient(135deg, #fbbf24, #f59e0b); color: white; padding: 0.5rem 1rem; border-radius: 50px;">
+                    <i class="fas fa-clock me-1"></i>Chờ Xử Lý
+                </span>
+            }
+            else if (Model.Report.Status == "Reviewed")
+            {
+                <span class="badge" style="background: linear-gradient(135deg, #34d399, #10b981); color: white; padding: 0.5rem 1rem; border-radius: 50px;">
+                    <i class="fas fa-check-circle me-1"></i>Đã Duyệt
+                </span>
+            }
+            else if (Model.Report.Status == "Rejected")
+            {
+                <span class="badge" style="background: linear-gradient(135deg, #f87171, #ef4444); color: white; padding: 0.5rem 1rem; border-radius: 50px;">
+                    <i class="fas fa-times-circle me-1"></i>Từ Chối
+                </span>
+            }
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="info-row">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="info-label"><i class="fas fa-heading me-2"></i>Tiêu Đề</div>
+                    <div class="info-value">@Model.Report.Title</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="info-label"><i class="fas fa-calendar me-2"></i>Ngày Tạo</div>
+                    <div class="info-value">@Model.Report.GeneratedDate.ToString("dd/MM/yyyy HH:mm")</div>
+                </div>
+            </div>
+        </div>
+        <div class="info-row">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="info-label"><i class="fas fa-user me-2"></i>Người Tạo</div>
+                    <div class="info-value">@Model.Report.CreatedBy</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="info-label"><i class="fas fa-clock me-2"></i>Cập Nhật Lần Cuối</div>
+                    <div class="info-value">@Model.Report.LastUpdated.ToString("dd/MM/yyyy HH:mm")</div>
+                </div>
+            </div>
+        </div>
+        <div class="info-row">
+            <div class="info-label"><i class="fas fa-align-left me-2"></i>Nội Dung</div>
+            <div class="content-box mt-3">
+                @Model.Report.Content
+            </div>
+        </div>
+        
+        @if (!string.IsNullOrEmpty(Model.Report.AdminFeedback))
+        {
+            <div class="info-row">
+                <div class="feedback-box">
+                    <h6 style="color: #059669; font-weight: 700; margin-bottom: 1rem;">
+                        <i class="fas fa-comment-dots me-2"></i>Phản Hồi Từ Admin
+                    </h6>
+                    <p class="mb-3" style="color: #064e3b; line-height: 1.8;">@Model.Report.AdminFeedback</p>
+                    @if (Model.Report.ReviewedDate.HasValue)
+                    {
+                        <hr style="border-color: #10b981;">
+                        <small style="color: #047857;">
+                            <i class="fas fa-user me-1"></i>@Model.Report.ReviewedBy |
+                            <i class="fas fa-calendar ms-2 me-1"></i>@Model.Report.ReviewedDate.Value.ToString("dd/MM/yyyy HH:mm")
+                        </small>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+    <div class="card-footer" style="background: #f8f9fa; padding: 1.5rem;">
+        <div class="d-flex gap-2">
+            <a asp-page="Index" class="btn" style="background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); color: white; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600;">
+                <i class="fas fa-arrow-left me-2"></i>Quay Lại
+            </a>
+            
+            @if (Model.UserRole == "Staff" && Model.Report.Status == "Pending")
+            {
+                <a asp-page="Edit" asp-route-id="@Model.Report.Id" class="btn" style="background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%); color: white; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600;">
+                    <i class="fas fa-edit me-2"></i>Chỉnh Sửa
+                </a>
+                <a asp-page="Delete" asp-route-id="@Model.Report.Id" class="btn" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600;">
+                    <i class="fas fa-trash me-2"></i>Xóa
+                </a>
+            }
+            
+            @if (Model.UserRole == "Admin" && Model.Report.Status == "Pending")
+            {
+                <a asp-page="Review" asp-route-id="@Model.Report.Id" class="btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600;">
+                    <i class="fas fa-check me-2"></i>Duyệt Báo Cáo
+                </a>
+            }
+        </div>
+    </div>
+</div>
