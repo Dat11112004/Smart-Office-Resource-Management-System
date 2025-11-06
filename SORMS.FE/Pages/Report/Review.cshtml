@@ -1,0 +1,137 @@
+﻿@page "{id:int}"
+@model SORMS.FE.Pages.Report.ReviewModel
+@{
+    ViewData["Title"] = "Duyệt Báo cáo";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<style>
+    .review-header {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+    }
+    .review-header h1 {
+        color: white;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    .review-header p {
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 0;
+    }
+    .form-check-custom {
+        padding: 1rem;
+        border-radius: 8px;
+        border: 2px solid #e5e7eb;
+        transition: all 0.3s;
+        cursor: pointer;
+    }
+    .form-check-custom:hover {
+        border-color: #10b981;
+        background: #f0fdf4;
+    }
+    .form-check-custom input:checked ~ label {
+        font-weight: 600;
+        color: #10b981;
+    }
+</style>
+
+<div class="review-header">
+    <h1>
+        <i class="fas fa-clipboard-check me-3"></i>Duyệt Báo cáo
+    </h1>
+    <p>Xem xét và phản hồi báo cáo từ nhân viên</p>
+</div>
+
+<div class="card mb-4" style="border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);">
+    <div class="card-header" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-bottom: 2px solid #10b981;">
+        <h5 class="mb-0" style="color: #10b981; font-weight: 700;">
+            <i class="fas fa-file-alt me-2"></i>Thông tin báo cáo
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div style="color: #10b981; font-weight: 600; font-size: 0.9rem; text-transform: uppercase; margin-bottom: 0.5rem;">
+                    <i class="fas fa-heading me-2"></i>Tiêu đề
+                </div>
+                <p style="color: #2d3748; font-size: 1.1rem;">@Model.Report.Title</p>
+            </div>
+            <div class="col-md-6">
+                <div style="color: #10b981; font-weight: 600; font-size: 0.9rem; text-transform: uppercase; margin-bottom: 0.5rem;">
+                    <i class="fas fa-user me-2"></i>Người tạo
+                </div>
+                <p style="color: #2d3748; font-size: 1.1rem;">@Model.Report.CreatedBy</p>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-12">
+                <div style="color: #10b981; font-weight: 600; font-size: 0.9rem; text-transform: uppercase; margin-bottom: 0.5rem;">
+                    <i class="fas fa-align-left me-2"></i>Nội dung
+                </div>
+                <div class="p-3 border rounded" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-left: 4px solid #10b981 !important; white-space: pre-line; min-height: 150px; line-height: 1.8;">@Model.Report.Content</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card" style="border: 2px solid #10b981; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);">
+    <div class="card-header" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;">
+        <h5 class="mb-0">
+            <i class="fas fa-clipboard-check me-2"></i>Phản hồi của quản trị viên
+        </h5>
+    </div>
+    <div class="card-body" style="padding: 2rem;">
+        <form method="post">
+            @Html.AntiForgeryToken()
+            
+            <div class="mb-4">
+                <label class="form-label" style="color: #10b981; font-weight: 600; font-size: 1rem;">
+                    <i class="fas fa-clipboard-list me-2"></i>Quyết định
+                </label>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-check-custom">
+                            <input class="form-check-input" type="radio" name="action" id="approve" value="approve" checked style="width: 20px; height: 20px;">
+                            <label class="form-check-label ms-2" for="approve" style="cursor: pointer; font-size: 1.1rem;">
+                                <i class="fas fa-check-circle text-success me-2"></i>Phê duyệt
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-check-custom">
+                            <input class="form-check-input" type="radio" name="action" id="reject" value="reject" style="width: 20px; height: 20px;">
+                            <label class="form-check-label ms-2" for="reject" style="cursor: pointer; font-size: 1.1rem;">
+                                <i class="fas fa-times-circle text-danger me-2"></i>Từ chối
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label for="AdminFeedback" class="form-label" style="color: #10b981; font-weight: 600; font-size: 1rem;">
+                    <i class="fas fa-comment-dots me-2"></i>Phản hồi chi tiết
+                </label>
+                <textarea class="form-control" id="AdminFeedback" name="Review.AdminFeedback" asp-for="Review.AdminFeedback" rows="6" required style="border: 2px solid #e5e7eb; border-radius: 8px; padding: 1rem; font-size: 1rem;"></textarea>
+                <span asp-validation-for="Review.AdminFeedback" class="text-danger"></span>
+            </div>
+            
+            <div class="d-flex gap-2 justify-content-end">
+                <a asp-page="Index" class="btn" style="background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); color: white; padding: 0.75rem 2rem; border-radius: 8px; font-weight: 600;">
+                    <i class="fas fa-times me-2"></i>Hủy bỏ
+                </a>
+                <button type="submit" class="btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 0.75rem 2rem; border-radius: 8px; font-weight: 600; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+                    <i class="fas fa-check-double me-2"></i>Gửi phản hồi
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
