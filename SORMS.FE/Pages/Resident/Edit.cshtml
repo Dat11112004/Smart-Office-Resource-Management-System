@@ -290,9 +290,9 @@
                             </label>
                             <select name="Resident.Role" class="form-control-modern">
                                 <option value="">-- Chọn vai trò --</option>
-                                <option value="Lecturer" @(Model.Resident.Role == "Lecturer" ? "selected" : "")>Giảng viên</option>
-                                <option value="Staff" @(Model.Resident.Role == "Staff" ? "selected" : "")>Nhân viên</option>
-                                <option value="Guest" @(Model.Resident.Role == "Guest" ? "selected" : "")>Khách</option>
+                                <option value="Lecturer" selected="@(Model.Resident.Role == "Lecturer")">Giảng viên</option>
+                                <option value="Staff" selected="@(Model.Resident.Role == "Staff")">Nhân viên</option>
+                                <option value="Guest" selected="@(Model.Resident.Role == "Guest")">Khách</option>
                             </select>
                         </div>
 
@@ -370,8 +370,8 @@
                                 Trạng thái
                             </label>
                             <select name="Resident.IsActive" class="form-control-modern">
-                                <option value="true" @(Model.Resident.IsActive == true ? "selected" : "")>Đang hoạt động</option>
-                                <option value="false" @(Model.Resident.IsActive == false ? "selected" : "")>Ngừng hoạt động</option>
+                                <option value="true" selected="@(Model.Resident.IsActive == true)">Đang hoạt động</option>
+                                <option value="false" selected="@(Model.Resident.IsActive == false)">Ngừng hoạt động</option>
                             </select>
                         </div>
 

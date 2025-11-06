@@ -1,0 +1,89 @@
+﻿@page
+@model SORMS.FE.Pages.Report.DeleteModel
+@{
+    ViewData["Title"] = "Xóa Báo Cáo";
+}
+
+<style>
+    .delete-header {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3);
+    }
+    .delete-header h1 {
+        color: white;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    .delete-header p {
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 0;
+    }
+</style>
+
+<div class="delete-header">
+    <h1>
+        <i class="fas fa-trash-alt me-2"></i>Xóa Báo Cáo
+    </h1>
+    <p>Xác nhận xóa báo cáo khỏi hệ thống</p>
+</div>
+
+<div class="alert alert-danger" style="border-left: 4px solid #dc2626; border-radius: 8px;">
+    <h5 class="alert-heading">
+        <i class="fas fa-exclamation-triangle me-2"></i>Cảnh Báo
+    </h5>
+    <p class="mb-0">Bạn có chắc chắn muốn xóa báo cáo này? Hành động này không thể hoàn tác!</p>
+</div>
+
+<div class="card" style="border: 2px solid #ef4444; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);">
+    <div class="card-header" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white;">
+        <h5 class="mb-0">
+            <i class="fas fa-info-circle me-2"></i>Thông Tin Báo Cáo Sẽ Bị Xóa
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label fw-semibold text-muted">Tiêu Đề</label>
+                <p class="form-control-plaintext">@Model.Report.Title</p>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold text-muted">Ngày Tạo</label>
+                <p class="form-control-plaintext">@Model.Report.GeneratedDate.ToString("dd/MM/yyyy HH:mm")</p>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold text-muted">Người Tạo</label>
+                <p class="form-control-plaintext">@Model.Report.CreatedBy</p>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold text-muted">Trạng Thái</label>
+                <p class="form-control-plaintext">
+                    @if (Model.Report.Status == "Pending")
+                    {
+                        <span class="badge badge-status pending">Chờ Xử Lý</span>
+                    }
+                </p>
+            </div>
+            <div class="col-12">
+                <label class="form-label fw-semibold text-muted">Nội Dung</label>
+                <div class="bg-light p-3 rounded">
+                    @Model.Report.Content
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form method="post" class="mt-4">
+    @Html.AntiForgeryToken()
+    <div class="d-flex gap-2 justify-content-end">
+        <a asp-page="Index" class="btn" style="background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); color: white; padding: 0.75rem 2rem; border-radius: 8px; font-weight: 600;">
+            <i class="fas fa-arrow-left me-2"></i>Hủy Bỏ
+        </a>
+        <button type="submit" class="btn" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; padding: 0.75rem 2rem; border-radius: 8px; font-weight: 600; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);">
+            <i class="fas fa-trash me-2"></i>Xác Nhận Xóa
+        </button>
+    </div>
+</form>

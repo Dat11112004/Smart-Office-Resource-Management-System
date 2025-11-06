@@ -21,5 +21,25 @@ namespace SORMS.API.Models
 
         [Required, MaxLength(100)]
         public string CreatedBy { get; set; }
+
+        // Staff ID who created the report
+        public int? StaffId { get; set; }
+
+        // Status: Pending, Reviewed, Rejected
+        [MaxLength(50)]
+        public string Status { get; set; } = "Pending";
+
+        // Admin feedback
+        public string? AdminFeedback { get; set; }
+
+        // Admin who reviewed
+        [MaxLength(100)]
+        public string? ReviewedBy { get; set; }
+
+        // Review date
+        public DateTime? ReviewedDate { get; set; }
+
+        // Last update
+        public DateTime LastUpdated { get; set; }
     }
 }

@@ -1,10 +1,29 @@
+@{
+    var token = Context.Session.GetString("JWTToken");
+    string? userRole = null;
+    
+    if (!string.IsNullOrEmpty(token))
+    {
+        try
+        {
+            var handler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
+            userRole = jwtToken.Claims.FirstOrDefault(c => c.Type == "role" || c.Type == System.Security.Claims.ClaimTypes.Role)?.Value;
+        }
+        catch { }
+    }
+}
+
 <li>
     <a href="#reportsSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
-        <i class="fas fa-chart-line"></i>
-        <span>Reports</span>
+        <i class="fas fa-file-text"></i>
+        <span>Báo cáo</span>
     </a>
     <ul class="collapse list-unstyled" id="reportsSubmenu">
-        <li><a href="/Report" class="nav-link"><i class="fas fa-file-alt"></i> Báo cáo tổng hợp</a></li>
-        <li><a href="/Report/Analytics" class="nav-link"><i class="fas fa-chart-pie"></i> Phân tích</a></li>
+        <li><a href="/Report" class="nav-link"><i class="fas fa-list"></i> Danh sách báo cáo</a></li>
+        @if (userRole == "Staff")
+        {
+            <li><a href="/Report/Create" class="nav-link"><i class="fas fa-plus-circle"></i> Tạo báo cáo mới</a></li>
+        }
     </ul>
 </li>

@@ -10,4 +10,8 @@
     <ProjectReference Include="..\SORMS.API\SORMS.API.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Pages\Report\" />
+  </ItemGroup>
+
 </Project>

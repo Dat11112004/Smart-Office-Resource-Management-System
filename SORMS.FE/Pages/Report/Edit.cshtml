@@ -1,0 +1,70 @@
+﻿@page
+@model SORMS.FE.Pages.Report.EditModel
+@{
+    ViewData["Title"] = "Chỉnh sửa Báo cáo";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<style>
+    .edit-header {
+        background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(245, 158, 11, 0.3);
+    }
+    .edit-header h1 {
+        color: white;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    .edit-header p {
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 0;
+    }
+</style>
+
+<div class="edit-header">
+    <h1>
+        <i class="fas fa-edit me-2"></i>Chỉnh sửa Báo cáo
+    </h1>
+    <p>Cập nhật thông tin báo cáo của bạn</p>
+</div>
+
+<div class="card" style="border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);">
+    <div class="card-header" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-bottom: 2px solid #f59e0b;">
+        <h5 class="mb-0" style="color: #f59e0b; font-weight: 700;">
+            <i class="fas fa-edit me-2"></i>
+        </h5>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            @Html.AntiForgeryToken()
+            
+            <div class="mb-3">
+                <label for="Title" class="form-label">Tiêu đề báo cáo</label>
+                <input type="text" class="form-control" id="Title" name="Report.Title" asp-for="Report.Title" required>
+                <span asp-validation-for="Report.Title" class="text-danger"></span>
+            </div>
+            
+            <div class="mb-3">
+                <label for="Content" class="form-label">Nội dung báo cáo</label>
+                <textarea class="form-control" id="Content" name="Report.Content" asp-for="Report.Content" rows="10" required></textarea>
+                <span asp-validation-for="Report.Content" class="text-danger"></span>
+            </div>
+            
+            <div class="d-flex gap-2 justify-content-end">
+                <a asp-page="Index" class="btn" style="background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); color: white; padding: 0.75rem 2rem; border-radius: 8px; font-weight: 600;">
+                    <i class="fas fa-times me-2"></i>Hủy bỏ
+                </a>
+                <button type="submit" class="btn" style="background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%); color: white; padding: 0.75rem 2rem; border-radius: 8px; font-weight: 600; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);">
+                    <i class="fas fa-save me-2"></i>Lưu thay đổi
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
