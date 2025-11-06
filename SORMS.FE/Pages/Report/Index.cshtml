@@ -1,0 +1,284 @@
+﻿@page
+@model SORMS.FE.Pages.Report.IndexModel
+@{
+    ViewData["Title"] = "Quản Lý Báo Cáo";
+}
+
+<style>
+    .report-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+    .report-header h1 {
+        color: white;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    .report-header p {
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 0;
+    }
+    .stats-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        border-left: 4px solid;
+        transition: transform 0.3s ease;
+    }
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
+    .stats-card.pending { border-left-color: #f59e0b; }
+    .stats-card.reviewed { border-left-color: #10b981; }
+    .stats-card.rejected { border-left-color: #ef4444; }
+    
+    .report-table {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    }
+    .report-table table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .report-table thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    .report-table thead th {
+        border: none;
+        padding: 1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 14px;
+    }
+    .report-table tbody tr {
+        transition: background-color 0.2s ease;
+        border-bottom: 1px solid #f1f3f5;
+    }
+    .report-table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    .report-table tbody td {
+        color: #4a5568;
+    }
+    .badge-modern {
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-weight: 500;
+        font-size: 0.85rem;
+    }
+    .badge-pending {
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        color: white;
+    }
+    .badge-reviewed {
+        background: linear-gradient(135deg, #34d399, #10b981);
+        color: white;
+    }
+    .badge-rejected {
+        background: linear-gradient(135deg, #f87171, #ef4444);
+        color: white;
+    }
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+    }
+    .btn-action {
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+        border: none;
+        cursor: pointer;
+    }
+    .btn-view {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    .btn-view:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        color: white;
+    }
+    .btn-edit {
+        background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+        color: white;
+    }
+    .btn-edit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        color: white;
+    }
+    .btn-delete {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+    }
+    .btn-delete:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        color: white;
+    }
+    .btn-review {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+    }
+    .btn-review:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        color: white;
+    }
+</style>
+
+<div class="report-header">
+    <h1>
+        <i class="fas fa-file-alt me-2"></i>Quản Lý Báo Cáo
+    </h1>
+    <p>Xem và quản lý các báo cáo trong hệ thống</p>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12 d-flex gap-2">
+        @if (Model.UserRole == "Staff")
+        {
+            <a asp-page="Create" class="btn btn-primary btn-action" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; padding: 0.75rem 2rem; font-weight: 600;">
+                <i class="fas fa-plus me-2"></i>Tạo Báo Cáo Mới
+            </a>
+        }
+        @if (Model.UserRole == "Admin")
+        {
+            <a asp-page="/Admin/Dashboard" class="btn btn-action" style="background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); border: none; padding: 0.75rem 2rem; font-weight: 600; color: white;">
+                <i class="fas fa-arrow-left me-2"></i>Quay lại Dashboard
+            </a>
+        }
+        else
+        {
+            <a asp-page="/Staff/Dashboard" class="btn btn-action" style="background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); border: none; padding: 0.75rem 2rem; font-weight: 600; color: white;">
+                <i class="fas fa-arrow-left me-2"></i>Quay lại Dashboard
+            </a>
+        }
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-left: 4px solid #10b981;">
+        <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-left: 4px solid #ef4444;">
+        <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="report-table">
+    @if (Model.Reports != null && Model.Reports.Any())
+    {
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Tiêu Đề</th>
+                    <th>Người Tạo</th>
+                    <th>Ngày Tạo</th>
+                    <th>Trạng Thái</th>
+                    <th style="text-align: center;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                        @foreach (var report in Model.Reports)
+                        {
+                            <tr>
+                                <td style="padding: 1rem;">
+                                    <div class="fw-bold" style="color: #1e293b;">@report.Title</div>
+                                    <small class="text-muted">@(report.Content?.Length > 50 ? report.Content.Substring(0, 50) + "..." : report.Content)</small>
+                                </td>
+                                <td style="padding: 1rem;">
+                                    <i class="fas fa-user me-1" style="color: #667eea;"></i>@report.CreatedBy
+                                </td>
+                                <td style="padding: 1rem;">
+                                    <i class="fas fa-calendar me-1" style="color: #667eea;"></i>
+                                    <small>@report.GeneratedDate.ToString("dd/MM/yyyy HH:mm")</small>
+                                </td>
+                                <td style="padding: 1rem;">
+                                    @if (report.Status == "Pending")
+                                    {
+                                        <span class="badge badge-modern badge-pending">
+                                            <i class="fas fa-clock me-1"></i>Chờ Xử Lý
+                                        </span>
+                                    }
+                                    else if (report.Status == "Reviewed")
+                                    {
+                                        <span class="badge badge-modern badge-reviewed">
+                                            <i class="fas fa-check-circle me-1"></i>Đã Duyệt
+                                        </span>
+                                    }
+                                    else if (report.Status == "Rejected")
+                                    {
+                                        <span class="badge badge-modern badge-rejected">
+                                            <i class="fas fa-times-circle me-1"></i>Từ Chối
+                                        </span>
+                                    }
+                                </td>
+                                <td class="text-center" style="padding: 1rem;">
+                                    <div class="action-buttons">
+                                        <a asp-page="Details" asp-route-id="@report.Id" class="btn-action btn-view" title="Xem chi tiết">
+                                            <i class="fas fa-eye"></i>
+                                            Chi tiết
+                                        </a>
+                                        @if (Model.UserRole == "Staff" && report.Status == "Pending")
+                                        {
+                                            <a asp-page="Edit" asp-route-id="@report.Id" class="btn-action btn-edit" title="Chỉnh sửa">
+                                                <i class="fas fa-edit"></i>
+                                                Sửa
+                                            </a>
+                                            <a asp-page="Delete" asp-route-id="@report.Id" class="btn-action btn-delete" title="Xóa">
+                                                <i class="fas fa-trash"></i>
+                                                Xóa
+                                            </a>
+                                        }
+                                        @if (Model.UserRole == "Admin" && report.Status == "Pending")
+                                        {
+                                            <a asp-page="Review" asp-route-id="@report.Id" class="btn-action btn-review" title="Duyệt báo cáo">
+                                                <i class="fas fa-check"></i>
+                                                Duyệt
+                                            </a>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-inbox fa-4x mb-3" style="color: #cbd5e1;"></i>
+                    <h5 class="text-muted">Chưa có báo cáo nào</h5>
+                    @if (Model.UserRole == "Staff")
+                    {
+                        <a asp-page="Create" class="btn btn-primary btn-action mt-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; padding: 0.75rem 2rem;">
+                            <i class="fas fa-plus me-2"></i>Tạo Báo Cáo Đầu Tiên
+                        </a>
+                    }
+                </div>
+            }
+        </div>
