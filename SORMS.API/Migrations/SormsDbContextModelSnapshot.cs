@@ -22,33 +22,6 @@ namespace SORMS.API.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("SORMS.API.Models.Billing", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("BillingDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsPaid")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("ResidentId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ResidentId");
-
-                    b.ToTable("Billings");
-                });
-
             modelBuilder.Entity("SORMS.API.Models.CheckInRecord", b =>
                 {
                     b.Property<int>("Id")
@@ -57,13 +30,29 @@ namespace SORMS.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CheckInTime")
+                    b.Property<int?>("ApprovedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ApprovedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("CheckInTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("CheckOutRequestTime")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("CheckOutTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Method")
+                    b.Property<string>("RejectReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("RequestTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RequestType")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
@@ -76,10 +65,12 @@ namespace SORMS.API.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ApprovedBy");
 
                     b.HasIndex("ResidentId");
 
@@ -444,19 +435,12 @@ namespace SORMS.API.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("SORMS.API.Models.Billing", b =>
-                {
-                    b.HasOne("SORMS.API.Models.Resident", "Resident")
-                        .WithMany("Billings")
-                        .HasForeignKey("ResidentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Resident");
-                });
-
             modelBuilder.Entity("SORMS.API.Models.CheckInRecord", b =>
                 {
+                    b.HasOne("SORMS.API.Models.User", "ApprovedByUser")
+                        .WithMany()
+                        .HasForeignKey("ApprovedBy");
+
                     b.HasOne("SORMS.API.Models.Resident", "Resident")
                         .WithMany("CheckInRecords")
                         .HasForeignKey("ResidentId")
@@ -468,6 +452,8 @@ namespace SORMS.API.Migrations
                         .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("ApprovedByUser");
 
                     b.Navigation("Resident");
 
@@ -533,8 +519,6 @@ namespace SORMS.API.Migrations
 
             modelBuilder.Entity("SORMS.API.Models.Resident", b =>
                 {
-                    b.Navigation("Billings");
-
                     b.Navigation("CheckInRecords");
 
                     b.Navigation("Notifications");
