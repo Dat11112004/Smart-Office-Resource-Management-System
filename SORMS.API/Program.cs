@@ -30,7 +30,6 @@ using System.Text;
 
     builder.Services.AddScoped<IAuthService, AuthService>();
     builder.Services.AddScoped<IResidentService, ResidentService>();
-    builder.Services.AddScoped<IBillingService, BillingService>();
     builder.Services.AddScoped<ICheckInService, CheckInService>();
     builder.Services.AddScoped<INotificationService, NotificationService>();
     builder.Services.AddScoped<IReportService, ReportService>();

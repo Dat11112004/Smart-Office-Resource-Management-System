@@ -1,0 +1,594 @@
+@page
+@model SORMS.FE.Pages.Admin.CheckInApprovalsModel
+@{
+    ViewData["Title"] = "Phê Duyệt Check-in/Check-out";
+}
+
+<style>
+    /* Tab Content Visibility */
+    .tab-content > .tab-pane {
+        display: none !important;
+    }
+
+        .tab-content > .tab-pane.active {
+            display: block !important;
+        }
+
+    /* Action Cards Grid */
+    .action-cards-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .action-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+        .action-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .action-card.approve-card {
+            border-color: #11998e;
+            background: linear-gradient(135deg, rgba(17,153,142,0.05) 0%, rgba(56,239,125,0.05) 100%);
+        }
+
+        .action-card.reject-card {
+            border-color: #eb3349;
+            background: linear-gradient(135deg, rgba(235,51,73,0.05) 0%, rgba(244,92,67,0.05) 100%);
+        }
+
+    .action-card-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .action-card-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .approve-card .action-card-icon {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white;
+    }
+
+    .reject-card .action-card-icon {
+        background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+        color: white;
+    }
+
+    .action-card h5 {
+        margin: 0;
+        font-size: 1.3rem;
+        font-weight: 700;
+    }
+
+    .action-card .form-label {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+    .action-card .form-control,
+    .action-card .form-select {
+        border-radius: 10px;
+        border: 2px solid #e0e0e0;
+        padding: 0.75rem;
+        font-size: 0.95rem;
+    }
+
+    .action-card .btn-submit {
+        width: 100%;
+        padding: 0.875rem;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 1rem;
+        border: none;
+        margin-top: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .approve-card .btn-submit {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(17,153,142,0.3);
+    }
+
+        .approve-card .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(17,153,142,0.4);
+        }
+
+    .reject-card .btn-submit {
+        background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(235,51,73,0.3);
+    }
+
+        .reject-card .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(235,51,73,0.4);
+        }
+
+    /* All Records Table Styles */
+    #all table tbody tr:hover {
+        background: linear-gradient(135deg, rgba(79,172,254,0.05) 0%, rgba(0,242,254,0.05) 100%);
+        transform: scale(1.01);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    #all .table-responsive {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    #all .table thead th {
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+</style>
+
+<!-- Main Container -->
+<div style="max-width: 1400px; margin: 0 auto; padding: 2rem 1.5rem;">
+
+    <!-- Header -->
+    <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 2.5rem 2rem; border-radius: 20px; margin-bottom: 2rem; box-shadow: 0 10px 40px rgba(79,172,254,0.3);">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <h2 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; color: white;">
+                    <i class="fas fa-clipboard-check"></i> Phê Duyệt Check-in/Check-out
+                </h2>
+                <p style="font-size: 1rem; margin: 0; color: white;">Quản lý và phê duyệt các yêu cầu</p>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <div style="text-align: center; background: rgba(255,255,255,0.2); padding: 0.75rem 1.5rem; border-radius: 12px;">
+                    <div style="font-size: 1.75rem; font-weight: 700;">@Model.PendingCheckIns.Count()</div>
+                    <div style="font-size: 0.85rem;">Check-in</div>
+                </div>
+                <div style="text-align: center; background: rgba(255,255,255,0.2); padding: 0.75rem 1.5rem; border-radius: 12px;">
+                    <div style="font-size: 1.75rem; font-weight: 700;">@Model.PendingCheckOuts.Count()</div>
+                    <div style="font-size: 0.85rem;">Check-out</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Section -->
+    <div style="background: #f8f9fa; border-radius: 20px; padding: 2rem;">
+
+        <!-- Tab Navigation -->
+        <div style="background: white; padding: 1rem; border-radius: 16px; margin-bottom: 2rem; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
+            <ul class="nav nav-tabs border-0" style="display: flex; gap: 0.5rem;">
+                <li class="nav-item" style="flex: 1;">
+                    <button class="nav-link active" id="checkin-tab" data-bs-toggle="tab" data-bs-target="#checkin" type="button"
+                            style="color: white; font-weight: 600; padding: 0.875rem 1.25rem; border-radius: 12px; border: none; width: 100%; text-align: center; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <i class="fas fa-sign-in-alt me-2"></i> Check In
+                    </button>
+                </li>
+                <li class="nav-item" style="flex: 1;">
+                    <button class="nav-link" id="checkout-tab" data-bs-toggle="tab" data-bs-target="#checkout" type="button"
+                            style="color: #546e7a; font-weight: 600; padding: 0.875rem 1.25rem; border-radius: 12px; border: none; width: 100%; text-align: center; background: transparent;">
+                        <i class="fas fa-sign-out-alt me-2"></i> Check Out
+                    </button>
+                </li>
+                <li class="nav-item" style="flex: 1;">
+                    <button class="nav-link" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button"
+                            style="color: #546e7a; font-weight: 600; padding: 0.875rem 1.25rem; border-radius: 12px; border: none; width: 100%; text-align: center; background: transparent;">
+                        <i class="fas fa-list me-2"></i> Tất Cả
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+            <!-- Tab Check-in -->
+            <div class="tab-pane fade show active" id="checkin">
+                <!-- Back Button -->
+                <div style="margin-bottom: 1.5rem;">
+                    <a href="javascript:history.back()" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 12px; font-weight: 600; box-shadow: 0 4px 15px rgba(102,126,234,0.3); transition: all 0.3s ease;">
+                        <i class="fas fa-arrow-left"></i> Quay Lại
+                    </a>
+                </div>
+
+                <div style="background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-bottom: 2rem;">
+                    <h4 style="margin-bottom: 1.5rem; color: #37474f;">
+                        <i class="fas fa-clipboard-list me-2" style="color: #4facfe;"></i>
+                        Danh Sách Yêu Cầu Check-in
+                    </h4>
+                    @if (!Model.PendingCheckIns.Any())
+                    {
+                        <div style="text-align: center; padding: 3rem 1rem;">
+                            <div style="width: 80px; height: 80px; margin: 0 auto 1rem; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0.2;">
+                                <i class="fas fa-check-circle" style="font-size: 2.5rem; color: white;"></i>
+                            </div>
+                            <p style="color: #90a4ae; font-size: 1.1rem; margin: 0;">Không có yêu cầu check-in nào đang chờ phê duyệt.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <table class="table" style="margin-bottom: 0; border-collapse: separate; border-spacing: 0;">
+                            <thead style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
+                                <tr>
+                                    <th style="padding: 1rem; font-weight: 600; border: none; border-radius: 12px 0 0 0;">Cư dân</th>
+                                    <th style="padding: 1rem; font-weight: 600; border: none;">Phòng</th>
+                                    <th style="padding: 1rem; font-weight: 600; border: none; border-radius: 0 12px 0 0;">Thời gian</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var request in Model.PendingCheckIns)
+                                {
+                                    <tr style="border-bottom: 1px solid #f0f0f0; transition: all 0.3s ease;" onmouseover="this.style.backgroundColor='#f8fafb'" onmouseout="this.style.backgroundColor='white'">
+                                        <td style="padding: 1rem; vertical-align: middle;">
+                                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                                <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1rem; flex-shrink: 0;">
+                                                    @request.ResidentName.Substring(0, 1).ToUpper()
+                                                </div>
+                                                <strong>@request.ResidentName</strong>
+                                            </div>
+                                        </td>
+                                        <td style="padding: 1rem; vertical-align: middle;">
+                                            <span style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; border-radius: 8px; font-weight: 600; font-size: 0.9rem;">
+                                                <i class="fas fa-door-open"></i> Phòng @request.RoomNumber
+                                            </span>
+                                        </td>
+                                        <td style="padding: 1rem; vertical-align: middle;">
+                                            <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                                                <div style="font-weight: 600; color: #37474f;">@request.RequestTime?.ToString("dd/MM/yyyy")</div>
+                                                <div style="font-size: 0.85rem; color: #90a4ae;">@request.RequestTime?.ToString("HH:mm")</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+
+                <!-- Action Cards for Check-in -->
+                <div class="action-cards-grid">
+                    <!-- Phê Duyệt Check-in Card -->
+                    <div class="action-card approve-card">
+                        <div class="action-card-header">
+                            <div class="action-card-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <h5>Phê Duyệt Check-in</h5>
+                        </div>
+                        <form method="post" asp-page-handler="ApproveCheckIn">
+                            @Html.AntiForgeryToken()
+                            <div class="mb-3">
+                                <label class="form-label">Chọn Yêu Cầu:</label>
+                                <select class="form-select" name="requestId" required>
+                                    <option value="">-- Chọn yêu cầu cần phê duyệt --</option>
+                                    @foreach (var request in Model.PendingCheckIns)
+                                    {
+                                        <option value="@request.Id">@request.ResidentName - Phòng @request.RoomNumber</option>
+                                    }
+                                </select>
+                            </div>
+                            <button type="submit" class="btn-submit">
+                                <i class="fas fa-check me-2"></i> Xác Nhận Phê Duyệt
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Từ Chối Check-in Card -->
+                    <div class="action-card reject-card">
+                        <div class="action-card-header">
+                            <div class="action-card-icon">
+                                <i class="fas fa-times-circle"></i>
+                            </div>
+                            <h5>Từ Chối Check-in</h5>
+                        </div>
+                        <form method="post" asp-page-handler="RejectCheckIn">
+                            @Html.AntiForgeryToken()
+                            <div class="mb-3">
+                                <label class="form-label">Chọn Yêu Cầu:</label>
+                                <select class="form-select" name="requestId" required>
+                                    <option value="">-- Chọn yêu cầu cần từ chối --</option>
+                                    @foreach (var request in Model.PendingCheckIns)
+                                    {
+                                        <option value="@request.Id">@request.ResidentName - Phòng @request.RoomNumber</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Lý do từ chối:</label>
+                                <textarea class="form-control" name="rejectReason" rows="3" required placeholder="Nhập lý do từ chối..."></textarea>
+                            </div>
+                            <button type="submit" class="btn-submit">
+                                <i class="fas fa-times me-2"></i> Xác Nhận Từ Chối
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Check-out -->
+            <div class="tab-pane fade" id="checkout">
+                <!-- Back Button -->
+                <div style="margin-bottom: 1.5rem;">
+                    <a href="javascript:history.back()" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 12px; font-weight: 600; box-shadow: 0 4px 15px rgba(102,126,234,0.3); transition: all 0.3s ease;">
+                        <i class="fas fa-arrow-left"></i> Quay Lại
+                    </a>
+                </div>
+
+                <div style="background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-bottom: 2rem;">
+                    <h4 style="margin-bottom: 1.5rem; color: #37474f;">
+                        <i class="fas fa-sign-out-alt me-2" style="color: #ff9800;"></i>
+                        Danh Sách Yêu Cầu Check-out
+                    </h4>
+                    @if (!Model.PendingCheckOuts.Any())
+                    {
+                        <div style="text-align: center; padding: 3rem 1rem;">
+                            <div style="width: 80px; height: 80px; margin: 0 auto 1rem; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0.2;">
+                                <i class="fas fa-sign-out-alt" style="font-size: 2.5rem; color: white;"></i>
+                            </div>
+                            <p style="color: #90a4ae; font-size: 1.1rem; margin: 0;">Không có yêu cầu check-out nào đang chờ phê duyệt.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <table class="table" style="margin-bottom: 0; border-collapse: separate; border-spacing: 0;">
+                            <thead style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white;">
+                                <tr>
+                                    <th style="padding: 1rem; font-weight: 600; border: none; border-radius: 12px 0 0 0;">Cư dân</th>
+                                    <th style="padding: 1rem; font-weight: 600; border: none;">Phòng</th>
+                                    <th style="padding: 1rem; font-weight: 600; border: none; border-radius: 0 12px 0 0;">Thời gian</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var request in Model.PendingCheckOuts)
+                                {
+                                    <tr style="border-bottom: 1px solid #f0f0f0; transition: all 0.3s ease;" onmouseover="this.style.backgroundColor='#f8fafb'" onmouseout="this.style.backgroundColor='white'">
+                                        <td style="padding: 1rem; vertical-align: middle;">
+                                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                                <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1rem; flex-shrink: 0;">
+                                                    @request.ResidentName.Substring(0, 1).ToUpper()
+                                                </div>
+                                                <strong>@request.ResidentName</strong>
+                                            </div>
+                                        </td>
+                                        <td style="padding: 1rem; vertical-align: middle;">
+                                            <span style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; border-radius: 8px; font-weight: 600; font-size: 0.9rem;">
+                                                <i class="fas fa-door-open"></i> Phòng @request.RoomNumber
+                                            </span>
+                                        </td>
+                                        <td style="padding: 1rem; vertical-align: middle;">
+                                            <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                                                <div style="font-weight: 600; color: #37474f;">@request.RequestTime?.ToString("dd/MM/yyyy")</div>
+                                                <div style="font-size: 0.85rem; color: #90a4ae;">@request.RequestTime?.ToString("HH:mm")</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+
+                <!-- Action Cards for Check-out -->
+                <div class="action-cards-grid">
+                    <!-- Phê Duyệt Check-out Card -->
+                    <div class="action-card approve-card">
+                        <div class="action-card-header">
+                            <div class="action-card-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <h5>Phê Duyệt Check-out</h5>
+                        </div>
+                        <form method="post" asp-page-handler="ApproveCheckOut">
+                            @Html.AntiForgeryToken()
+                            <div class="mb-3">
+                                <label class="form-label">Chọn Yêu Cầu:</label>
+                                <select class="form-select" name="requestId" required>
+                                    <option value="">-- Chọn yêu cầu cần phê duyệt --</option>
+                                    @foreach (var request in Model.PendingCheckOuts)
+                                    {
+                                        <option value="@request.Id">@request.ResidentName - Phòng @request.RoomNumber</option>
+                                    }
+                                </select>
+                            </div>
+                            <button type="submit" class="btn-submit">
+                                <i class="fas fa-check me-2"></i> Xác Nhận Phê Duyệt
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Từ Chối Check-out Card -->
+                    <div class="action-card reject-card">
+                        <div class="action-card-header">
+                            <div class="action-card-icon">
+                                <i class="fas fa-times-circle"></i>
+                            </div>
+                            <h5>Từ Chối Check-out</h5>
+                        </div>
+                        <form method="post" asp-page-handler="RejectCheckOut">
+                            @Html.AntiForgeryToken()
+                            <div class="mb-3">
+                                <label class="form-label">Chọn Yêu Cầu:</label>
+                                <select class="form-select" name="requestId" required>
+                                    <option value="">-- Chọn yêu cầu cần từ chối --</option>
+                                    @foreach (var request in Model.PendingCheckOuts)
+                                    {
+                                        <option value="@request.Id">@request.ResidentName - Phòng @request.RoomNumber</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Lý do từ chối:</label>
+                                <textarea class="form-control" name="rejectReason" rows="3" required placeholder="Nhập lý do từ chối..."></textarea>
+                            </div>
+                            <button type="submit" class="btn-submit">
+                                <i class="fas fa-times me-2"></i> Xác Nhận Từ Chối
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab All Records -->
+            <div class="tab-pane fade" id="all">
+                <div style="background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
+                    <h4 style="margin-bottom: 1.5rem; color: #37474f; font-weight: 700; display: flex; align-items: center; gap: 0.75rem;">
+                        <div style="width: 45px; height: 45px; border-radius: 12px; background: linear-gradient(135deg, #5c6bc0 0%, #3f51b5 100%); display: flex; align-items: center; justify-content: center; color: white;">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        Tất Cả Bản Ghi
+                    </h4>
+                    @if (!Model.AllRecords.Any())
+                    {
+                        <div style="text-align: center; padding: 4rem 2rem;">
+                            <div style="width: 120px; height: 120px; margin: 0 auto 1.5rem; background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-folder-open" style="font-size: 3.5rem; color: #5c6bc0;"></i>
+                            </div>
+                            <h5 style="color: #546e7a; font-weight: 600; margin-bottom: 0.5rem;">Chưa Có Bản Ghi</h5>
+                            <p style="color: #90a4ae; margin: 0;">Chưa có bản ghi check-in/check-out nào trong hệ thống.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table" style="margin-bottom: 0;">
+                                <thead style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                                    <tr>
+                                        <th style="padding: 1rem; font-weight: 600; border: none; border-radius: 12px 0 0 0;">Cư dân</th>
+                                        <th style="padding: 1rem; font-weight: 600; border: none; text-align: center;">Phòng</th>
+                                        <th style="padding: 1rem; font-weight: 600; border: none; text-align: center;">Loại</th>
+                                        <th style="padding: 1rem; font-weight: 600; border: none; text-align: center;">Thời gian</th>
+                                        <th style="padding: 1rem; font-weight: 600; border: none; text-align: center; border-radius: 0 12px 0 0;">Trạng thái</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var record in Model.AllRecords)
+                                    {
+                                        <tr style="border-bottom: 1px solid #f0f0f0; transition: all 0.3s ease;">
+                                            <td style="padding: 1rem; vertical-align: middle;">
+                                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                                    <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.95rem; box-shadow: 0 3px 10px rgba(102,126,234,0.3);">
+                                                        @record.ResidentName.Substring(0, 1).ToUpper()
+                                                    </div>
+                                                    <strong style="color: #37474f; font-size: 0.95rem;">@record.ResidentName</strong>
+                                                </div>
+                                            </td>
+                                            <td style="padding: 1rem; vertical-align: middle; text-align: center;">
+                                                <span style="display: inline-flex; align-items: center; gap: 0.4rem; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; padding: 0.5rem 1rem; border-radius: 10px; font-weight: 600; font-size: 0.9rem; box-shadow: 0 2px 8px rgba(67,233,123,0.3);">
+                                                    <i class="fas fa-door-open" style="font-size: 0.85rem;"></i> Phòng @record.RoomNumber
+                                                </span>
+                                            </td>
+                                            <td style="padding: 1rem; vertical-align: middle; text-align: center;">
+                                                @if (record.Status.Contains("CheckIn"))
+                                                {
+                                                    <span style="display: inline-flex; align-items: center; gap: 0.4rem; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 0.5rem 1rem; border-radius: 10px; font-weight: 600; font-size: 0.85rem; box-shadow: 0 2px 8px rgba(79,172,254,0.3);">
+                                                        <i class="fas fa-sign-in-alt"></i> Check-in
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span style="display: inline-flex; align-items: center; gap: 0.4rem; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; padding: 0.5rem 1rem; border-radius: 10px; font-weight: 600; font-size: 0.85rem; box-shadow: 0 2px 8px rgba(250,112,154,0.3);">
+                                                        <i class="fas fa-sign-out-alt"></i> Check-out
+                                                    </span>
+                                                }
+                                            </td>
+                                            <td style="padding: 1rem; vertical-align: middle; text-align: center; color: #546e7a; font-size: 0.9rem;">
+                                                <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
+                                                    <span style="font-weight: 600; color: #37474f;">@record.RequestTime?.ToString("dd/MM/yyyy")</span>
+                                                    <span style="font-size: 0.85rem; color: #90a4ae;">@record.RequestTime?.ToString("HH:mm")</span>
+                                                </div>
+                                            </td>
+                                            <td style="padding: 1rem; vertical-align: middle; text-align: center;">
+                                                <span class="badge @GetStatusBadgeClass(record.Status)" style="padding: 0.5rem 1rem; border-radius: 10px; font-weight: 600; font-size: 0.85rem; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
+                                                    @GetStatusText(record.Status)
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Tab Switching Handler
+    document.addEventListener('DOMContentLoaded', function() {
+        const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
+        const tabPanes = document.querySelectorAll('.tab-pane');
+
+        const inactiveStyle = 'color: #546e7a; font-weight: 600; padding: 0.875rem 1.25rem; border-radius: 12px; border: none; transition: all 0.3s ease; width: 100%; text-align: center; background: transparent;';
+        const activeStyle = 'color: white; font-weight: 600; padding: 0.875rem 1.25rem; border-radius: 12px; border: none; transition: all 0.3s ease; width: 100%; text-align: center; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);';
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('data-bs-target');
+
+                tabButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.setAttribute('style', inactiveStyle);
+                });
+
+                tabPanes.forEach(pane => {
+                    pane.classList.remove('show', 'active');
+                });
+
+                this.classList.add('active');
+                this.setAttribute('style', activeStyle);
+
+                const targetPane = document.querySelector(targetId);
+                if (targetPane) {
+                    targetPane.classList.add('show', 'active');
+                }
+            });
+        });
+    });
+</script>
+
+@functions {
+    private string GetStatusText(string status)
+    {
+        return status switch
+        {
+            "PendingCheckIn" => "Chờ Check-in",
+            "CheckedIn" => "Đã Check-in",
+            "PendingCheckOut" => "Chờ Check-out",
+            "CheckedOut" => "Đã Check-out",
+            "Rejected" => "Bị Từ Chối",
+            _ => status
+        };
+    }
+
+    private string GetStatusBadgeClass(string status)
+    {
+        return status switch
+        {
+            "PendingCheckIn" => "bg-warning text-dark",
+            "CheckedIn" => "bg-success",
+            "PendingCheckOut" => "bg-info text-dark",
+            "CheckedOut" => "bg-secondary",
+            "Rejected" => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+}

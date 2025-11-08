@@ -13,6 +13,18 @@
         {
             <li><a href="/Room/Create" class="nav-link"><i class="fas fa-plus"></i> Thêm phòng mới</a></li>
         }
+        @if (userRole == "Admin")
+        {
+            <li><a href="/Admin/CheckInApprovals" class="nav-link"><i class="fas fa-chart-bar"></i> Quản Lý Yêu Cầu</a></li>
+        }
+        @if (userRole == "Staff")
+        {
+            <li><a href="/Staff/CheckInApprovals" class="nav-link"><i class="fas fa-chart-bar"></i> Quản Lý Yêu Cầu</a></li>
+        }
+        @if (userRole == "Resident")
+        {
+            <li><a href="/Resident/CheckInStatus" class="nav-link"><i class="fas fa-chart-bar"></i> CheckIn-CheckOut</a></li>
+        }
         <li><a href="/Room/Available" class="nav-link"><i class="fas fa-check-circle"></i> Phòng trống</a></li>
     </ul>
 </li>

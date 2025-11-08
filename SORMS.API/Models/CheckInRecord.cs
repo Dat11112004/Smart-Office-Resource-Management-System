@@ -23,14 +23,28 @@ namespace SORMS.API.Models
         public Room Room { get; set; }
 
         [Required]
-        public DateTime CheckInTime { get; set; }
+        public DateTime RequestTime { get; set; } // Thời gian yêu cầu
 
-        public DateTime? CheckOutTime { get; set; }
+        public DateTime? ApprovedTime { get; set; } // Thời gian được phê duyệt
+
+        public DateTime? CheckInTime { get; set; } // Thời gian check-in thực tế
+
+        public DateTime? CheckOutRequestTime { get; set; } // Thời gian yêu cầu check-out
+
+        public DateTime? CheckOutTime { get; set; } // Thời gian check-out thực tế
+
+        [Required, MaxLength(50)]
+        public string Status { get; set; } // PendingCheckIn, CheckedIn, PendingCheckOut, CheckedOut, Rejected
+
+        [MaxLength(500)]
+        public string? RejectReason { get; set; } // Lý do từ chối
+
+        public int? ApprovedBy { get; set; } // Staff/Admin ID người phê duyệt
+
+        [ForeignKey(nameof(ApprovedBy))]
+        public User? ApprovedByUser { get; set; }
 
         [Required, MaxLength(20)]
-        public string Status { get; set; }
-
-        [Required, MaxLength(20)]
-        public string Method { get; set; }
+        public string RequestType { get; set; } // CheckIn, CheckOut
     }
 }

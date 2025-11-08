@@ -15,7 +15,6 @@ namespace SORMS.API.Data
         public DbSet<Room> Rooms { get; set; }
         public DbSet<ServiceRequest> ServiceRequests { get; set; }
         public DbSet<Staff> Staffs { get; set; }
-        public DbSet<Billing> Billings { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
@@ -38,12 +37,7 @@ namespace SORMS.API.Data
             // ==========================
             // 🔹 Resident ↔ Billing (1-n)
             // ==========================
-            modelBuilder.Entity<Billing>()
-                .HasOne(b => b.Resident)
-                .WithMany(r => r.Billings)
-                .HasForeignKey(b => b.ResidentId)
-                .OnDelete(DeleteBehavior.Restrict);
-
+            
             // ==========================
             // 🔹 Resident ↔ Notification (1-n)
             // ==========================
