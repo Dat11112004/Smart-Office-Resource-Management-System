@@ -237,6 +237,16 @@ namespace SORMS.API.Services
                     new Claim("role", roleName)                                   // plain "role" for compatibility
 };
 
+                // Nếu là Resident, thêm ResidentId claim
+                if (user.RoleId == 3)
+                {
+                    var resident = _context.Residents.FirstOrDefault(r => r.UserId == user.Id);
+                    if (resident != null)
+                    {
+                        claims.Add(new Claim("ResidentId", resident.Id.ToString()));
+                    }
+                }
+
 
                 // 4️⃣ Đọc config JWT
                 var issuer = _configuration["Jwt:Issuer"] ?? "SORMS.API";

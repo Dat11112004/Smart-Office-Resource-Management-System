@@ -58,7 +58,6 @@ namespace SORMS.API.Models
 
         // Navigation collections
         public ICollection<ServiceRequest> ServiceRequests { get; set; } = new List<ServiceRequest>();
-        public ICollection<Billing> Billings { get; set; } = new List<Billing>();
         public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
         public ICollection<CheckInRecord> CheckInRecords { get; set; } = new List<CheckInRecord>();
     }

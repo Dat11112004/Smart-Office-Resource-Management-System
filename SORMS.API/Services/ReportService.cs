@@ -173,28 +173,28 @@
 
         public async Task<ReportDto> GenerateRevenueReportAsync()
         {
-            var totalRevenue = await _context.Billings
-                .Where(b => b.IsPaid)
-                .SumAsync(b => b.Amount);
+            //var totalRevenue = await _context.Billings
+            //    .Where(b => b.IsPaid)
+            //    .SumAsync(b => b.Amount);
 
-            var pendingRevenue = await _context.Billings
-                .Where(b => !b.IsPaid)
-                .SumAsync(b => b.Amount);
+            //var pendingRevenue = await _context.Billings
+            //    .Where(b => !b.IsPaid)
+            //    .SumAsync(b => b.Amount);
 
-            var report = new Report
-            {
-                Title = "Báo cáo doanh thu",
-                GeneratedDate = DateTime.Now,
-                CreatedBy = "System",
-                Content = $"Tổng doanh thu đã thu: {totalRevenue:N0} VND\nDoanh thu chờ thanh toán: {pendingRevenue:N0} VND\nTổng cộng: {(totalRevenue + pendingRevenue):N0} VND",
-                Status = "Reviewed",
-                LastUpdated = DateTime.Now
-            };
+            //var report = new Report
+            //{
+            //    Title = "Báo cáo doanh thu",
+            //    GeneratedDate = DateTime.Now,
+            //    CreatedBy = "System",
+            //    Content = $"Tổng doanh thu đã thu: {totalRevenue:N0} VND\nDoanh thu chờ thanh toán: {pendingRevenue:N0} VND\nTổng cộng: {(totalRevenue + pendingRevenue):N0} VND",
+            //    Status = "Reviewed",
+            //    LastUpdated = DateTime.Now
+            //};
 
-            _context.Reports.Add(report);
-            await _context.SaveChangesAsync();
+            //_context.Reports.Add(report);
+            //await _context.SaveChangesAsync();
 
-            return MapToDto(report);
+            return null;
         }
 
         // ==================== HELPER ====================
