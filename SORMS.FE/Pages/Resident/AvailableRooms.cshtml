@@ -1,0 +1,279 @@
+@page
+@model SORMS.FE.Pages.Resident.AvailableRoomsModel
+@{
+    ViewData["Title"] = "Phòng Trống - Yêu Cầu Check-in";
+}
+
+<style>
+    .available-rooms-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem 2rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 40px rgba(102,126,234,0.3);
+    }
+    .available-rooms-header h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    .available-rooms-header p {
+        font-size: 1.1rem;
+        opacity: 0.95;
+        margin: 0;
+    }
+    .room-card-available-resident {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        height: 100%;
+    }
+    .room-card-available-resident:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 30px rgba(102,126,234,0.2);
+        border-color: #667eea;
+    }
+    .room-card-header-resident {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 1.5rem;
+        color: white;
+    }
+    .room-number-resident {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    .room-type-badge-resident {
+        display: inline-block;
+        padding: 0.4rem 1rem;
+        background: rgba(255,255,255,0.3);
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    .room-card-body-resident {
+        padding: 1.5rem;
+    }
+    .room-info-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+        padding: 0.75rem;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+    .room-info-row i {
+        font-size: 1.2rem;
+        width: 30px;
+        text-align: center;
+        color: #667eea;
+    }
+    .room-info-label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-right: 0.5rem;
+    }
+    .room-info-value {
+        color: #546e7a;
+    }
+    .room-description-resident {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+        color: #546e7a;
+        line-height: 1.6;
+        min-height: 60px;
+    }
+    .btn-request-checkin {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+    .btn-request-checkin:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102,126,234,0.4);
+        color: white;
+    }
+    .empty-state-resident {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+    .empty-state-resident i {
+        font-size: 5rem;
+        color: #e0e6ed;
+        margin-bottom: 1.5rem;
+    }
+    .empty-state-resident h3 {
+        color: #7f8c8d;
+        margin-bottom: 1rem;
+    }
+    .modal-header.bg-primary-gradient {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+</style>
+
+<div class="available-rooms-header">
+    <div class="container">
+        <h2>
+            <i class="fas fa-door-open me-3"></i>
+            Danh Sách Phòng Trống
+        </h2>
+        <p>Chọn phòng bạn muốn thuê và gửi yêu cầu check-in</p>
+    </div>
+</div>
+
+<div class="container mt-4">
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (Model.AvailableRooms == null || !Model.AvailableRooms.Any())
+    {
+        <div class="empty-state-resident">
+            <i class="fas fa-inbox"></i>
+            <h3>Không có phòng trống</h3>
+            <p>Hiện tại không có phòng nào sẵn sàng cho thuê. Vui lòng quay lại sau.</p>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var room in Model.AvailableRooms)
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="room-card-available-resident">
+                        <div class="room-card-header-resident">
+                            <div class="room-number-resident">
+                                <i class="fas fa-door-open me-2"></i>
+                                Phòng @room.RoomNumber
+                            </div>
+                            <span class="room-type-badge-resident">@room.Type</span>
+                        </div>
+                        <div class="room-card-body-resident">
+                            <div class="room-info-row">
+                                <i class="fas fa-layer-group"></i>
+                                <div>
+                                    <span class="room-info-label">Tầng:</span>
+                                    <span class="room-info-value">Tầng @room.Floor</span>
+                                </div>
+                            </div>
+                            
+                            <div class="room-info-row">
+                                <i class="fas fa-expand-arrows-alt"></i>
+                                <div>
+                                    <span class="room-info-label">Diện tích:</span>
+                                    <span class="room-info-value">@room.Area m²</span>
+                                </div>
+                            </div>
+                            
+                            <div class="room-info-row">
+                                <i class="fas fa-money-bill-wave"></i>
+                                <div>
+                                    <span class="room-info-label">Giá thuê:</span>
+                                    <span class="room-info-value">@room.MonthlyRent.ToString("N0") VNĐ/tháng</span>
+                                </div>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(room.Description))
+                            {
+                                <div class="room-description-resident">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    @room.Description
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="room-description-resident" style="color: #95a5a6; font-style: italic;">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Chưa có mô tả
+                                </div>
+                            }
+                            
+                            <button type="button" 
+                                    class="btn-request-checkin"
+                                    onclick="requestCheckIn(@room.Id, '@room.RoomNumber')">
+                                <i class="fas fa-hand-pointer me-2"></i> Yêu Cầu Check-in
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<!-- Modal xác nhận -->
+<div class="modal fade" id="confirmModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; overflow: hidden; border: none;">
+            <div class="modal-header bg-primary-gradient text-white" style="border: none;">
+                <h5 class="modal-title">
+                    <i class="fas fa-question-circle me-2"></i> Xác Nhận Yêu Cầu Check-in
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn yêu cầu check-in vào <strong id="roomNumberText"></strong>?</p>
+                <p class="text-muted mb-0">
+                    <i class="fas fa-info-circle"></i> Yêu cầu sẽ được gửi đến Staff/Admin để phê duyệt.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Hủy
+                </button>
+                <form id="checkInForm" method="post" asp-page="/Resident/AvailableRooms">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="roomIdInput" name="roomId" />
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-check"></i> Xác Nhận
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let confirmModal;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        });
+
+        function requestCheckIn(roomId, roomNumber) {
+            document.getElementById('roomIdInput').value = roomId;
+            document.getElementById('roomNumberText').textContent = 'Phòng ' + roomNumber;
+            confirmModal.show();
+        }
+    </script>
+}
