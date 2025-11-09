@@ -1,0 +1,309 @@
+@page "{checkInRecordId:int}"
+@model SORMS.FE.Pages.Resident.RequestCheckOutModel
+@{
+    ViewData["Title"] = "Yêu Cầu Check-out";
+}
+
+<style>
+    .checkout-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 0 1.5rem;
+    }
+
+    .checkout-header {
+        background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+        color: white;
+        padding: 2.5rem 2rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 40px rgba(246,211,101,0.3);
+    }
+
+    .checkout-header h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: white;
+    }
+
+    .checkout-header p {
+        font-size: 1rem;
+        margin: 0;
+        color: white;
+        opacity: 0.95;
+    }
+
+    .checkout-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        margin-bottom: 1.5rem;
+    }
+
+    .info-box {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #f6d365;
+    }
+
+    .info-row {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        flex: 0 0 180px;
+        font-weight: 600;
+        color: #546e7a;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-label i {
+        color: #f6d365;
+        width: 20px;
+    }
+
+    .info-value {
+        flex: 1;
+        color: #37474f;
+        font-size: 1rem;
+    }
+
+    .warning-box {
+        background: linear-gradient(135deg, #fff3cd 0%, #fff3cd 100%);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border-left: 4px solid #ffc107;
+        color: #856404;
+        margin-bottom: 2rem;
+    }
+
+    .warning-box-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .warning-box-icon {
+        width: 36px;
+        height: 36px;
+        background: rgba(255,193,7,0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .warning-box-icon i {
+        color: #ffc107;
+        font-size: 1.1rem;
+    }
+
+    .warning-box h5 {
+        margin: 0;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .warning-box ul {
+        margin: 0;
+        padding-left: 3rem;
+        font-size: 0.95rem;
+        line-height: 1.8;
+    }
+
+    .btn-action {
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 1rem;
+        border: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        text-decoration: none;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(246,211,101,0.3);
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(246,211,101,0.4);
+        color: white;
+    }
+
+    .btn-back {
+        background: linear-gradient(135deg, #90a4ae 0%, #78909c 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(144,164,174,0.3);
+    }
+
+    .btn-back:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(144,164,174,0.4);
+        color: white;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 1rem;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
+    .button-group > * {
+        flex: 1;
+        min-width: 200px;
+        text-align: center;
+    }
+</style>
+
+<div class="checkout-container">
+    <!-- Header -->
+    <div class="checkout-header">
+        <h2>
+            <i class="fas fa-sign-out-alt me-3"></i>
+            Yêu Cầu Check-out
+        </h2>
+        <p>Xác nhận thông tin và gửi yêu cầu check-out</p>
+    </div>
+
+    @if (Model.CurrentCheckIn == null)
+    {
+        <div class="checkout-card" style="text-align: center; padding: 3rem 2rem;">
+            <div style="width: 80px; height: 80px; margin: 0 auto 1.5rem; background: linear-gradient(135deg, #ef5350 0%, #e53935 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 2.5rem; color: white;"></i>
+            </div>
+            <h4 style="color: #37474f; margin-bottom: 0.5rem;">Không Tìm Thấy Thông Tin</h4>
+            <p style="color: #90a4ae; margin-bottom: 1.5rem;">Không tìm thấy thông tin check-in hoặc bạn không có quyền truy cập.</p>
+            <a href="/Resident/CheckInStatus" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Quay Lại Trạng Thái
+            </a>
+        </div>
+    }
+    else
+    {
+        <!-- Thông Tin Check-in Hiện Tại -->
+        <div class="checkout-card">
+            <h4 style="color: #37474f; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                <div style="width: 45px; height: 45px; border-radius: 12px; background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); display: flex; align-items: center; justify-content: center; color: white;">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                Thông Tin Check-in Hiện Tại
+            </h4>
+
+            <div class="info-box">
+                <div class="info-row">
+                    <div class="info-label">
+                        <i class="fas fa-door-open"></i>
+                        Phòng:
+                    </div>
+                    <div class="info-value">
+                        <strong style="font-size: 1.1rem; color: #f6d365;">@Model.CurrentCheckIn.RoomNumber</strong>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">
+                        <i class="fas fa-calendar-check"></i>
+                        Ngày check-in:
+                    </div>
+                    <div class="info-value">
+                        @Model.CurrentCheckIn.CheckInTime?.ToString("dd/MM/yyyy HH:mm")
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">
+                        <i class="fas fa-user-check"></i>
+                        Phê duyệt bởi:
+                    </div>
+                    <div class="info-value">
+                        @Model.CurrentCheckIn.ApprovedByName
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">
+                        <i class="fas fa-hourglass-half"></i>
+                        Thời gian lưu trú:
+                    </div>
+                    <div class="info-value">
+                        @if (Model.CurrentCheckIn.CheckInTime.HasValue)
+                        {
+                            var duration = DateTime.Now - Model.CurrentCheckIn.CheckInTime.Value;
+                            <strong>@duration.Days ngày @duration.Hours giờ @duration.Minutes phút</strong>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Warning Box -->
+        <div class="warning-box">
+            <div class="warning-box-header">
+                <div class="warning-box-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h5>Lưu Ý Quan Trọng</h5>
+            </div>
+            <ul>
+                <li>Yêu cầu check-out sẽ được gửi đến Staff/Admin để xem xét và phê duyệt.</li>
+                <li>Sau khi gửi yêu cầu, bạn vẫn có thể ở lại phòng cho đến khi được phê duyệt.</li>
+                <li>Vui lòng đảm bảo đã dọn dẹp và kiểm tra lại đồ đạc trước khi yêu cầu.</li>
+                <li>Bạn có thể theo dõi trạng thái yêu cầu tại trang "Trạng Thái Check-in".</li>
+            </ul>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="checkout-card">
+            <h5 style="color: #37474f; font-weight: 700; margin-bottom: 1.5rem;">
+                <i class="fas fa-clipboard-check me-2"></i>
+                Xác Nhận Yêu Cầu
+            </h5>
+
+            <div style="background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%); padding: 1.25rem; border-radius: 12px; margin-bottom: 1.5rem; border-left: 4px solid #17a2b8; color: #0c5460;">
+                <p style="margin: 0; display: flex; align-items: center; gap: 0.75rem; font-size: 0.95rem;">
+                    <i class="fas fa-info-circle" style="font-size: 1.2rem;"></i>
+                    <span>Sau khi bạn xác nhận, yêu cầu check-out sẽ được gửi ngay lập tức. Bạn có chắc chắn muốn tiếp tục?</span>
+                </p>
+            </div>
+
+            <form method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="checkInRecordId" value="@Model.CurrentCheckIn.Id" />
+                
+                <div class="button-group">
+                    <a href="/Resident/CheckInStatus" class="btn-action btn-back">
+                        <i class="fas fa-arrow-left"></i> Quay Lại
+                    </a>
+                    <button type="submit" class="btn-action btn-submit">
+                        <i class="fas fa-paper-plane"></i> Gửi Yêu Cầu Check-out
+                    </button>
+                </div>
+            </form>
+        </div>
+    }
+</div>
+
+```

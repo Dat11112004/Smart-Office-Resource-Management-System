@@ -10,6 +10,9 @@ namespace SORMS.API.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
+        [Required, MaxLength(100)]
+        public string Title { get; set; }
+
         [Required, MaxLength(50)]
         public string ServiceType { get; set; }
 
@@ -19,8 +22,8 @@ namespace SORMS.API.Models
         [Required]
         public DateTime RequestDate { get; set; }
 
-        [Required, MaxLength(20)]
-        public string Status { get; set; }
+        [Required, MaxLength(50)]
+        public string Status { get; set; } = "Pending"; // Pending, Approved, InProgress, Completed, Rejected
 
         // FK: Resident
         [Required]
@@ -29,11 +32,24 @@ namespace SORMS.API.Models
         [ForeignKey(nameof(ResidentId))]
         public Resident Resident { get; set; }
 
-        // FK: Staff
-        [Required]
-        public int StaffId { get; set; }
+        // Staff feedback/response
+        public string? StaffFeedback { get; set; }
 
-        [ForeignKey(nameof(StaffId))]
-        public Staff Staff { get; set; }
+        // Staff who reviewed
+        [MaxLength(100)]
+        public string? ReviewedBy { get; set; }
+
+        // Review date
+        public DateTime? ReviewedDate { get; set; }
+
+        // Completion date
+        public DateTime? CompletedDate { get; set; }
+
+        // Last update
+        public DateTime LastUpdated { get; set; }
+
+        // Priority: Low, Normal, High, Urgent
+        [MaxLength(20)]
+        public string Priority { get; set; } = "Normal";
     }
 }

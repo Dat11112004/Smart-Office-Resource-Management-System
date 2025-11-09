@@ -352,5 +352,16 @@
                 RequestType = record.RequestType
             };
         }
+
+        // Helper method: Lấy ResidentId từ UserId
+        public async Task<int> GetResidentIdByUserIdAsync(int userId)
+        {
+            var resident = await _context.Residents
+                .Where(r => r.UserId == userId)
+                .Select(r => r.Id)
+                .FirstOrDefaultAsync();
+            
+            return resident;
+        }
     }
 }

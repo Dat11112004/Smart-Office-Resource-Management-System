@@ -184,15 +184,49 @@ namespace SORMS.API.Controllers
         {
             try
             {
-                var residentId = int.Parse(User.FindFirst("ResidentId")?.Value ?? "0");
+                Console.WriteLine("[my-status] ========== START ==========");
+                var residentIdClaim = User.FindFirst("ResidentId")?.Value;
+                Console.WriteLine($"[my-status] ResidentId Claim: {residentIdClaim ?? "NULL"}");
+                
+                var residentId = int.Parse(residentIdClaim ?? "0");
+                Console.WriteLine($"[my-status] Parsed ResidentId: {residentId}");
+                
+                // Nếu không có ResidentId claim, thử lấy từ UserId
                 if (residentId == 0)
-                    return BadRequest("Không tìm thấy thông tin resident");
+                {
+                    Console.WriteLine("[my-status] ResidentId = 0, trying to get from UserId...");
+                    var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+                    Console.WriteLine($"[my-status] UserId from claim: {userId}");
+                    
+                    if (userId == 0)
+                    {
+                        Console.WriteLine("[my-status] ERROR: UserId = 0");
+                        return BadRequest(new { success = false, message = "Không tìm thấy thông tin người dùng" });
+                    }
+                    
+                    // Tìm ResidentId từ UserId
+                    residentId = await _checkInService.GetResidentIdByUserIdAsync(userId);
+                    Console.WriteLine($"[my-status] ResidentId from UserId: {residentId}");
+                    
+                    if (residentId == 0)
+                    {
+                        Console.WriteLine("[my-status] ERROR: No resident found for this user");
+                        return BadRequest(new { success = false, message = "Bạn chưa được đăng ký là cư dân. Vui lòng liên hệ quản trị viên." });
+                    }
+                }
 
+                Console.WriteLine($"[my-status] Getting status for ResidentId: {residentId}");
                 var status = await _checkInService.GetCurrentCheckInStatusAsync(residentId);
+                Console.WriteLine($"[my-status] Status found: {status != null}");
+                Console.WriteLine("[my-status] ========== END (SUCCESS) ==========");
+                
                 return Ok(new { success = true, data = status });
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"[my-status] ========== END (ERROR) ==========");
+                Console.WriteLine($"[my-status] Exception: {ex.Message}");
+                Console.WriteLine($"[my-status] StackTrace: {ex.StackTrace}");
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
@@ -206,9 +240,21 @@ namespace SORMS.API.Controllers
         {
             try
             {
-                var residentId = int.Parse(User.FindFirst("ResidentId")?.Value ?? "0");
+                var residentIdClaim = User.FindFirst("ResidentId")?.Value;
+                var residentId = int.Parse(residentIdClaim ?? "0");
+                
+                // Nếu không có ResidentId claim, thử lấy từ UserId
                 if (residentId == 0)
-                    return BadRequest("Không tìm thấy thông tin resident");
+                {
+                    var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+                    if (userId == 0)
+                        return BadRequest(new { success = false, message = "Không tìm thấy thông tin người dùng" });
+                    
+                    // Tìm ResidentId từ UserId
+                    residentId = await _checkInService.GetResidentIdByUserIdAsync(userId);
+                    if (residentId == 0)
+                        return BadRequest(new { success = false, message = "Bạn chưa được đăng ký là cư dân." });
+                }
 
                 var history = await _checkInService.GetCheckInHistoryAsync(residentId);
                 return Ok(new { success = true, data = history });

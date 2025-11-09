@@ -1,0 +1,245 @@
+@page "{requestId:int}"
+@model SORMS.FE.Pages.Resident.EditServiceRequestModel
+@{
+    ViewData["Title"] = "Chỉnh Sửa Yêu Cầu";
+}
+
+@if (Model.Request == null)
+{
+    <div style="max-width: 800px; margin: 2rem auto; padding: 2rem; text-align: center; background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+        <i class="fas fa-exclamation-circle" style="font-size: 4rem; color: #ef5350; margin-bottom: 1rem;"></i>
+        <h4 style="color: #37474f; margin-bottom: 0.5rem;">Không Tìm Thấy Yêu Cầu</h4>
+        <p style="color: #90a4ae; margin-bottom: 1.5rem;">Yêu cầu này không tồn tại hoặc đã bị xóa.</p>
+        <a href="/Resident/ServiceRequests" class="btn btn-primary">
+            <i class="fas fa-arrow-left me-2"></i> Quay Lại Danh Sách
+        </a>
+    </div>
+    return;
+}
+
+<style>
+    .edit-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem 1.5rem;
+    }
+
+    .edit-form {
+        background: white;
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        color: #546e7a;
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        border-radius: 12px;
+        border: 2px solid #e0e0e0;
+        padding: 0.875rem 1rem;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #f093fb;
+        box-shadow: 0 0 0 3px rgba(240,147,251,0.1);
+        outline: none;
+    }
+
+    .btn-update {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        padding: 0.875rem 2rem;
+        border-radius: 12px;
+        border: none;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+
+    .btn-update:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(240,147,251,0.4);
+    }
+
+    .btn-cancel {
+        background: linear-gradient(135deg, #90a4ae 0%, #78909c 100%);
+        color: white;
+        padding: 0.875rem 2rem;
+        border-radius: 12px;
+        border: none;
+        font-weight: 600;
+        font-size: 1rem;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+        width: 100%;
+        text-align: center;
+    }
+
+    .btn-cancel:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(144,164,174,0.3);
+        color: white;
+    }
+
+    .status-info {
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        padding: 1rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.4rem 0.8rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+</style>
+
+<div class="edit-container">
+    
+    <!-- Header -->
+    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 2rem; border-radius: 20px; margin-bottom: 2rem; box-shadow: 0 10px 40px rgba(240,147,251,0.3);">
+        <h2 style="font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; color: white;">
+            <i class="fas fa-edit"></i> Chỉnh Sửa Yêu Cầu Dịch Vụ
+        </h2>
+        <p style="font-size: 0.95rem; margin: 0; color: white;">Cập nhật thông tin yêu cầu của bạn</p>
+    </div>
+
+    @if (Model.Request.Status != "Pending")
+    {
+        <!-- Cannot Edit Warning -->
+        <div style="background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); padding: 1.5rem; border-radius: 16px; margin-bottom: 2rem; text-align: center;">
+            <i class="fas fa-lock" style="font-size: 3rem; color: #f57c00; margin-bottom: 1rem;"></i>
+            <h5 style="color: #e65100; font-weight: 700; margin-bottom: 0.5rem;">Không Thể Chỉnh Sửa</h5>
+            <p style="color: #f57c00; margin-bottom: 1rem;">Yêu cầu đã được @GetStatusText(Model.Request.Status). Bạn không thể chỉnh sửa yêu cầu này.</p>
+            <a href="/Resident/ServiceRequests" class="btn btn-warning">
+                <i class="fas fa-arrow-left me-2"></i> Quay Lại Danh Sách
+            </a>
+        </div>
+    }
+    else
+    {
+        <!-- Edit Form -->
+        <div class="edit-form">
+            
+            <div class="status-info">
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <small style="color: #546e7a; font-size: 0.85rem; display: block; margin-bottom: 0.25rem;">Trạng thái hiện tại:</small>
+                        <span class="status-badge bg-warning text-dark">
+                            <i class="fas fa-clock"></i> @GetStatusText(Model.Request.Status)
+                        </span>
+                    </div>
+                    <div style="text-align: right;">
+                        <small style="color: #546e7a; font-size: 0.85rem; display: block;">Ngày gửi:</small>
+                        <strong style="color: #37474f; font-size: 0.9rem;">@Model.Request.RequestDate.ToString("dd/MM/yyyy HH:mm")</strong>
+                    </div>
+                </div>
+            </div>
+
+            <form method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-heading" style="color: #f093fb;"></i>
+                        Tiêu đề yêu cầu:
+                    </label>
+                    <input type="text" class="form-control" name="title" value="@Model.Request.Title" required placeholder="Nhập tiêu đề yêu cầu...">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-tools" style="color: #f093fb;"></i>
+                        Loại dịch vụ:
+                    </label>
+                    <select class="form-select" name="serviceType" required>
+                        <option value="">-- Chọn loại dịch vụ --</option>
+                        <option value="Sửa chữa" selected="@(Model.Request.ServiceType == "Sửa chữa")">Sửa chữa</option>
+                        <option value="Điện nước" selected="@(Model.Request.ServiceType == "Điện nước")">Điện nước</option>
+                        <option value="Vệ sinh" selected="@(Model.Request.ServiceType == "Vệ sinh")">Vệ sinh</option>
+                        <option value="Bảo trì" selected="@(Model.Request.ServiceType == "Bảo trì")">Bảo trì</option>
+                        <option value="Khác" selected="@(Model.Request.ServiceType == "Khác")">Khác</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-flag" style="color: #f093fb;"></i>
+                        Mức độ ưu tiên:
+                    </label>
+                    <select class="form-select" name="priority" required>
+                        <option value="Low" selected="@(Model.Request.Priority == "Low")">Thấp</option>
+                        <option value="Normal" selected="@(Model.Request.Priority == "Normal")">Bình thường</option>
+                        <option value="High" selected="@(Model.Request.Priority == "High")">Cao</option>
+                        <option value="Urgent" selected="@(Model.Request.Priority == "Urgent")">Khẩn cấp</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-comment-alt" style="color: #f093fb;"></i>
+                        Mô tả chi tiết:
+                    </label>
+                    <textarea class="form-control" name="description" rows="6" required placeholder="Mô tả chi tiết vấn đề cần hỗ trợ...">@Model.Request.Description</textarea>
+                </div>
+
+                <div style="background: #f8f9fa; padding: 1rem; border-radius: 10px; margin-bottom: 1.5rem;">
+                    <small style="color: #546e7a; display: flex; align-items: start; gap: 0.5rem;">
+                        <i class="fas fa-info-circle" style="margin-top: 0.2rem;"></i>
+                        <span>Lưu ý: Bạn chỉ có thể chỉnh sửa yêu cầu khi ở trạng thái "Chờ xử lý". Sau khi được staff xử lý, bạn sẽ không thể chỉnh sửa.</span>
+                    </small>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <button type="submit" class="btn-update">
+                            <i class="fas fa-save me-2"></i> Lưu Thay Đổi
+                        </button>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <a href="/Resident/ServiceRequests" class="btn-cancel" style="width: 91%;">
+                            <i class="fas fa-times me-2"></i> Hủy Bỏ
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    }
+
+</div>
+
+@functions {
+    private string GetStatusText(string status)
+    {
+        return status switch
+        {
+            "Pending" => "Chờ xử lý",
+            "Approved" => "Đã duyệt",
+            "InProgress" => "Đang xử lý",
+            "Completed" => "Hoàn thành",
+            "Rejected" => "Từ chối",
+            _ => status
+        };
+    }
+}

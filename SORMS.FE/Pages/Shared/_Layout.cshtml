@@ -36,8 +36,6 @@
                 @* ALL: Rooms Management (Resident can view and rent) *@
                 @await Component.InvokeAsync("MenuByRole", new { allowedRoles = new[] { 1, 2, 3 }, menuId = "rooms" })
 
-                @* ADMIN & STAFF: Billing Management *@
-                @await Component.InvokeAsync("MenuByRole", new { allowedRoles = new[] { 1, 2 }, menuId = "billing" })
 
                 @* ADMIN ONLY: Staff Management *@
                 @await Component.InvokeAsync("MenuByRole", new { allowedRoles = new[] { 1 }, menuId = "staff" })

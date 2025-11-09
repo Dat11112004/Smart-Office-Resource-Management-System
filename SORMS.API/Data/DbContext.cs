@@ -75,15 +75,6 @@ namespace SORMS.API.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             // ==========================
-            // 🔹 ServiceRequest ↔ Staff (1-n)
-            // ==========================
-            modelBuilder.Entity<ServiceRequest>()
-                .HasOne(sr => sr.Staff)
-                .WithMany(s => s.AssignedRequests)
-                .HasForeignKey(sr => sr.StaffId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // ==========================
             // 🔹 User ↔ Role (1-n)
             // ==========================
             modelBuilder.Entity<User>()

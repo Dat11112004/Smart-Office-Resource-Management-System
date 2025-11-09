@@ -1,0 +1,357 @@
+@page
+@model SORMS.FE.Pages.Staff.ServiceRequestManagementModel
+@{
+    ViewData["Title"] = "Quản Lý Yêu Cầu Dịch Vụ";
+}
+
+<style>
+    /* Tab Content Visibility */
+    .tab-content > .tab-pane {
+        display: none !important;
+    }
+    
+    .tab-content > .tab-pane.active {
+        display: block !important;
+    }
+
+    /* Request Cards Grid */
+    .requests-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .request-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        border-left: 4px solid;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 1;
+    }
+
+    .request-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        z-index: 2;
+    }
+
+    .request-card.pending {
+        border-left-color: #ffa726;
+    }
+
+    .request-card.approved {
+        border-left-color: #66bb6a;
+    }
+
+    .request-card.inprogress {
+        border-left-color: #42a5f5;
+    }
+
+    .request-card.completed {
+        border-left-color: #26a69a;
+    }
+
+    .request-card.rejected {
+        border-left-color: #ef5350;
+    }
+
+    .priority-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.4rem 0.8rem;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .priority-low {
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        color: #1976d2;
+    }
+
+    .priority-normal {
+        background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+        color: #7b1fa2;
+    }
+
+    .priority-high {
+        background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+        color: #f57c00;
+    }
+
+    .priority-urgent {
+        background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+        color: #c62828;
+        animation: pulse 2s infinite;
+    }
+
+    @@keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+
+    /* Action Buttons */
+    .action-btns {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+        position: relative;
+        z-index: 10;
+    }
+
+    .action-btns .btn {
+        flex: 1;
+        padding: 0.6rem;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        border: none;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 10;
+        cursor: pointer;
+    }
+
+    .btn-approve {
+        background: linear-gradient(135deg, #66bb6a 0%, #4caf50 100%);
+        color: white;
+    }
+
+    .btn-inprogress {
+        background: linear-gradient(135deg, #42a5f5 0%, #2196f3 100%);
+        color: white;
+    }
+
+    .btn-complete {
+        background: linear-gradient(135deg, #26a69a 0%, #009688 100%);
+        color: white;
+    }
+
+    .btn-reject {
+        background: linear-gradient(135deg, #ef5350 0%, #f44336 100%);
+        color: white;
+    }
+
+    /* Modal Styles */
+    .modal {
+        z-index: 1050;
+    }
+
+    .modal-backdrop {
+        z-index: 1040;
+    }
+
+    .modal-content {
+        border-radius: 16px;
+        border: none;
+        position: relative;
+        z-index: 1060;
+    }
+
+    .modal-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 16px 16px 0 0;
+        padding: 1.5rem;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+</style>
+
+<!-- Main Container -->
+<div style="max-width: 1600px; margin: 0 auto; padding: 2rem 1.5rem;">
+    
+    <!-- Header -->
+    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 2.5rem 2rem; border-radius: 20px; margin-bottom: 2rem; box-shadow: 0 10px 40px rgba(240,147,251,0.3);">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <h2 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; color: white;">
+                    <i class="fas fa-tasks"></i> Quản Lý Yêu Cầu Dịch Vụ
+                </h2>
+                <p style="font-size: 1rem; margin: 0; color: white;">Xem và xử lý các yêu cầu từ cư dân</p>
+            </div>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <div style="text-align: center; background: rgba(255,255,255,0.2); padding: 0.75rem 1.5rem; border-radius: 12px;">
+                    <div style="font-size: 1.75rem; font-weight: 700;">@Model.PendingRequests.Count()</div>
+                    <div style="font-size: 0.85rem;">Chờ xử lý</div>
+                </div>
+                <div style="text-align: center; background: rgba(255,255,255,0.2); padding: 0.75rem 1.5rem; border-radius: 12px;">
+                    <div style="font-size: 1.75rem; font-weight: 700;">@Model.AllRequests.Count(r => r.Status == "InProgress")</div>
+                    <div style="font-size: 0.85rem;">Đang xử lý</div>
+                </div>
+                <div style="text-align: center; background: rgba(255,255,255,0.2); padding: 0.75rem 1.5rem; border-radius: 12px;">
+                    <div style="font-size: 1.75rem; font-weight: 700;">@Model.AllRequests.Count(r => r.Status == "Completed")</div>
+                    <div style="font-size: 0.85rem;">Hoàn thành</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Section -->
+    <div style="background: #f8f9fa; border-radius: 20px; padding: 2rem;">
+
+        <!-- Tab Navigation -->
+        <div style="background: white; padding: 1rem; border-radius: 16px; margin-bottom: 2rem; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
+            <ul class="nav nav-tabs border-0" style="display: flex; gap: 0.5rem;">
+                <li class="nav-item" style="flex: 1;">
+                    <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" 
+                            style="color: white; font-weight: 600; padding: 0.875rem 1.25rem; border-radius: 12px; border: none; width: 100%; text-align: center; background: linear-gradient(135deg, #ffa726 0%, #fb8c00 100%);">
+                        <i class="fas fa-clock me-2"></i> Chờ Xử Lý (@Model.PendingRequests.Count())
+                    </button>
+                </li>
+                <li class="nav-item" style="flex: 1;">
+                    <button class="nav-link" id="inprogress-tab" data-bs-toggle="tab" data-bs-target="#inprogress" type="button"
+                            style="color: #546e7a; font-weight: 600; padding: 0.875rem 1.25rem; border-radius: 12px; border: none; width: 100%; text-align: center; background: transparent;">
+                        <i class="fas fa-spinner me-2"></i> Đang Xử Lý
+                    </button>
+                </li>
+                <li class="nav-item" style="flex: 1;">
+                    <button class="nav-link" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button"
+                            style="color: #546e7a; font-weight: 600; padding: 0.875rem 1.25rem; border-radius: 12px; border: none; width: 100%; text-align: center; background: transparent;">
+                        <i class="fas fa-list me-2"></i> Tất Cả
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+            <!-- Tab: Chờ xử lý -->
+            <div class="tab-pane fade show active" id="pending">
+                <!-- Back Button -->
+                <div style="margin-bottom: 1.5rem;">
+                    <a href="/Staff/Dashboard" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 12px; font-weight: 600; box-shadow: 0 4px 15px rgba(102,126,234,0.3); transition: all 0.3s ease;">
+                        <i class="fas fa-arrow-left"></i> Quay Lại Dashboard
+                    </a>
+                </div>
+
+                @if (!Model.PendingRequests.Any())
+                {
+                    <div style="text-align: center; padding: 4rem 2rem; background: white; border-radius: 16px;">
+                        <div style="width: 120px; height: 120px; margin: 0 auto 1.5rem; background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-check-circle" style="font-size: 3.5rem; color: #ffa726;"></i>
+                        </div>
+                        <h5 style="color: #546e7a; font-weight: 600; margin-bottom: 0.5rem;">Không Có Yêu Cầu Mới</h5>
+                        <p style="color: #90a4ae; margin: 0;">Hiện tại không có yêu cầu nào đang chờ xử lý.</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="requests-grid">
+                        @foreach (var request in Model.PendingRequests.OrderByDescending(r => r.Priority == "Urgent").ThenByDescending(r => r.RequestDate))
+                        {
+                            <div class="request-card pending">
+                                @await Html.PartialAsync("_ServiceRequestCard", request)
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- Tab: Đang xử lý -->
+            <div class="tab-pane fade" id="inprogress">
+                @{
+                    var inProgressRequests = Model.AllRequests.Where(r => r.Status == "InProgress" || r.Status == "Approved").ToList();
+                }
+
+                @if (!inProgressRequests.Any())
+                {
+                    <div style="text-align: center; padding: 4rem 2rem; background: white; border-radius: 16px;">
+                        <div style="width: 120px; height: 120px; margin: 0 auto 1.5rem; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-tasks" style="font-size: 3.5rem; color: #42a5f5;"></i>
+                        </div>
+                        <h5 style="color: #546e7a; font-weight: 600; margin-bottom: 0.5rem;">Không Có Yêu Cầu Đang Xử Lý</h5>
+                        <p style="color: #90a4ae; margin: 0;">Chưa có yêu cầu nào đang được xử lý.</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="requests-grid">
+                        @foreach (var request in inProgressRequests.OrderByDescending(r => r.RequestDate))
+                        {
+                            <div class="request-card @request.Status.ToLower()">
+                                @await Html.PartialAsync("_ServiceRequestCard", request)
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- Tab: Tất cả -->
+            <div class="tab-pane fade" id="all">
+                @if (!Model.AllRequests.Any())
+                {
+                    <div style="text-align: center; padding: 4rem 2rem; background: white; border-radius: 16px;">
+                        <div style="width: 120px; height: 120px; margin: 0 auto 1.5rem; background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-inbox" style="font-size: 3.5rem; color: #5c6bc0;"></i>
+                        </div>
+                        <h5 style="color: #546e7a; font-weight: 600; margin-bottom: 0.5rem;">Chưa Có Yêu Cầu</h5>
+                        <p style="color: #90a4ae; margin: 0;">Chưa có yêu cầu dịch vụ nào trong hệ thống.</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="requests-grid">
+                        @foreach (var request in Model.AllRequests.OrderByDescending(r => r.RequestDate))
+                        {
+                            <div class="request-card @request.Status.ToLower()">
+                                @await Html.PartialAsync("_ServiceRequestCard", request)
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Tab Switching Handler
+    document.addEventListener('DOMContentLoaded', function() {
+        const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
+        const tabPanes = document.querySelectorAll('.tab-pane');
+        
+        const inactiveStyle = 'color: #546e7a; font-weight: 600; padding: 0.875rem 1.25rem; border-radius: 12px; border: none; transition: all 0.3s ease; width: 100%; text-align: center; background: transparent;';
+        
+        const activeStyles = {
+            'pending-tab': 'color: white; font-weight: 600; padding: 0.875rem 1.25rem; border-radius: 12px; border: none; transition: all 0.3s ease; width: 100%; text-align: center; background: linear-gradient(135deg, #ffa726 0%, #fb8c00 100%);',
+            'inprogress-tab': 'color: white; font-weight: 600; padding: 0.875rem 1.25rem; border-radius: 12px; border: none; transition: all 0.3s ease; width: 100%; text-align: center; background: linear-gradient(135deg, #42a5f5 0%, #2196f3 100%);',
+            'all-tab': 'color: white; font-weight: 600; padding: 0.875rem 1.25rem; border-radius: 12px; border: none; transition: all 0.3s ease; width: 100%; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);'
+        };
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('data-bs-target');
+                const buttonId = this.getAttribute('id');
+                
+                tabButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.setAttribute('style', inactiveStyle);
+                });
+                
+                tabPanes.forEach(pane => {
+                    pane.classList.remove('show', 'active');
+                });
+                
+                this.classList.add('active');
+                this.setAttribute('style', activeStyles[buttonId] || activeStyles['all-tab']);
+                
+                const targetPane = document.querySelector(targetId);
+                if (targetPane) {
+                    targetPane.classList.add('show', 'active');
+                }
+            });
+        });
+    });
+
+</script>
