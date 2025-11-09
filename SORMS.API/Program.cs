@@ -20,6 +20,7 @@ using System.Text;
     // 1. Load cấu hình từ appsettings.json
     builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
     builder.Services.Configure<EmailConfig>(builder.Configuration.GetSection("EmailConfig"));
+    builder.Services.Configure<AdminConfig>(builder.Configuration.GetSection("AdminAccount"));
 
     // 2. Cấu hình DbContext
     builder.Services.AddDbContext<SormsDbContext>(options =>
@@ -163,5 +164,21 @@ builder.Services.AddEndpointsApiExplorer();
     app.UseAuthentication();
     app.UseAuthorization();
     app.MapControllers();
+
+    // ========== 🔐 SEED ADMIN USER ON STARTUP ==========
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        try
+        {
+            var authService = services.GetRequiredService<IAuthService>();
+            await authService.SeedAdminUserAsync();
+            Log.Information("✅ Admin user seeding completed");
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"❌ Error occurred seeding admin user: {ex.Message}");
+        }
+    }
 
     app.Run();
