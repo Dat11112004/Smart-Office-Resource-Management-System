@@ -160,7 +160,7 @@
             <div class="stat-icon">
                 <i class="fas fa-users"></i>
             </div>
-            <div class="stat-number">247</div>
+            <div class="stat-number">@Model.TotalResidents</div>
             <div class="stat-label">Tổng số cư dân</div>
         </div>
     </div>
@@ -170,7 +170,7 @@
             <div class="stat-icon">
                 <i class="fas fa-user-tie"></i>
             </div>
-            <div class="stat-number">12</div>
+            <div class="stat-number">@Model.TotalStaff</div>
             <div class="stat-label">Nhân viên</div>
         </div>
     </div>
@@ -180,7 +180,7 @@
             <div class="stat-icon">
                 <i class="fas fa-door-open"></i>
             </div>
-            <div class="stat-number">156</div>
+            <div class="stat-number">@Model.OccupiedRooms / @Model.TotalRooms</div>
             <div class="stat-label">Phòng đang thuê</div>
         </div>
     </div>
@@ -190,8 +190,41 @@
             <div class="stat-icon">
                 <i class="fas fa-exclamation-triangle"></i>
             </div>
-            <div class="stat-number">8</div>
+            <div class="stat-number">@Model.PendingServiceRequests</div>
             <div class="stat-label">Yêu cầu chờ xử lý</div>
+        </div>
+    </div>
+</div>
+
+<!-- Additional Stats Row -->
+<div class="row mb-4">
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="stat-card primary">
+            <div class="stat-icon">
+                <i class="fas fa-clipboard-check"></i>
+            </div>
+            <div class="stat-number">@Model.PendingCheckIns</div>
+            <div class="stat-label">Check-in chờ duyệt</div>
+        </div>
+    </div>
+    
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="stat-card warning">
+            <div class="stat-icon">
+                <i class="fas fa-flag"></i>
+            </div>
+            <div class="stat-number">@Model.PendingReports</div>
+            <div class="stat-label">Báo cáo chờ xử lý</div>
+        </div>
+    </div>
+    
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="stat-card success">
+            <div class="stat-icon">
+                <i class="fas fa-door-closed"></i>
+            </div>
+            <div class="stat-number">@Model.AvailableRooms</div>
+            <div class="stat-label">Phòng trống</div>
         </div>
     </div>
 </div>
@@ -243,38 +276,100 @@
 
 <!-- Recent Activities -->
 <div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-users me-2"></i>Cư dân mới nhất</h5>
+            </div>
+            <div class="card-body">
+                @if (Model.RecentResidents != null && Model.RecentResidents.Any())
+                {
+                    @foreach (var resident in Model.RecentResidents)
+                    {
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold">@resident.FullName</div>
+                                <div class="activity-time">Check-in: @resident.CheckInDate?.ToString("dd/MM/yyyy")</div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="text-center text-muted py-3">
+                        <i class="fas fa-inbox fa-2x mb-2"></i>
+                        <p>Chưa có cư dân mới</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-tools me-2"></i>Yêu cầu dịch vụ gần đây</h5>
+            </div>
+            <div class="card-body">
+                @if (Model.RecentServiceRequests != null && Model.RecentServiceRequests.Any())
+                {
+                    @foreach (var request in Model.RecentServiceRequests)
+                    {
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-concierge-bell"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold">@request.ServiceType</div>
+                                <div class="activity-time">@request.RequestDate.ToString("dd/MM/yyyy HH:mm") - @request.Status</div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="text-center text-muted py-3">
+                        <i class="fas fa-inbox fa-2x mb-2"></i>
+                        <p>Chưa có yêu cầu dịch vụ</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Hoạt động gần đây</h5>
+                <h5 class="mb-0"><i class="fas fa-flag me-2"></i>Báo cáo gần đây</h5>
             </div>
             <div class="card-body">
-                <div class="activity-item">
-                    <div class="activity-icon">
-                        <i class="fas fa-user-plus"></i>
+                @if (Model.RecentReports != null && Model.RecentReports.Any())
+                {
+                    @foreach (var report in Model.RecentReports)
+                    {
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold">@report.Title</div>
+                                <div class="activity-time">@report.GeneratedDate.ToString("dd/MM/yyyy HH:mm") - @report.Status</div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="text-center text-muted py-3">
+                        <i class="fas fa-inbox fa-2x mb-2"></i>
+                        <p>Chưa có báo cáo nào</p>
                     </div>
-                    <div class="flex-grow-1">
-                        <div class="fw-semibold">Cư dân mới đăng ký</div>
-                        <div class="activity-time">Nguyễn Văn A - 5 phút trước</div>
-                    </div>
-                </div>
-                <div class="activity-item">
-                    <div class="activity-icon">
-                        <i class="fas fa-receipt"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                        <div class="fw-semibold">Hóa đơn mới được tạo</div>
-                        <div class="activity-time">Phòng 302 - 15 phút trước</div>
-                    </div>
-                </div>
-                <div class="activity-item">
-                    <div class="activity-icon">
-                        <i class="fas fa-tools"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                        <div class="fw-semibold">Yêu cầu dịch vụ</div>
-                        <div class="activity-time">Sửa chữa điện - 1 giờ trước</div>
-                    </div>
+                }
                 </div>
             </div>
         </div>
