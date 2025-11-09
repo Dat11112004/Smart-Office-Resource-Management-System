@@ -1,10 +1,25 @@
+@{
+    var userRole = Context.Session.GetString("UserRole");
+}
 <li>
     <a href="#notificationsSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
         <i class="fas fa-bell"></i>
         <span>Notifications</span>
     </a>
     <ul class="collapse list-unstyled" id="notificationsSubmenu">
-        <li><a href="/Notification" class="nav-link"><i class="fas fa-list"></i> Danh sách</a></li>
-        <li><a href="/Notification/Create" class="nav-link"><i class="fas fa-plus"></i> Tạo thông báo</a></li>
+        @if (userRole == "Admin")
+        {
+            <li><a href="/Admin/NotificationHistory" class="nav-link"><i class="fas fa-list"></i> Danh sách</a></li>
+            <li><a href="/Admin/CreateNotification" class="nav-link"><i class="fas fa-plus"></i> Tạo thông báo</a></li>
+        }
+        @if (userRole == "Staff")
+        {
+            <li><a href="/Staff/MyNotifications" class="nav-link"><i class="fas fa-list"></i> Xem thông báo</a></li>
+            <li><a href="/Staff/SendNotification" class="nav-link"><i class="fas fa-plus"></i> Tạo thông báo</a></li>
+        }
+		@if (userRole == "Resident")
+		{
+			<li><a href="/Resident/Notifications" class="nav-link"><i class="fas fa-list"></i> Xem thông báo</a></li>
+		}
     </ul>
 </li>

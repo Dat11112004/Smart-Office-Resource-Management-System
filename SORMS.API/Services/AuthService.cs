@@ -247,6 +247,15 @@ namespace SORMS.API.Services
                     }
                 }
 
+                // Nếu là Staff, thêm StaffId claim
+                if (user.RoleId == 2)
+                {
+                    var staff = _context.Staffs.FirstOrDefault(s => s.Email == user.Email);
+                    if (staff != null)
+                    {
+                        claims.Add(new Claim("StaffId", staff.Id.ToString()));
+                    }
+                }
 
                 // 4️⃣ Đọc config JWT
                 var issuer = _configuration["Jwt:Issuer"] ?? "SORMS.API";

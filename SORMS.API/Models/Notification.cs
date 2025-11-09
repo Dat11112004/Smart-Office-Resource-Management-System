@@ -19,11 +19,24 @@ namespace SORMS.API.Models
         [Required]
         public bool IsRead { get; set; }
 
-        // FK: Resident
-        [Required]
-        public int ResidentId { get; set; }
+        // Type: "Broadcast" (gửi cho tất cả) hoặc "Individual" (gửi cho 1 người)
+        [Required, MaxLength(50)]
+        public string Type { get; set; } = "Individual";
+
+        // TargetRole: "All", "Resident", "Staff" (dùng cho broadcast)
+        [MaxLength(50)]
+        public string? TargetRole { get; set; }
+
+        // FK: Resident (nullable cho broadcast notifications)
+        public int? ResidentId { get; set; }
 
         [ForeignKey(nameof(ResidentId))]
-        public Resident Resident { get; set; }
+        public Resident? Resident { get; set; }
+
+        // FK: Staff (nullable, dùng khi gửi cho staff)
+        public int? StaffId { get; set; }
+
+        [ForeignKey(nameof(StaffId))]
+        public Staff? Staff { get; set; }
     }
 }
