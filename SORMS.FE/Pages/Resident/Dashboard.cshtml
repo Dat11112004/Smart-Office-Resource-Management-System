@@ -167,25 +167,7 @@
                 <i class="fas fa-door-open"></i>
             </div>
             <h6>Phòng của bạn</h6>
-            <div class="value">302</div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="info-card">
-            <div class="icon">
-                <i class="fas fa-receipt"></i>
-            </div>
-            <h6>Hóa đơn tháng này</h6>
-            <div class="value">2,500,000đ</div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="info-card">
-            <div class="icon">
-                <i class="fas fa-calendar-check"></i>
-            </div>
-            <h6>Ngày check-in</h6>
-            <div class="value">01/01/2024</div>
+            <div class="value">@(Model.ResidentInfo?.RoomNumber ?? Model.RoomInfo?.RoomNumber ?? "Chưa có phòng")</div>
         </div>
     </div>
     <div class="col-md-3">
@@ -194,7 +176,25 @@
                 <i class="fas fa-concierge-bell"></i>
             </div>
             <h6>Yêu cầu dịch vụ</h6>
-            <div class="value">2</div>
+            <div class="value">@Model.PendingServiceRequests / @Model.TotalServiceRequests</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="info-card">
+            <div class="icon">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <h6>Ngày check-in</h6>
+            <div class="value">@(Model.ResidentInfo?.CheckInDate?.ToString("dd/MM/yyyy") ?? "N/A")</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="info-card">
+            <div class="icon">
+                <i class="fas fa-bell"></i>
+            </div>
+            <h6>Thông báo chưa đọc</h6>
+            <div class="value">@Model.UnreadNotifications / @Model.TotalNotifications</div>
         </div>
     </div>
 </div>
@@ -252,36 +252,36 @@
     <div class="col-md-6">
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0"><i class="fas fa-receipt me-2"></i>Hóa đơn gần đây</h5>
+                <h5 class="mb-0"><i class="fas fa-clipboard-list me-2"></i>Yêu cầu dịch vụ gần đây</h5>
             </div>
             <div class="card-body">
-                <div class="bill-card">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <div>
-                            <h6 class="mb-1">Hóa đơn tháng 11/2024</h6>
-                            <p class="text-muted mb-0" style="font-size: 14px;">Tiền phòng + Điện nước</p>
+                @if (Model.RecentServiceRequests != null && Model.RecentServiceRequests.Any())
+                {
+                    @foreach (var request in Model.RecentServiceRequests)
+                    {
+                        <div class="bill-card">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h6 class="mb-1">@request.ServiceType</h6>
+                                    <p class="text-muted mb-0" style="font-size: 14px;">@request.Description</p>
+                                </div>
+                                <span class="bill-status @(request.Status == "Pending" ? "pending" : "paid")">@request.Status</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <div class="text-muted" style="font-size: 14px;">
+                                    <i class="fas fa-calendar me-1"></i>@request.RequestDate.ToString("dd/MM/yyyy HH:mm")
+                                </div>
+                            </div>
                         </div>
-                        <span class="bill-status pending">Chưa thanh toán</span>
+                    }
+                }
+                else
+                {
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-inbox fa-3x mb-3"></i>
+                        <p>Chưa có yêu cầu dịch vụ nào</p>
                     </div>
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <div class="fw-bold text-danger" style="font-size: 18px;">2,500,000đ</div>
-                        <a href="/Billing/Pay" class="btn btn-sm btn-primary">Thanh toán</a>
-                    </div>
-                </div>
-
-                <div class="bill-card">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <div>
-                            <h6 class="mb-1">Hóa đơn tháng 10/2024</h6>
-                            <p class="text-muted mb-0" style="font-size: 14px;">Tiền phòng + Điện nước</p>
-                        </div>
-                        <span class="bill-status paid">Đã thanh toán</span>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <div class="fw-bold text-success" style="font-size: 18px;">2,400,000đ</div>
-                        <a href="/Billing/Details" class="btn btn-sm btn-outline-primary">Chi tiết</a>
-                    </div>
-                </div>
+                }
             </div>
         </div>
     </div>
@@ -292,26 +292,27 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0"><i class="fas fa-bullhorn me-2"></i>Thông báo</h5>
+                <h5 class="mb-0"><i class="fas fa-bell me-2"></i>Thông báo gần đây</h5>
             </div>
             <div class="card-body">
-                <div class="announcement-item">
-                    <h6>📢 Bảo trì hệ thống điện</h6>
-                    <p>Hệ thống điện sẽ được bảo trì vào ngày 05/11/2024 từ 8:00 - 12:00. Vui lòng chuẩn bị trước.</p>
-                    <div class="date"><i class="fas fa-clock me-1"></i>02/11/2024</div>
-                </div>
-
-                <div class="announcement-item">
-                    <h6>🎉 Chương trình khuyến mãi tháng 11</h6>
-                    <p>Giảm 10% cho hóa đơn thanh toán trước ngày 10/11. Áp dụng cho tất cả cư dân.</p>
-                    <div class="date"><i class="fas fa-clock me-1"></i>01/11/2024</div>
-                </div>
-
-                <div class="announcement-item">
-                    <h6>ℹ️ Quy định về giờ giấc nghỉ ngơi</h6>
-                    <p>Nhắc nhở các cư dân giữ trật tự và tránh gây ồn ào sau 22:00 hàng ngày.</p>
-                    <div class="date"><i class="fas fa-clock me-1"></i>30/10/2024</div>
-                </div>
+                @if (Model.RecentNotifications != null && Model.RecentNotifications.Any())
+                {
+                    @foreach (var notification in Model.RecentNotifications)
+                    {
+                        <div class="announcement-item">
+                            <h6>@(notification.IsRead ? "" : "🔔 ")@notification.Message</h6>
+                            <p>@notification.Message</p>
+                            <div class="date"><i class="fas fa-clock me-1"></i>@notification.CreatedAt.ToString("dd/MM/yyyy HH:mm")</div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-inbox fa-3x mb-3"></i>
+                        <p>Chưa có thông báo nào</p>
+                    </div>
+                }
             </div>
         </div>
     </div>
