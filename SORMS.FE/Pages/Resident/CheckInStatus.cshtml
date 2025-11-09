@@ -9,229 +9,451 @@
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     
+    body {
+        background: #f5f7fa;
+    }
+    
     .status-header {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
-        padding: 2.5rem 2rem;
-        border-radius: 16px;
+        padding: 2rem 0;
         margin-bottom: 2rem;
-        box-shadow: 0 8px 30px rgba(240,147,251,0.25);
+        box-shadow: 0 4px 20px rgba(102,126,234,0.2);
     }
+    
     .status-header h2 {
-        font-size: 2rem;
+        font-size: 1.75rem;
         font-weight: 700;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
     }
+    
     .status-header p {
-        font-size: 1rem;
-        opacity: 0.95;
+        font-size: 0.95rem;
+        opacity: 0.9;
         margin: 0;
     }
+    
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.65rem 1.25rem;
+        background: white;
+        color: #667eea;
+        text-decoration: none;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        margin-bottom: 1.5rem;
+    }
+    
+    .back-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102,126,234,0.2);
+        color: #764ba2;
+    }
+    
     .status-card {
         background: white;
-        border-radius: 12px;
-        box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+        border-radius: 16px;
+        box-shadow: 0 2px 16px rgba(0,0,0,0.06);
         overflow: hidden;
-        border: none;
         margin-bottom: 2rem;
+        border: 1px solid #e9ecef;
     }
+    
     .status-card-header {
-        padding: 1.25rem 1.5rem;
+        padding: 1.5rem 2rem;
         border: none;
+        position: relative;
+        overflow: hidden;
     }
+    
+    .status-card-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 200px;
+        height: 200px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+        transform: translate(50%, -50%);
+    }
+    
     .status-card-header h5 {
-        font-size: 1.1rem;
+        font-size: 1.25rem;
         font-weight: 700;
         margin: 0;
+        position: relative;
+        z-index: 1;
     }
+    
     .status-card-header.pending {
-        background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+        background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+        color: white;
     }
-    .status-card-header.approved {
-        background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
-    }
-    .status-card-header.rejected {
-        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-    }
+    
     .status-card-header.checkedin {
-        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white;
     }
+    
+    .status-card-header.rejected {
+        background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+        color: white;
+    }
+    
+    .status-card-header.pendingcheckout {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+    }
+    
+    .card-body {
+        padding: 2rem !important;
+    }
+    
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
     .status-info-box {
-        background: #f8f9fa;
-        padding: 1rem;
-        border-radius: 10px;
-        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%);
+        padding: 1.25rem;
+        border-radius: 12px;
+        border-left: 4px solid #667eea;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
     }
+    
+    .status-info-box::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 80px;
+        height: 80px;
+        background: rgba(102,126,234,0.05);
+        border-radius: 50%;
+        transform: translate(30%, -30%);
+    }
+    
+    .status-info-box:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    
     .status-info-box p {
         margin: 0;
-        font-size: 0.9rem;
+        font-size: 0.95rem;
         line-height: 1.6;
+        position: relative;
+        z-index: 1;
     }
+    
     .status-info-box i {
         color: #667eea;
         margin-right: 0.5rem;
+        font-size: 1.1rem;
     }
+    
     .status-info-box strong {
         color: #2c3e50;
-        font-size: 0.9rem;
-    }
-    .status-alert {
-        border-radius: 10px;
-        padding: 1rem;
-        border: none;
-        font-size: 0.9rem;
-    }
-    .status-alert strong {
-        font-size: 0.95rem;
-    }
-    .status-alert small {
         font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: block;
+        margin-bottom: 0.25rem;
     }
-    .btn-checkout-request {
-        background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
-        color: white;
-        border: none;
-        padding: 0.7rem 1.5rem;
-        border-radius: 10px;
+    
+    .status-info-box .info-value {
+        color: #495057;
+        font-size: 1rem;
         font-weight: 600;
-        font-size: 0.95rem;
-        transition: all 0.3s ease;
     }
+    
+    .alert-box {
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: none;
+        margin-bottom: 1.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .alert-box::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+    }
+    
+    .alert-box.success {
+        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        color: #155724;
+    }
+    
+    .alert-box.success::before {
+        background: #28a745;
+    }
+    
+    .alert-box.warning {
+        background: linear-gradient(135deg, #fff3cd 0%, #fff3cd 100%);
+        color: #856404;
+    }
+    
+    .alert-box.warning::before {
+        background: #ffc107;
+    }
+    
+    .alert-box.info {
+        background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+        color: #0c5460;
+    }
+    
+    .alert-box.info::before {
+        background: #17a2b8;
+    }
+    
+    .alert-box.danger {
+        background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+        color: #721c24;
+    }
+    
+    .alert-box.danger::before {
+        background: #dc3545;
+    }
+    
+    .alert-box-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .alert-box-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+    }
+    
+    .alert-box.success .alert-box-icon {
+        background: rgba(40,167,69,0.2);
+        color: #28a745;
+    }
+    
+    .alert-box.warning .alert-box-icon {
+        background: rgba(255,193,7,0.2);
+        color: #ffc107;
+    }
+    
+    .alert-box.info .alert-box-icon {
+        background: rgba(23,162,184,0.2);
+        color: #17a2b8;
+    }
+    
+    .alert-box.danger .alert-box-icon {
+        background: rgba(220,53,69,0.2);
+        color: #dc3545;
+    }
+    
+    .btn-checkout-request {
+        width: 100%;
+        padding: 1rem 1.5rem;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white !important;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(240,147,251,0.3);
+        text-decoration: none !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        cursor: pointer;
+    }
+    
     .btn-checkout-request:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 15px rgba(246,211,101,0.3);
-        color: white;
+        box-shadow: 0 6px 20px rgba(240,147,251,0.4);
+        color: white !important;
     }
+    
+    .btn-checkout-request i {
+        font-size: 1.1rem;
+    }
+    
     .history-section {
         background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+        border: 1px solid #e9ecef;
     }
+    
     .history-section h4 {
         color: #2c3e50;
         font-weight: 700;
-        font-size: 1.2rem;
+        font-size: 1.25rem;
         margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
+    
     .table-modern {
         margin-bottom: 0;
-        border-radius: 10px;
+        border-radius: 12px;
         overflow: hidden;
+        border: 1px solid #e9ecef;
     }
+    
     .table-modern thead {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
     }
+    
     .table-modern thead th {
-        padding: 1rem 0.75rem;
+        padding: 1rem;
         font-weight: 600;
         font-size: 0.9rem;
         border: none;
         text-align: center;
         vertical-align: middle;
+        white-space: nowrap;
     }
+    
     .table-modern tbody td {
-        padding: 1rem 0.75rem;
+        padding: 1rem;
         font-size: 0.9rem;
         text-align: center;
         vertical-align: middle;
         color: #495057;
-    }
-    .table-modern tbody tr {
-        transition: all 0.2s ease;
         border-bottom: 1px solid #f0f0f0;
     }
+    
+    .table-modern tbody tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .table-modern tbody tr {
+        transition: all 0.2s ease;
+    }
+    
     .table-modern tbody tr:hover {
         background: #f8f9fa;
+        transform: scale(1.01);
     }
+    
     .status-badge {
-        padding: 0.35rem 0.75rem;
-        border-radius: 8px;
+        padding: 0.4rem 0.85rem;
+        border-radius: 20px;
         font-weight: 600;
-        font-size: 0.82rem;
+        font-size: 0.8rem;
         display: inline-block;
+        white-space: nowrap;
     }
+    
     .empty-state-status {
         text-align: center;
-        padding: 3rem 2rem;
+        padding: 3.5rem 2rem;
         background: white;
-        border-radius: 12px;
-        box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+        border-radius: 16px;
+        box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+        border: 1px solid #e9ecef;
     }
+    
     .empty-state-status i {
-        font-size: 3.5rem;
-        color: #e0e6ed;
-        margin-bottom: 1rem;
+        font-size: 4rem;
+        color: #d0d5dd;
+        margin-bottom: 1.5rem;
     }
+    
     .empty-state-status h3 {
-        font-size: 1.3rem;
+        font-size: 1.4rem;
         color: #2c3e50;
         font-weight: 700;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
     }
+    
     .empty-state-status h5 {
-        font-size: 1.1rem;
-        color: #7f8c8d;
+        font-size: 1.15rem;
+        color: #6c757d;
         font-weight: 600;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
     }
+    
     .empty-state-status p {
-        font-size: 0.9rem;
-        color: #95a5a6;
-    }
-    .modal-content {
-        border-radius: 12px;
-        border: none;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-    }
-    .modal-header {
-        padding: 1.25rem 1.5rem;
-        border-bottom: 1px solid #e9ecef;
-        border-radius: 12px 12px 0 0;
-    }
-    .modal-title {
-        font-weight: 700;
-        font-size: 1.1rem;
-    }
-    .modal-body {
-        padding: 1.5rem;
         font-size: 0.95rem;
+        color: #95a5a6;
+        margin-bottom: 1.5rem;
     }
-    .modal-footer {
-        padding: 1rem 1.5rem;
-        border-top: 1px solid #e9ecef;
-    }
-    .btn {
-        padding: 0.6rem 1.2rem;
-        font-weight: 600;
-        font-size: 0.9rem;
-        border-radius: 8px;
-    }
+    
     .alert {
-        border-radius: 10px;
-        font-size: 0.92rem;
-        padding: 1rem 1.25rem;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        padding: 1rem 1.5rem;
+        border: none;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    
+    .alert i {
+        margin-right: 0.5rem;
+    }
+    
+    @@media (max-width: 768px) {
+        .status-header h2 {
+            font-size: 1.5rem;
+        }
+        
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .table-responsive {
+            border-radius: 12px;
+            overflow-x: auto;
+        }
+        
+        .card-body {
+            padding: 1.5rem !important;
+        }
     }
 </style>
 
 <div class="status-header">
     <div class="container">
         <h2>
-            <i class="fas fa-clipboard-check me-3"></i>
+            <i class="fas fa-clipboard-check"></i>
             Trạng Thái Check-in
         </h2>
         <p>Theo dõi trạng thái và lịch sử check-in của bạn</p>
     </div>
 </div>
 
-<div class="container mt-4">
+<div class="container mt-4 mb-5">
     <!-- Back Button -->
-    <div style="margin-bottom: 1.5rem;">
-        <a href="javascript:history.back()" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 12px; font-weight: 600; box-shadow: 0 4px 15px rgba(102,126,234,0.3); transition: all 0.3s ease;">
-            <i class="fas fa-arrow-left"></i> Quay Lại
-        </a>
-    </div>
+    <a href="javascript:history.back()" class="back-btn">
+        <i class="fas fa-arrow-left"></i> Quay Lại
+    </a>
 
     @if (TempData["SuccessMessage"] != null)
     {
@@ -263,112 +485,125 @@
     else
     {
         <div class="status-card">
-            <div class="status-card-header @(Model.CurrentStatus.Status == "PendingCheckIn" ? "pending" : Model.CurrentStatus.Status == "CheckedIn" ? "checkedin" : Model.CurrentStatus.Status == "Rejected" ? "rejected" : "approved") text-white">
-                <h5 class="mb-0">
+            <div class="status-card-header @(Model.CurrentStatus.Status == "PendingCheckIn" ? "pending" : Model.CurrentStatus.Status == "CheckedIn" ? "checkedin" : Model.CurrentStatus.Status == "PendingCheckOut" ? "pendingcheckout" : Model.CurrentStatus.Status == "Rejected" ? "rejected" : "approved")">
+                <h5>
                     <i class="fas @GetStatusIcon(Model.CurrentStatus.Status) me-2"></i>
                     @GetStatusText(Model.CurrentStatus.Status)
                 </h5>
             </div>
-            <div class="card-body p-4">
+            <div class="card-body">
                 <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <div class="status-info-box">
-                            <p class="mb-2">
-                                <i class="fas fa-door-closed"></i>
-                                <strong>Phòng:</strong> @Model.CurrentStatus.RoomNumber
-                            </p>
-                        </div>
-                        <div class="status-info-box">
-                            <p class="mb-2">
-                                <i class="fas fa-clock"></i>
-                                <strong>Thời gian yêu cầu:</strong><br>
-                                @Model.CurrentStatus.RequestTime?.ToString("dd/MM/yyyy HH:mm")
-                            </p>
+                    <div class="col-lg-6">
+                        <div class="info-grid">
+                            <div class="status-info-box">
+                                <p>
+                                    <i class="fas fa-door-closed"></i>
+                                    <strong>Phòng</strong>
+                                    <span class="info-value d-block">@Model.CurrentStatus.RoomNumber</span>
+                                </p>
+                            </div>
+                            <div class="status-info-box">
+                                <p>
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <strong>Yêu cầu lúc</strong>
+                                    <span class="info-value d-block">@Model.CurrentStatus.RequestTime?.ToString("dd/MM/yyyy HH:mm")</span>
+                                </p>
+                            </div>
                         </div>
                         
                         @if (Model.CurrentStatus.Status == "CheckedIn")
                         {
-                            <div class="status-info-box">
-                                <p class="mb-2">
-                                    <i class="fas fa-check-circle"></i>
-                                    <strong>Thời gian check-in:</strong><br>
-                                    @Model.CurrentStatus.CheckInTime?.ToString("dd/MM/yyyy HH:mm")
-                                </p>
-                            </div>
-                            <div class="status-info-box">
-                                <p class="mb-2">
-                                    <i class="fas fa-user-check"></i>
-                                    <strong>Phê duyệt bởi:</strong><br>
-                                    @Model.CurrentStatus.ApprovedByName
-                                </p>
+                            <div class="info-grid">
+                                <div class="status-info-box">
+                                    <p>
+                                        <i class="fas fa-check-circle"></i>
+                                        <strong>Check-in lúc</strong>
+                                        <span class="info-value d-block">@Model.CurrentStatus.CheckInTime?.ToString("dd/MM/yyyy HH:mm")</span>
+                                    </p>
+                                </div>
+                                <div class="status-info-box">
+                                    <p>
+                                        <i class="fas fa-user-check"></i>
+                                        <strong>Phê duyệt bởi</strong>
+                                        <span class="info-value d-block">@Model.CurrentStatus.ApprovedByName</span>
+                                    </p>
+                                </div>
                             </div>
                         }
 
                         @if (Model.CurrentStatus.Status == "PendingCheckOut")
                         {
                             <div class="status-info-box">
-                                <p class="mb-2">
-                                    <i class="fas fa-clock"></i>
-                                    <strong>Yêu cầu check-out lúc:</strong><br>
-                                    @Model.CurrentStatus.CheckOutRequestTime?.ToString("dd/MM/yyyy HH:mm")
+                                <p>
+                                    <i class="fas fa-calendar-check"></i>
+                                    <strong>Yêu cầu check-out</strong>
+                                    <span class="info-value d-block">@Model.CurrentStatus.CheckOutRequestTime?.ToString("dd/MM/yyyy HH:mm")</span>
                                 </p>
                             </div>
                         }
 
                         @if (Model.CurrentStatus.Status == "Rejected")
                         {
-                            <div style="background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); padding: 1.25rem; border-radius: 12px; border-left: 4px solid #dc3545; color: #721c24;">
-                                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
-                                    <div style="width: 32px; height: 32px; background: rgba(220,53,69,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                                        <i class="fas fa-exclamation-triangle" style="color: #dc3545;"></i>
+                            <div class="alert-box danger">
+                                <div class="alert-box-header">
+                                    <div class="alert-box-icon">
+                                        <i class="fas fa-exclamation-triangle"></i>
                                     </div>
-                                    <strong style="font-size: 1rem;">Lý do từ chối:</strong>
+                                    <strong>Lý do từ chối</strong>
                                 </div>
-                                <div style="padding-left: 2.5rem; font-size: 0.95rem;">@Model.CurrentStatus.RejectReason</div>
+                                <p class="mb-0">@Model.CurrentStatus.RejectReason</p>
                             </div>
                         }
                     </div>
 
-                    <div class="col-md-6 mb-3">
+                    <div class="col-lg-6">
                         @if (Model.CurrentStatus.Status == "PendingCheckIn")
                         {
-                            <div style="background: linear-gradient(135deg, #fff3cd 0%, #fff3cd 100%); padding: 1.25rem; border-radius: 12px; border-left: 4px solid #ffc107; color: #856404;">
-                                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
-                                    <div style="width: 32px; height: 32px; background: rgba(255,193,7,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                                        <i class="fas fa-hourglass-half" style="color: #ffc107;"></i>
+                            <div class="alert-box warning">
+                                <div class="alert-box-header">
+                                    <div class="alert-box-icon">
+                                        <i class="fas fa-hourglass-half"></i>
                                     </div>
-                                    <strong style="font-size: 1rem;">Đang chờ phê duyệt</strong>
+                                    <strong>Đang chờ phê duyệt</strong>
                                 </div>
-                                <small style="font-size: 0.9rem; opacity: 0.9;">Yêu cầu check-in của bạn đang chờ Staff/Admin xem xét.</small>
+                                <p class="mb-0">Yêu cầu check-in của bạn đang chờ Staff/Admin xem xét và phê duyệt.</p>
                             </div>
                         }
                         else if (Model.CurrentStatus.Status == "CheckedIn")
                         {
-                            <div style="background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); padding: 1.25rem; border-radius: 12px; margin-bottom: 1.5rem; border-left: 4px solid #28a745; color: #155724;">
-                                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
-                                    <div style="width: 32px; height: 32px; background: rgba(40,167,69,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                                        <i class="fas fa-check-circle" style="color: #28a745;"></i>
+                            <div class="alert-box success mb-3">
+                                <div class="alert-box-header">
+                                    <div class="alert-box-icon">
+                                        <i class="fas fa-check-circle"></i>
                                     </div>
-                                    <strong style="font-size: 1rem;">Check-in thành công!</strong>
+                                    <strong>Check-in thành công!</strong>
                                 </div>
-                                <small style="font-size: 0.9rem; opacity: 0.9;">Bạn đã check-in vào phòng thành công.</small>
+                                <p class="mb-0">Bạn đã check-in vào phòng thành công. Hãy yêu cầu check-out khi cần rời phòng.</p>
                             </div>
-                            <button type="button" 
-                                    onclick="requestCheckOut()"
-                                    style="width: 100%; padding: 1rem 1.5rem; background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); color: white; border: none; border-radius: 12px; font-weight: 600; font-size: 1rem; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(246,211,101,0.3); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.75rem;">
-                                <i class="fas fa-sign-out-alt"></i> Yêu Cầu Check-out
-                            </button>
+                            @if (Model.CurrentStatus?.Id != null && Model.CurrentStatus.Id > 0)
+                            {
+                                <a href="/Resident/RequestCheckOut/@Model.CurrentStatus.Id" class="btn-checkout-request">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    <span>Yêu Cầu Check-out</span>
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="alert alert-secondary text-center">
+                                    <i class="fas fa-exclamation-triangle"></i> Không thể yêu cầu check-out
+                                </div>
+                            }
                         }
                         else if (Model.CurrentStatus.Status == "PendingCheckOut")
                         {
-                            <div style="background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%); padding: 1.25rem; border-radius: 12px; border-left: 4px solid #17a2b8; color: #0c5460;">
-                                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
-                                    <div style="width: 32px; height: 32px; background: rgba(23,162,184,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                                        <i class="fas fa-hourglass-half" style="color: #17a2b8;"></i>
+                            <div class="alert-box info">
+                                <div class="alert-box-header">
+                                    <div class="alert-box-icon">
+                                        <i class="fas fa-hourglass-half"></i>
                                     </div>
-                                    <strong style="font-size: 1rem;">Đang chờ phê duyệt check-out</strong>
+                                    <strong>Đang chờ phê duyệt check-out</strong>
                                 </div>
-                                <small style="font-size: 0.9rem; opacity: 0.9;">Yêu cầu check-out của bạn đang chờ Staff/Admin xem xét.</small>
+                                <p class="mb-0">Yêu cầu check-out của bạn đang chờ Staff/Admin xem xét và phê duyệt.</p>
                             </div>
                         }
                     </div>
@@ -427,66 +662,6 @@
         </div>
     }
 </div>
-
-<!-- Modal xác nhận check-out -->
-<div class="modal fade" id="checkOutModal" tabindex="-1">
-    <div class="modal-dialog" style="max-width: 500px;">
-        <div style="border-radius: 16px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2); overflow: hidden; background: white;">
-            <div style="padding: 1.5rem 2rem; background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); color: white; border: none;">
-                <h5 style="margin: 0; font-weight: 700; font-size: 1.25rem; display: flex; align-items: center; gap: 0.75rem;">
-                    <div style="width: 36px; height: 36px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-question-circle"></i>
-                    </div>
-                    Xác Nhận Yêu Cầu Check-out
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" style="position: absolute; top: 1.5rem; right: 1.5rem; opacity: 0.8;"></button>
-            </div>
-            <div style="padding: 2rem;">
-                <div style="background: linear-gradient(135deg, #fff5e6 0%, #ffe8cc 100%); padding: 1.25rem; border-radius: 12px; margin-bottom: 1.5rem; border-left: 4px solid #f6d365;">
-                    <p style="margin: 0 0 0.75rem 0; font-size: 1rem; color: #2c3e50; font-weight: 600;">
-                        <i class="fas fa-door-open" style="color: #f6d365; margin-right: 0.5rem;"></i>
-                        Bạn có chắc chắn muốn yêu cầu check-out khỏi phòng <strong style="color: #e67e22;">@Model.CurrentStatus?.RoomNumber</strong>?
-                    </p>
-                    <p style="margin: 0; font-size: 0.9rem; color: #7f8c8d; display: flex; align-items: center; gap: 0.5rem;">
-                        <i class="fas fa-info-circle" style="color: #f6d365;"></i>
-                        Yêu cầu sẽ được gửi đến Staff/Admin để phê duyệt.
-                    </p>
-                </div>
-                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
-                    <button type="button" class="btn" data-bs-dismiss="modal" style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%); color: white; border: none; border-radius: 10px; font-weight: 600; font-size: 0.95rem; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(127,140,141,0.3);">
-                        <i class="fas fa-times"></i> Hủy
-                    </button>
-                    <form method="post" asp-page-handler="CheckOut" style="margin: 0;">
-                        <input type="hidden" name="checkInRecordId" value="@Model.CurrentStatus?.Id" />
-                        <button type="submit" style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); color: white; border: none; border-radius: 10px; font-weight: 600; font-size: 0.95rem; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(246,211,101,0.3); cursor: pointer;">
-                            <i class="fas fa-check"></i> Xác Nhận
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    function requestCheckOut() {
-        const modalEl = document.getElementById('checkOutModal');
-        if (!modalEl) {
-            console.error('Modal element not found');
-            return;
-        }
-        
-        // Kiểm tra xem Bootstrap đã load chưa
-        if (typeof bootstrap === 'undefined') {
-            console.error('Bootstrap chưa được load');
-            return;
-        }
-        
-        // Lấy instance hiện có hoặc tạo mới
-        const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-        modal.show();
-    }
-</script>
 
 @functions {
     private string GetStatusText(string status)

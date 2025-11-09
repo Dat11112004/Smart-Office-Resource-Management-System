@@ -32,14 +32,48 @@ namespace SORMS.FE.Pages.Resident
 
                 // Lấy trạng thái hiện tại
                 var statusResponse = await client.GetAsync("api/CheckIn/my-status");
+                var statusContent = await statusResponse.Content.ReadAsStringAsync();
+                
+                Console.WriteLine($"[CheckInStatus] API Response Status: {statusResponse.StatusCode}");
+                Console.WriteLine($"[CheckInStatus] API Response Content: {statusContent}");
+                
                 if (statusResponse.IsSuccessStatusCode)
                 {
-                    var statusJson = await statusResponse.Content.ReadAsStringAsync();
-                    var statusResult = JsonSerializer.Deserialize<ApiResponse<CheckInRecordDto>>(statusJson, new JsonSerializerOptions
+                    var statusResult = JsonSerializer.Deserialize<ApiResponse<CheckInRecordDto>>(statusContent, new JsonSerializerOptions
                     {
                         PropertyNameCaseInsensitive = true
                     });
+                    
+                    Console.WriteLine($"[CheckInStatus] Deserialized Success: {statusResult?.Success}");
+                    Console.WriteLine($"[CheckInStatus] Data is NULL: {statusResult?.Data == null}");
+                    
                     CurrentStatus = statusResult?.Data;
+                    
+                    if (CurrentStatus != null)
+                    {
+                        Console.WriteLine($"[CheckInStatus] CurrentStatus: ID={CurrentStatus.Id}, Status={CurrentStatus.Status}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"[CheckInStatus] CurrentStatus is NULL - No active check-in");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"[CheckInStatus] API returned error status");
+                    // Parse error message từ API
+                    try
+                    {
+                        var errorResult = JsonSerializer.Deserialize<ApiErrorResponse>(statusContent, new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true
+                        });
+                        TempData["ErrorMessage"] = errorResult?.Message ?? $"Không thể tải trạng thái check-in. Mã lỗi: {statusResponse.StatusCode}";
+                    }
+                    catch
+                    {
+                        TempData["ErrorMessage"] = $"Không thể tải trạng thái check-in. Mã lỗi: {statusResponse.StatusCode}";
+                    }
                 }
 
                 // Lấy lịch sử
@@ -60,48 +94,6 @@ namespace SORMS.FE.Pages.Resident
             }
 
             return Page();
-        }
-
-        public async Task<IActionResult> OnPostCheckOutAsync(int checkInRecordId)
-        {
-            var token = HttpContext.Session.GetString("JWTToken");
-            if (string.IsNullOrEmpty(token))
-                return RedirectToPage("/Auth/Login");
-
-            try
-            {
-                var client = _httpClientFactory.CreateClient("API");
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-                var requestDto = new { CheckInRecordId = checkInRecordId };
-                var content = new StringContent(
-                    JsonSerializer.Serialize(requestDto),
-                    Encoding.UTF8,
-                    "application/json"
-                );
-
-                var response = await client.PostAsync("api/CheckIn/request-checkout", content);
-                var responseContent = await response.Content.ReadAsStringAsync();
-
-                if (response.IsSuccessStatusCode)
-                {
-                    TempData["SuccessMessage"] = "Yêu cầu check-out đã được gửi! Vui lòng chờ Staff/Admin phê duyệt.";
-                }
-                else
-                {
-                    var error = JsonSerializer.Deserialize<ApiErrorResponse>(responseContent, new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    });
-                    TempData["ErrorMessage"] = error?.Message ?? "Không thể gửi yêu cầu check-out";
-                }
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = "Lỗi: " + ex.Message;
-            }
-
-            return RedirectToPage();
         }
     }
 

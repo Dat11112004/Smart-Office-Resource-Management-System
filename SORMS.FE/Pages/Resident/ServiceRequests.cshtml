@@ -1,0 +1,417 @@
+@page
+@model SORMS.FE.Pages.Resident.ServiceRequestsModel
+@{
+    ViewData["Title"] = "Yêu Cầu Dịch Vụ";
+}
+
+<style>
+    /* Tab Content Visibility */
+    .tab-content > .tab-pane {
+        display: none !important;
+    }
+    
+    .tab-content > .tab-pane.active {
+        display: block !important;
+    }
+
+    /* Request Cards Grid */
+    .requests-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .request-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        border-left: 4px solid;
+        transition: all 0.3s ease;
+    }
+
+    .request-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    }
+
+    .request-card.pending {
+        border-left-color: #ffa726;
+        background: linear-gradient(135deg, rgba(255,167,38,0.05) 0%, rgba(255,193,7,0.05) 100%);
+    }
+
+    .request-card.approved {
+        border-left-color: #66bb6a;
+        background: linear-gradient(135deg, rgba(102,187,106,0.05) 0%, rgba(76,175,80,0.05) 100%);
+    }
+
+    .request-card.inprogress {
+        border-left-color: #42a5f5;
+        background: linear-gradient(135deg, rgba(66,165,245,0.05) 0%, rgba(33,150,243,0.05) 100%);
+    }
+
+    .request-card.completed {
+        border-left-color: #26a69a;
+        background: linear-gradient(135deg, rgba(38,166,154,0.05) 0%, rgba(0,150,136,0.05) 100%);
+    }
+
+    .request-card.rejected {
+        border-left-color: #ef5350;
+        background: linear-gradient(135deg, rgba(239,83,80,0.05) 0%, rgba(244,67,54,0.05) 100%);
+    }
+
+    .priority-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.4rem 0.8rem;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .priority-low {
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        color: #1976d2;
+    }
+
+    .priority-normal {
+        background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+        color: #7b1fa2;
+    }
+
+    .priority-high {
+        background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+        color: #f57c00;
+    }
+
+    .priority-urgent {
+        background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+        color: #c62828;
+    }
+
+    /* Form Card */
+    .form-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .form-card .form-label {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #37474f;
+    }
+
+    .form-card .form-control,
+    .form-card .form-select {
+        border-radius: 10px;
+        border: 2px solid #e0e0e0;
+        padding: 0.75rem;
+    }
+
+    .form-card .form-control:focus,
+    .form-card .form-select:focus {
+        border-color: #4facfe;
+        box-shadow: 0 0 0 0.2rem rgba(79,172,254,0.25);
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+        padding: 0.875rem 2rem;
+        border-radius: 12px;
+        font-weight: 700;
+        border: none;
+        box-shadow: 0 4px 15px rgba(79,172,254,0.3);
+        transition: all 0.3s ease;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(79,172,254,0.4);
+        color: white;
+    }
+</style>
+
+<!-- Main Container -->
+<div style="max-width: 1400px; margin: 0 auto; padding: 2rem 1.5rem;">
+    
+    <!-- Header -->
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2.5rem 2rem; border-radius: 20px; margin-bottom: 2rem; box-shadow: 0 10px 40px rgba(102,126,234,0.3);">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <h2 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; color: white;">
+                    <i class="fas fa-concierge-bell"></i> Yêu Cầu Dịch Vụ
+                </h2>
+                <p style="font-size: 1rem; margin: 0; color: white;">Quản lý các yêu cầu dịch vụ của bạn</p>
+            </div>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <div style="text-align: center; background: rgba(255,255,255,0.2); padding: 0.75rem 1.5rem; border-radius: 12px;">
+                    <div style="font-size: 1.75rem; font-weight: 700;">@Model.MyRequests.Count(r => r.Status == "Pending")</div>
+                    <div style="font-size: 0.85rem;">Chờ xử lý</div>
+                </div>
+                <div style="text-align: center; background: rgba(255,255,255,0.2); padding: 0.75rem 1.5rem; border-radius: 12px;">
+                    <div style="font-size: 1.75rem; font-weight: 700;">@Model.MyRequests.Count(r => r.Status == "InProgress")</div>
+                    <div style="font-size: 0.85rem;">Đang xử lý</div>
+                </div>
+                <div style="text-align: center; background: rgba(255,255,255,0.2); padding: 0.75rem 1.5rem; border-radius: 12px;">
+                    <div style="font-size: 1.75rem; font-weight: 700;">@Model.MyRequests.Count(r => r.Status == "Completed")</div>
+                    <div style="font-size: 0.85rem;">Hoàn thành</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Section -->
+    <div style="background: #f8f9fa; border-radius: 20px; padding: 2rem;">
+
+        <!-- Tab Navigation -->
+        <div style="background: white; padding: 1rem; border-radius: 16px; margin-bottom: 2rem; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
+            <ul class="nav nav-tabs border-0" style="display: flex; gap: 0.5rem;">
+                <li class="nav-item" style="flex: 1;">
+                    <button class="nav-link active" id="list-tab" data-bs-toggle="tab" data-bs-target="#list" type="button" 
+                            style="color: white; font-weight: 600; padding: 0.875rem 1.25rem; border-radius: 12px; border: none; width: 100%; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <i class="fas fa-list me-2"></i> Danh Sách Yêu Cầu
+                    </button>
+                </li>
+                <li class="nav-item" style="flex: 1;">
+                    <button class="nav-link" id="create-tab" data-bs-toggle="tab" data-bs-target="#create" type="button"
+                            style="color: #546e7a; font-weight: 600; padding: 0.875rem 1.25rem; border-radius: 12px; border: none; width: 100%; text-align: center; background: transparent;">
+                        <i class="fas fa-plus-circle me-2"></i> Tạo Yêu Cầu Mới
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+            <!-- Tab: Danh sách yêu cầu -->
+            <div class="tab-pane fade show active" id="list">
+                <!-- Back Button -->
+                <div style="margin-bottom: 1.5rem;">
+                    <a href="/Resident/Dashboard" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 12px; font-weight: 600; box-shadow: 0 4px 15px rgba(102,126,234,0.3); transition: all 0.3s ease;">
+                        <i class="fas fa-arrow-left"></i> Quay Lại Dashboard
+                    </a>
+                </div>
+
+                @if (!Model.MyRequests.Any())
+                {
+                    <div style="text-align: center; padding: 4rem 2rem; background: white; border-radius: 16px;">
+                        <div style="width: 120px; height: 120px; margin: 0 auto 1.5rem; background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-inbox" style="font-size: 3.5rem; color: #5c6bc0;"></i>
+                        </div>
+                        <h5 style="color: #546e7a; font-weight: 600; margin-bottom: 0.5rem;">Chưa Có Yêu Cầu</h5>
+                        <p style="color: #90a4ae; margin: 0;">Bạn chưa có yêu cầu dịch vụ nào. Hãy tạo yêu cầu mới!</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="requests-grid">
+                        @foreach (var request in Model.MyRequests.OrderByDescending(r => r.RequestDate))
+                        {
+                            <div class="request-card @request.Status.ToLower()">
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                                    <div>
+                                        <h5 style="margin: 0 0 0.5rem 0; color: #37474f; font-weight: 700;">@request.Title</h5>
+                                        <span class="priority-badge priority-@request.Priority.ToLower()">
+                                            <i class="fas fa-flag"></i> @request.Priority
+                                        </span>
+                                    </div>
+                                    <span class="badge @GetStatusBadgeClass(request.Status)" style="padding: 0.5rem 1rem; border-radius: 10px; font-weight: 600; font-size: 0.85rem;">
+                                        @GetStatusText(request.Status)
+                                    </span>
+                                </div>
+
+                                <div style="margin-bottom: 1rem;">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                        <i class="fas fa-tools" style="color: #546e7a; width: 16px;"></i>
+                                        <strong style="color: #546e7a; font-size: 0.9rem;">Loại dịch vụ:</strong>
+                                        <span style="color: #37474f; font-size: 0.9rem;">@request.ServiceType</span>
+                                    </div>
+                                    <div style="display: flex; align-items: start; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                        <i class="fas fa-comment" style="color: #546e7a; width: 16px; margin-top: 0.2rem;"></i>
+                                        <div style="flex: 1;">
+                                            <strong style="color: #546e7a; font-size: 0.9rem;">Mô tả:</strong>
+                                            <p style="color: #37474f; font-size: 0.9rem; margin: 0.25rem 0 0 0;">@request.Description</p>
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <i class="fas fa-calendar" style="color: #546e7a; width: 16px;"></i>
+                                        <strong style="color: #546e7a; font-size: 0.9rem;">Ngày gửi:</strong>
+                                        <span style="color: #37474f; font-size: 0.9rem;">@request.RequestDate.ToString("dd/MM/yyyy HH:mm")</span>
+                                    </div>
+                                </div>
+
+                                @if (!string.IsNullOrEmpty(request.StaffFeedback))
+                                {
+                                    <div style="background: rgba(102,126,234,0.1); padding: 1rem; border-radius: 10px; margin-bottom: 1rem;">
+                                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                            <i class="fas fa-user-tie" style="color: #667eea;"></i>
+                                            <strong style="color: #667eea; font-size: 0.9rem;">Phản hồi từ @request.ReviewedBy:</strong>
+                                        </div>
+                                        <p style="color: #37474f; font-size: 0.9rem; margin: 0;">@request.StaffFeedback</p>
+                                        @if (request.ReviewedDate.HasValue)
+                                        {
+                                            <small style="color: #90a4ae; font-size: 0.8rem;">@request.ReviewedDate.Value.ToString("dd/MM/yyyy HH:mm")</small>
+                                        }
+                                    </div>
+                                }
+
+                                @if (request.Status == "Pending")
+                                {
+                                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                                        <a href="/Resident/EditServiceRequest/@request.Id" class="btn btn-sm" style="flex: 1; background: linear-gradient(135deg, #ffa726 0%, #fb8c00 100%); color: white; border: none; padding: 0.5rem; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-edit me-1"></i> Sửa
+                                        </a>
+                                        <button class="btn btn-sm" style="flex: 1; background: linear-gradient(135deg, #ef5350 0%, #e53935 100%); color: white; border: none; padding: 0.5rem; border-radius: 8px; font-weight: 600;" onclick="deleteRequest(@request.Id)">
+                                            <i class="fas fa-trash"></i> Xóa
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- Tab: Tạo yêu cầu mới -->
+            <div class="tab-pane fade" id="create">
+                <div class="form-card">
+                    <h4 style="margin-bottom: 1.5rem; color: #37474f; font-weight: 700; display: flex; align-items: center; gap: 0.75rem;">
+                        <div style="width: 45px; height: 45px; border-radius: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white;">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        Tạo Yêu Cầu Dịch Vụ Mới
+                    </h4>
+
+                    <form method="post" asp-page-handler="CreateRequest">
+                        @Html.AntiForgeryToken()
+                        
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-heading me-2"></i>Tiêu đề yêu cầu:</label>
+                            <input type="text" class="form-control" name="title" required placeholder="VD: Sửa chữa điều hòa" maxlength="100">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-tools me-2"></i>Loại dịch vụ:</label>
+                            <select class="form-select" name="serviceType" required>
+                                <option value="">-- Chọn loại dịch vụ --</option>
+                                <option value="Sửa chữa">Sửa chữa</option>
+                                <option value="Bảo trì">Bảo trì</option>
+                                <option value="Vệ sinh">Vệ sinh</option>
+                                <option value="Điện nước">Điện nước</option>
+                                <option value="Internet">Internet</option>
+                                <option value="An ninh">An ninh</option>
+                                <option value="Khác">Khác</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-flag me-2"></i>Mức độ ưu tiên:</label>
+                            <select class="form-select" name="priority" required>
+                                <option value="Normal" selected>Bình thường</option>
+                                <option value="Low">Thấp</option>
+                                <option value="High">Cao</option>
+                                <option value="Urgent">Khẩn cấp</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-align-left me-2"></i>Mô tả chi tiết:</label>
+                            <textarea class="form-control" name="description" rows="5" required placeholder="Mô tả chi tiết về yêu cầu của bạn..." maxlength="500"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-submit">
+                            <i class="fas fa-paper-plane me-2"></i> Gửi Yêu Cầu
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Tab Switching Handler
+    document.addEventListener('DOMContentLoaded', function() {
+        const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
+        const tabPanes = document.querySelectorAll('.tab-pane');
+        
+        const inactiveStyle = 'color: #546e7a; font-weight: 600; padding: 0.875rem 1.25rem; border-radius: 12px; border: none; transition: all 0.3s ease; width: 100%; text-align: center; background: transparent;';
+        const activeStyle = 'color: white; font-weight: 600; padding: 0.875rem 1.25rem; border-radius: 12px; border: none; transition: all 0.3s ease; width: 100%; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);';
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('data-bs-target');
+                
+                tabButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.setAttribute('style', inactiveStyle);
+                });
+                
+                tabPanes.forEach(pane => {
+                    pane.classList.remove('show', 'active');
+                });
+                
+                this.classList.add('active');
+                this.setAttribute('style', activeStyle);
+                
+                const targetPane = document.querySelector(targetId);
+                if (targetPane) {
+                    targetPane.classList.add('show', 'active');
+                }
+            });
+        });
+    });
+
+    function deleteRequest(id) {
+        if (confirm('Bạn có chắc chắn muốn xóa yêu cầu này?')) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '?handler=DeleteRequest&id=' + id;
+            
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            const tokenInput = document.createElement('input');
+            tokenInput.type = 'hidden';
+            tokenInput.name = '__RequestVerificationToken';
+            tokenInput.value = token;
+            
+            form.appendChild(tokenInput);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+</script>
+
+@functions {
+    private string GetStatusText(string status)
+    {
+        return status switch
+        {
+            "Pending" => "Chờ xử lý",
+            "Approved" => "Đã duyệt",
+            "InProgress" => "Đang xử lý",
+            "Completed" => "Hoàn thành",
+            "Rejected" => "Từ chối",
+            _ => status
+        };
+    }
+
+    private string GetStatusBadgeClass(string status)
+    {
+        return status switch
+        {
+            "Pending" => "bg-warning text-dark",
+            "Approved" => "bg-success",
+            "InProgress" => "bg-info text-dark",
+            "Completed" => "bg-secondary",
+            "Rejected" => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+}

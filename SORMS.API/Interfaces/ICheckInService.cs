@@ -24,5 +24,8 @@ namespace SORMS.API.Interfaces
         
         // Lấy tất cả records (cho Staff/Admin)
         Task<IEnumerable<CheckInRecordDto>> GetAllCheckInRecordsAsync();
+        
+        // Helper method: Lấy ResidentId từ UserId
+        Task<int> GetResidentIdByUserIdAsync(int userId);
     }
 }

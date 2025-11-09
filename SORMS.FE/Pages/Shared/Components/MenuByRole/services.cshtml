@@ -1,10 +1,23 @@
+@{
+    var userRole = Context.Session.GetString("UserRole");
+}
 <li>
     <a href="#servicesSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
         <i class="fas fa-concierge-bell"></i>
         <span>Services</span>
     </a>
     <ul class="collapse list-unstyled" id="servicesSubmenu">
-        <li><a href="/ServiceRequest" class="nav-link"><i class="fas fa-list"></i> Yêu cầu dịch vụ</a></li>
-        <li><a href="/ServiceRequest/Create" class="nav-link"><i class="fas fa-plus"></i> Tạo yêu cầu</a></li>
+        @if (userRole == "Resident")
+        {
+            <li><a href="/Resident/ServiceRequests" class="nav-link"><i class="fas fa-list"></i> Yêu cầu dịch vụ</a></li>
+        }
+        @if (userRole == "Staff")
+        {
+            <li><a href="/Staff/ServiceRequestManagement" class="nav-link"><i class="fas fa-list"></i> Quản Lý dịch vụ</a></li>
+        }
+        @if (userRole == "Admin")
+        {
+            <li><a href="/Admin/ServiceRequestManagement" class="nav-link"><i class="fas fa-list"></i> Quản Lý dịch vụ</a></li>
+        }
     </ul>
 </li>

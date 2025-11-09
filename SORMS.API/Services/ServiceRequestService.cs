@@ -15,84 +15,175 @@
             _context = context;
         }
 
-        public async Task<IEnumerable<ServiceRequestDto>> GetAllRequestsAsync()
-        {
-            var requests = await _context.ServiceRequests
-                .Include(r => r.Resident)
-                .Include(r => r.Staff)
-                .OrderByDescending(r => r.RequestDate)
-                .ToListAsync();
+        // ==================== CRUD OPERATIONS ====================
 
-            return requests.Select(r => new ServiceRequestDto
-            {
-                Id = r.Id,
-                ServiceType = r.ServiceType,
-                Description = r.Description,
-                Status = r.Status,
-                ResidentId = r.ResidentId,
-                StaffId = r.StaffId
-            });
-        }
-
-        public async Task<ServiceRequestDto> GetRequestByIdAsync(int id)
-        {
-            var request = await _context.ServiceRequests
-                .Include(r => r.Resident)
-                .Include(r => r.Staff)
-                .FirstOrDefaultAsync(r => r.Id == id);
-
-            if (request == null) return null;
-
-            return new ServiceRequestDto
-            {
-                Id = request.Id,
-                ServiceType = request.ServiceType,
-                Description = request.Description,
-                Status = request.Status,
-                ResidentId = request.ResidentId,
-                StaffId = request.StaffId
-            };
-        }
-
-        public async Task<ServiceRequestDto> CreateRequestAsync(ServiceRequestDto requestDto)
+        public async Task<ServiceRequestDto> CreateRequestAsync(CreateServiceRequestDto dto, int residentId)
         {
             var request = new ServiceRequest
             {
-                ServiceType = requestDto.ServiceType,
-                Description = requestDto.Description,
+                Title = dto.Title,
+                ServiceType = dto.ServiceType,
+                Description = dto.Description,
+                Priority = dto.Priority,
+                RequestDate = DateTime.Now,
+                ResidentId = residentId,
                 Status = "Pending",
-                RequestDate = DateTime.UtcNow,
-                ResidentId = requestDto.ResidentId,
-                StaffId = requestDto.StaffId
+                LastUpdated = DateTime.Now
             };
 
             _context.ServiceRequests.Add(request);
             await _context.SaveChangesAsync();
 
-            requestDto.Id = request.Id;
-            requestDto.Status = request.Status;
-            return requestDto;
+            return await MapToDtoAsync(request);
         }
 
-        public async Task<bool> UpdateRequestStatusAsync(int id, string status)
+        public async Task<IEnumerable<ServiceRequestDto>> GetAllRequestsAsync()
+        {
+            var requests = await _context.ServiceRequests
+                .Include(r => r.Resident)
+                .OrderByDescending(r => r.RequestDate)
+                .ToListAsync();
+
+            var dtos = new List<ServiceRequestDto>();
+            foreach (var request in requests)
+            {
+                dtos.Add(await MapToDtoAsync(request));
+            }
+            return dtos;
+        }
+
+        public async Task<IEnumerable<ServiceRequestDto>> GetRequestsByResidentIdAsync(int residentId)
+        {
+            var requests = await _context.ServiceRequests
+                .Include(r => r.Resident)
+                .Where(r => r.ResidentId == residentId)
+                .OrderByDescending(r => r.RequestDate)
+                .ToListAsync();
+
+            var dtos = new List<ServiceRequestDto>();
+            foreach (var request in requests)
+            {
+                dtos.Add(await MapToDtoAsync(request));
+            }
+            return dtos;
+        }
+
+        public async Task<IEnumerable<ServiceRequestDto>> GetRequestsByStatusAsync(string status)
+        {
+            var requests = await _context.ServiceRequests
+                .Include(r => r.Resident)
+                .Where(r => r.Status == status)
+                .OrderByDescending(r => r.RequestDate)
+                .ToListAsync();
+
+            var dtos = new List<ServiceRequestDto>();
+            foreach (var request in requests)
+            {
+                dtos.Add(await MapToDtoAsync(request));
+            }
+            return dtos;
+        }
+
+        public async Task<ServiceRequestDto?> GetRequestByIdAsync(int id)
+        {
+            var request = await _context.ServiceRequests
+                .Include(r => r.Resident)
+                .FirstOrDefaultAsync(r => r.Id == id);
+
+            return request == null ? null : await MapToDtoAsync(request);
+        }
+
+        public async Task<bool> UpdateRequestAsync(int id, UpdateServiceRequestDto dto, int residentId)
         {
             var request = await _context.ServiceRequests.FindAsync(id);
-            if (request == null) return false;
+            
+            if (request == null || request.ResidentId != residentId)
+                return false;
 
-            request.Status = status;
+            // Chỉ cho phép update nếu status là Pending
+            if (request.Status != "Pending")
+                return false;
+
+            request.Title = dto.Title;
+            request.ServiceType = dto.ServiceType;
+            request.Description = dto.Description;
+            request.Priority = dto.Priority;
+            request.LastUpdated = DateTime.Now;
+
             await _context.SaveChangesAsync();
             return true;
         }
 
-        public async Task<bool> DeleteRequestAsync(int id)
+        public async Task<bool> DeleteRequestAsync(int id, int residentId)
         {
             var request = await _context.ServiceRequests.FindAsync(id);
-            if (request == null) return false;
+            
+            if (request == null || request.ResidentId != residentId)
+                return false;
+
+            // Chỉ cho phép xóa nếu status là Pending
+            if (request.Status != "Pending")
+                return false;
 
             _context.ServiceRequests.Remove(request);
             await _context.SaveChangesAsync();
             return true;
         }
-    }
 
+        // ==================== STAFF/ADMIN REVIEW ====================
+
+        public async Task<bool> ReviewRequestAsync(int id, ReviewServiceRequestDto dto, string reviewedBy)
+        {
+            var request = await _context.ServiceRequests.FindAsync(id);
+            
+            if (request == null)
+                return false;
+
+            request.Status = dto.Status;
+            request.StaffFeedback = dto.StaffFeedback;
+            request.ReviewedBy = reviewedBy;
+            request.ReviewedDate = DateTime.Now;
+            
+            if (dto.Status == "Completed")
+            {
+                request.CompletedDate = DateTime.Now;
+            }
+            
+            request.LastUpdated = DateTime.Now;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        // ==================== HELPER ====================
+
+        private async Task<ServiceRequestDto> MapToDtoAsync(ServiceRequest request)
+        {
+            // Load resident if not loaded
+            if (request.Resident == null)
+            {
+                await _context.Entry(request)
+                    .Reference(r => r.Resident)
+                    .LoadAsync();
+            }
+
+            return new ServiceRequestDto
+            {
+                Id = request.Id,
+                Title = request.Title,
+                ServiceType = request.ServiceType,
+                Description = request.Description,
+                RequestDate = request.RequestDate,
+                Status = request.Status,
+                ResidentId = request.ResidentId,
+                ResidentName = request.Resident?.FullName ?? "Unknown",
+                StaffFeedback = request.StaffFeedback,
+                ReviewedBy = request.ReviewedBy,
+                ReviewedDate = request.ReviewedDate,
+                CompletedDate = request.CompletedDate,
+                LastUpdated = request.LastUpdated,
+                Priority = request.Priority
+            };
+        }
+    }
 }
