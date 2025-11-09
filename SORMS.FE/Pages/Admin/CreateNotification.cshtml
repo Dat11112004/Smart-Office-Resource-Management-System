@@ -1,0 +1,313 @@
+@page
+@model SORMS.FE.Pages.Admin.CreateNotificationModel
+@{
+    ViewData["Title"] = "Tạo Thông Báo";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<style>
+    .notification-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .card-header-custom {
+        border-bottom: 3px solid #667eea;
+        padding-bottom: 1rem;
+        margin-bottom: 2rem;
+    }
+
+        .card-header-custom h4 {
+            color: #667eea;
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .card-header-custom h4 i {
+                font-size: 1.5rem;
+            }
+
+    .form-label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .form-control, .form-select {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+    textarea.form-control {
+        min-height: 150px;
+        resize: vertical;
+    }
+
+    .char-counter {
+        text-align: right;
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-top: 0.5rem;
+    }
+
+        .char-counter.warning {
+            color: #f39c12;
+        }
+
+        .char-counter.danger {
+            color: #e74c3c;
+        }
+
+    .target-role-options {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-top: 0.5rem;
+    }
+
+    .role-option {
+        position: relative;
+    }
+
+        .role-option input[type="radio"] {
+            display: none;
+        }
+
+        .role-option label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1.5rem 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+            .role-option label i {
+                font-size: 2rem;
+                color: #6c757d;
+            }
+
+            .role-option label span {
+                font-weight: 600;
+                color: #2c3e50;
+            }
+
+            .role-option label:hover {
+                border-color: #667eea;
+                background: #f0f3ff;
+                transform: translateY(-2px);
+            }
+
+        .role-option input[type="radio"]:checked + label {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+            .role-option input[type="radio"]:checked + label i,
+            .role-option input[type="radio"]:checked + label span {
+                color: white;
+            }
+
+    .btn-send {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 0.875rem 2rem;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+
+        .btn-send:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-send:active {
+            transform: translateY(0);
+        }
+
+        .btn-send:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+    .alert {
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        border: none;
+        margin-bottom: 1.5rem;
+    }
+
+    .alert-success {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white;
+    }
+
+    .alert-danger {
+        background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+        color: white;
+    }
+
+    .info-box {
+        background: #e8f4f8;
+        border-left: 4px solid #3498db;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+    }
+
+        .info-box i {
+            color: #3498db;
+            margin-right: 0.5rem;
+        }
+
+        .info-box p {
+            margin: 0;
+            color: #2c3e50;
+        }
+
+    @@media (max-width: 768px) {
+        .target-role-options {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-7">
+            <div class="notification-card">
+                <div class="card-header-custom">
+                    <h4>
+                        <i class="fas fa-bullhorn"></i>
+                        Tạo Thông Báo Mới
+                    </h4>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+                {
+                    <div class="alert alert-success" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>
+                        @Model.SuccessMessage
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                {
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        @Model.ErrorMessage
+                    </div>
+                }
+
+                <div class="info-box">
+                    <i class="fas fa-info-circle"></i>
+                    <p><strong>Lưu ý:</strong> Thông báo broadcast sẽ được gửi ngay lập tức đến tất cả người dùng trong nhóm đã chọn.</p>
+                </div>
+
+                <form method="post">
+                    <div class="mb-4">
+                        <label class="form-label">
+                            <i class="fas fa-users me-1"></i> Đối Tượng Nhận
+                        </label>
+                        <div class="target-role-options">
+                            <div class="role-option">
+                                <input type="radio" id="targetAll" name="TargetRole" value="All" checked asp-for="TargetRole" />
+                                <label for="targetAll">
+                                    <i class="fas fa-globe"></i>
+                                    <span>Tất Cả</span>
+                                </label>
+                            </div>
+                            <div class="role-option">
+                                <input type="radio" id="targetResident" name="TargetRole" value="Resident" asp-for="TargetRole" />
+                                <label for="targetResident">
+                                    <i class="fas fa-user-friends"></i>
+                                    <span>Cư Dân</span>
+                                </label>
+                            </div>
+                            <div class="role-option">
+                                <input type="radio" id="targetStaff" name="TargetRole" value="Staff" asp-for="TargetRole" />
+                                <label for="targetStaff">
+                                    <i class="fas fa-user-tie"></i>
+                                    <span>Nhân Viên</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Message" class="form-label">
+                            <i class="fas fa-comment-alt me-1"></i> Nội Dung Thông Báo
+                        </label>
+                        <textarea asp-for="Message" 
+                                  class="form-control" 
+                                  placeholder="Nhập nội dung thông báo..."
+                                  id="messageInput"
+                                  maxlength="500"
+                                  required></textarea>
+                        <div class="char-counter" id="charCounter">
+                            <span id="charCount">0</span> / 500 ký tự
+                        </div>
+                        <span asp-validation-for="Message" class="text-danger small"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-send" id="sendBtn">
+                        <i class="fas fa-paper-plane me-2"></i> Gửi Thông Báo
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const messageInput = document.getElementById('messageInput');
+            const charCount = document.getElementById('charCount');
+            const charCounter = document.getElementById('charCounter');
+            const sendBtn = document.getElementById('sendBtn');
+
+            messageInput.addEventListener('input', function () {
+                const length = this.value.length;
+                charCount.textContent = length;
+
+                // Update counter color
+                charCounter.classList.remove('warning', 'danger');
+                if (length > 450) {
+                    charCounter.classList.add('danger');
+                } else if (length > 400) {
+                    charCounter.classList.add('warning');
+                }
+
+                // Disable button if empty or too long
+                sendBtn.disabled = length === 0 || length > 500;
+            });
+
+            // Initial check
+            messageInput.dispatchEvent(new Event('input'));
+        });
+    </script>
+}

@@ -136,7 +136,7 @@
                 {
                     ResidentId = record.ResidentId,
                     Message = $"Yêu cầu check-in vào phòng {record.Room.RoomNumber} đã được phê duyệt",
-                    SentDate = DateTime.UtcNow,
+                    CreatedAt = DateTime.UtcNow,
                     IsRead = false
                 });
             }
@@ -151,7 +151,7 @@
                 {
                     ResidentId = record.ResidentId,
                     Message = $"Yêu cầu check-in vào phòng {record.Room.RoomNumber} đã bị từ chối. Lý do: {record.RejectReason}",
-                    SentDate = DateTime.UtcNow,
+                    CreatedAt = DateTime.UtcNow,
                     IsRead = false
                 });
             }
@@ -197,7 +197,7 @@
                 {
                     ResidentId = record.ResidentId,
                     Message = $"Yêu cầu check-out khỏi phòng {record.Room.RoomNumber} đã được phê duyệt",
-                    SentDate = DateTime.UtcNow,
+                    CreatedAt = DateTime.UtcNow,
                     IsRead = false
                 });
             }
@@ -213,7 +213,7 @@
                 {
                     ResidentId = record.ResidentId,
                     Message = $"Yêu cầu check-out khỏi phòng {record.Room.RoomNumber} đã bị từ chối. Lý do: {record.RejectReason}",
-                    SentDate = DateTime.UtcNow,
+                    CreatedAt = DateTime.UtcNow,
                     IsRead = false
                 });
             }
@@ -314,7 +314,7 @@
                     {
                         ResidentId = resident.Id,
                         Message = message,
-                        SentDate = DateTime.UtcNow,
+                        CreatedAt = DateTime.UtcNow,
                         IsRead = false
                     });
                 }

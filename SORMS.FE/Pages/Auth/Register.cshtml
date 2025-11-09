@@ -122,16 +122,6 @@
                     <div class="form-group">
                         <div class="input-group">
                             <span class="input-group-text">
-                                <i class="fas fa-id-card"></i>
-                            </span>
-                            <input name="IdentityNumber" id="IdentityNumber" type="text" class="form-control" placeholder="CCCD/CMND" />
-                        </div>
-                        <small class="form-text text-muted">Tùy chọn</small>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="input-group">
-                            <span class="input-group-text">
                                 <i class="fas fa-map-marker-alt"></i>
                             </span>
                             <input name="Address" id="Address" type="text" class="form-control" placeholder="Địa chỉ thường trú" />
@@ -142,28 +132,21 @@
                     <div class="form-group">
                         <div class="input-group">
                             <span class="input-group-text">
-                                <i class="fas fa-phone-square"></i>
-                            </span>
-                            <input name="EmergencyContact" id="EmergencyContact" type="tel" class="form-control" placeholder="SĐT khẩn cấp" />
-                        </div>
-                        <small class="form-text text-muted">Tùy chọn - Số điện thoại người thân</small>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="input-group">
-                            <span class="input-group-text">
                                 <i class="fas fa-user-tag"></i>
                             </span>
                             <select name="RoleId" id="RoleId" class="form-control" required>
                                 <option value="3" selected>Resident (Cư dân)</option>
                                 <option value="2">Staff (Nhân viên)</option>
-                                <option value="1">Admin (Quản trị viên)</option>
                             </select>
                         </div>
                         <span class="text-danger" id="roleid-error"></span>
                         <small class="form-text text-muted">
                             <i class="fas fa-info-circle me-1"></i>
-                            Mặc định đăng ký là Resident - Hồ sơ cư dân sẽ tự động được tạo
+                            Chọn Resident để đăng ký tài khoản cư dân, hoặc Staff để đăng ký tài khoản nhân viên
+                        </small>
+                        <small class="form-text text-muted mt-1">
+                            <i class="fas fa-shield-alt me-1"></i>
+                            <strong>Lưu ý:</strong> Tài khoản Admin không thể đăng ký qua form này
                         </small>
                     </div>
 

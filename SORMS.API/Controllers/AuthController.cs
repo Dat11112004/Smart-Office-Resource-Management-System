@@ -56,6 +56,26 @@ namespace SORMS.API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            // ⛔ CHẶN ĐĂNG KÝ ADMIN (RoleId = 1)
+            if (registerDto.RoleId == 1)
+            {
+                return BadRequest(new 
+                { 
+                    Message = "Không thể đăng ký tài khoản Admin qua form đăng ký. Admin account được quản lý bởi hệ thống.",
+                    Error = "Admin registration is not allowed"
+                });
+            }
+
+            // ✅ CHỈ CHO PHÉP STAFF (RoleId = 2) VÀ RESIDENT (RoleId = 3)
+            if (registerDto.RoleId != 2 && registerDto.RoleId != 3)
+            {
+                return BadRequest(new 
+                { 
+                    Message = "Role không hợp lệ. Chỉ được đăng ký Staff hoặc Resident.",
+                    Error = "Invalid role"
+                });
+            }
+
             var token = await _authService.RegisterAsync(registerDto);
             if (token == null)
                 return Conflict("Tên hoặc Email đăng nhập đã tồn tại.");
@@ -172,6 +192,24 @@ namespace SORMS.API.Controllers
                 return BadRequest("Email đã được sử dụng bởi người dùng khác");
 
             return Ok("Cập nhật email thành công");
+        }
+
+        /// <summary>
+        /// Seed Admin user (Development/Testing only)
+        /// </summary>
+        [AllowAnonymous]
+        [HttpPost("seed-admin")]
+        public async Task<IActionResult> SeedAdmin()
+        {
+            try
+            {
+                await _authService.SeedAdminUserAsync();
+                return Ok("Admin user seeding completed");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error seeding admin: {ex.Message}");
+            }
         }
     }
 }

@@ -157,33 +157,43 @@
 
 <!-- Statistics Cards -->
 <div class="row mb-4">
-    <div class="col-xl-4 col-md-6 mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
         <div class="stat-card primary">
             <div class="stat-icon">
-                <i class="fas fa-tasks"></i>
+                <i class="fas fa-clipboard-list"></i>
             </div>
-            <div class="stat-number">15</div>
-            <div class="stat-label">Công việc hôm nay</div>
+            <div class="stat-number">@Model.PendingServiceRequests</div>
+            <div class="stat-label">Yêu cầu chờ xử lý</div>
         </div>
     </div>
     
-    <div class="col-xl-4 col-md-6 mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
         <div class="stat-card info">
             <div class="stat-icon">
                 <i class="fas fa-check-circle"></i>
             </div>
-            <div class="stat-number">42</div>
+            <div class="stat-number">@Model.CompletedServiceRequests</div>
             <div class="stat-label">Đã hoàn thành</div>
         </div>
     </div>
     
-    <div class="col-xl-4 col-md-6 mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
         <div class="stat-card warning">
             <div class="stat-icon">
-                <i class="fas fa-clock"></i>
+                <i class="fas fa-clipboard-check"></i>
             </div>
-            <div class="stat-number">7</div>
-            <div class="stat-label">Đang xử lý</div>
+            <div class="stat-number">@Model.PendingCheckIns</div>
+            <div class="stat-label">Check-in chờ duyệt</div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stat-card warning">
+            <div class="stat-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="stat-number">@Model.PendingReports</div>
+            <div class="stat-label">Báo cáo chờ xử lý</div>
         </div>
     </div>
 </div>
@@ -233,46 +243,39 @@
     </div>
 </div>
 
-<!-- Today's Tasks -->
+<!-- Recent Service Requests -->
 <div class="row">
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0"><i class="fas fa-list-check me-2"></i>Công việc hôm nay</h5>
+                <h5 class="mb-0"><i class="fas fa-list-check me-2"></i>Yêu cầu dịch vụ gần đây</h5>
             </div>
             <div class="card-body">
-                <div class="task-card">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <h6 class="mb-0">Kiểm tra phòng 302</h6>
-                        <span class="task-priority high">Cao</span>
+                @if (Model.RecentServiceRequests != null && Model.RecentServiceRequests.Any())
+                {
+                    @foreach (var request in Model.RecentServiceRequests)
+                    {
+                        <div class="task-card">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="mb-0">@request.ServiceType</h6>
+                                <span class="task-priority @(request.Status == "Pending" ? "high" : request.Status == "In Progress" ? "medium" : "low")">
+                                    @request.Status
+                                </span>
+                            </div>
+                            <p class="text-muted mb-2" style="font-size: 14px;">@request.Description</p>
+                            <div class="text-muted" style="font-size: 13px;">
+                                <i class="fas fa-clock me-1"></i> @request.RequestDate.ToString("dd/MM/yyyy HH:mm")
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-inbox fa-3x mb-3"></i>
+                        <p>Không có yêu cầu dịch vụ nào</p>
                     </div>
-                    <p class="text-muted mb-2" style="font-size: 14px;">Kiểm tra hệ thống điện và nước trước khi cư dân mới chuyển vào</p>
-                    <div class="text-muted" style="font-size: 13px;">
-                        <i class="fas fa-clock me-1"></i> 10:00 AM
-                    </div>
-                </div>
-
-                <div class="task-card">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <h6 class="mb-0">Xử lý yêu cầu sửa chữa</h6>
-                        <span class="task-priority medium">Trung bình</span>
-                    </div>
-                    <p class="text-muted mb-2" style="font-size: 14px;">Phòng 205 - Sửa chữa điều hòa không hoạt động</p>
-                    <div class="text-muted" style="font-size: 13px;">
-                        <i class="fas fa-clock me-1"></i> 2:00 PM
-                    </div>
-                </div>
-
-                <div class="task-card">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <h6 class="mb-0">Cập nhật hóa đơn tháng 11</h6>
-                        <span class="task-priority low">Thấp</span>
-                    </div>
-                    <p class="text-muted mb-2" style="font-size: 14px;">Tạo và gửi hóa đơn điện nước cho các phòng</p>
-                    <div class="text-muted" style="font-size: 13px;">
-                        <i class="fas fa-clock me-1"></i> 4:00 PM
-                    </div>
-                </div>
+                }
             </div>
         </div>
     </div>

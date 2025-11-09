@@ -19,6 +19,11 @@ namespace SORMS.API.Interfaces
 
         Task<bool> UpdateEmailAsync(int userId, string newEmail);
 
+        /// <summary>
+        /// Tạo tài khoản Admin từ config nếu chưa tồn tại
+        /// </summary>
+        Task SeedAdminUserAsync();
+
     }
 
 }

@@ -21,29 +21,52 @@ namespace SORMS.API.Services
         private readonly IEmailService _emailService;
         private readonly IConfiguration _configuration;
         private readonly ILogger<AuthService> _logger;
+        private readonly AdminConfig _adminConfig;
        
 
-        public AuthService(SormsDbContext context, IOptions<JwtConfig> jwtOptions, IEmailService emailService, IConfiguration configuration, ILogger<AuthService>logger)
+        public AuthService(SormsDbContext context, IOptions<JwtConfig> jwtOptions, IEmailService emailService, IConfiguration configuration, ILogger<AuthService>logger, IOptions<AdminConfig> adminOptions)
         {
             _context = context;
             _jwtConfig = jwtOptions.Value;
             _emailService = emailService;
             _configuration = configuration;
             _logger = logger;
+            _adminConfig = adminOptions.Value;
 
+            // Debug log
+            _logger.LogInformation($"📝 AdminConfig loaded: Username={_adminConfig.Username}, Email={_adminConfig.Email}");
         }
 
         public async Task<string> LoginAsync(LoginDto loginDto)
         {
-                var user = await _context.Users
+            // ✅ KIỂM TRA ADMIN ACCOUNT TỪ CONFIG TRƯỚC
+            if (loginDto.Email == _adminConfig.Email && loginDto.Password == _adminConfig.Password)
+            {
+                _logger.LogInformation($"🔐 Admin login from config: {_adminConfig.Email}");
+                
+                // Tạo User object giả để generate token
+                var adminUser = new User
+                {
+                    Id = 0, // Admin ID đặc biệt
+                    Username = _adminConfig.Username,
+                    Email = _adminConfig.Email,
+                    RoleId = 1, // Admin role
+                    IsActive = true,
+                    Role = new Role { Id = 1, Name = "Admin", Description = "System Administrator" }
+                };
+
+                return GenerateJwtToken(adminUser);
+            }
+
+            // ✅ KIỂM TRA USER THƯỜNG TRONG DATABASE
+            var user = await _context.Users
                .Include(u => u.Role)
                .FirstOrDefaultAsync(u => u.Email == loginDto.Email);
 
             if (user == null || !VerifyPassword(loginDto.Password, user.PasswordHash))
                 return null;
 
-            var token = GenerateJwtToken(user);
-            return token;
+            return GenerateJwtToken(user);
         }
 
         public async Task<string> RegisterAsync(RegisterDto registerDto)
@@ -134,6 +157,20 @@ namespace SORMS.API.Services
 
         public async Task<UserDto> GetUserByEmailAsync(string email)
         {
+            // ✅ KIỂM TRA ADMIN ACCOUNT TỪ CONFIG TRƯỚC
+            if (email == _adminConfig.Email)
+            {
+                return new UserDto
+                {
+                    Id = 0, // Admin ID đặc biệt
+                    Username = _adminConfig.Username,
+                    RoleName = "Admin",
+                    Email = _adminConfig.Email,
+                    IsActive = true
+                };
+            }
+
+            // ✅ KIỂM TRA USER THƯỜNG TRONG DATABASE
             var user = await _context.Users
                 .Include(u => u.Role)
                 .FirstOrDefaultAsync(u => u.Email == email);
@@ -247,6 +284,15 @@ namespace SORMS.API.Services
                     }
                 }
 
+                // Nếu là Staff, thêm StaffId claim
+                if (user.RoleId == 2)
+                {
+                    var staff = _context.Staffs.FirstOrDefault(s => s.Email == user.Email);
+                    if (staff != null)
+                    {
+                        claims.Add(new Claim("StaffId", staff.Id.ToString()));
+                    }
+                }
 
                 // 4️⃣ Đọc config JWT
                 var issuer = _configuration["Jwt:Issuer"] ?? "SORMS.API";
@@ -350,6 +396,45 @@ namespace SORMS.API.Services
 
             _logger.LogInformation($"Email updated successfully for user ID: {userId}");
             return true;
+        }
+
+        // =================== SEED ADMIN USER ===================
+        /// <summary>
+        /// Tạo tài khoản Admin từ appsettings.json nếu chưa tồn tại
+        /// </summary>
+        public async Task SeedAdminUserAsync()
+        {
+            try
+            {
+                // Kiểm tra xem đã có Admin chưa
+                var adminExists = await _context.Users.AnyAsync(u => u.RoleId == 1);
+                
+                if (adminExists)
+                {
+                    _logger.LogInformation("Admin account already exists. Skipping seed.");
+                    return;
+                }
+
+                // Tạo Admin user từ config
+                var adminUser = new User
+                {
+                    Username = _adminConfig.Username,
+                    Email = _adminConfig.Email,
+                    PasswordHash = HashPassword(_adminConfig.Password),
+                    RoleId = 1, // Admin role
+                    IsActive = true
+                };
+
+                _context.Users.Add(adminUser);
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation($"✅ Admin account created successfully: {_adminConfig.Username} ({_adminConfig.Email})");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"❌ Error seeding admin user: {ex.Message}");
+                throw;
+            }
         }
     }
 }
