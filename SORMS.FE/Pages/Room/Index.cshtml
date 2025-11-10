@@ -216,6 +216,18 @@
                                 <i class="fas fa-edit"></i>
                             </a>
                         }
+                        @* Resident: Nút Thuê phòng cho phòng trống *@
+                        @if (HttpContext.Session.GetString("UserRole") == "Resident" && room.IsAvailable)
+                        {
+                            <form method="post" asp-page-handler="RequestCheckIn" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="roomId" value="@room.Id" />
+                                <button type="submit" class="btn btn-outline-success btn-sm" title="Thuê phòng" 
+                                        onclick="return confirm('Bạn có chắc muốn yêu cầu check-in vào phòng @room.RoomNumber không?')">
+                                    <i class="fas fa-home"></i>
+                                </button>
+                            </form>
+                        }
                         @* Chỉ Admin và Staff mới thấy nút Add Resident/CheckOut *@
                         @if (HttpContext.Session.GetString("UserRole") == "Admin" || HttpContext.Session.GetString("UserRole") == "Staff")
                         {
