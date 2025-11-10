@@ -29,21 +29,28 @@ namespace SORMS.API.Controllers
         [Authorize(Roles = "Resident")]
         public async Task<IActionResult> CreateRequest([FromBody] CreateServiceRequestDto dto)
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+            try
             {
-                return BadRequest(new { message = "Không thể xác định thông tin người dùng" });
-            }
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+                {
+                    return BadRequest(new { message = "Không thể xác định thông tin người dùng" });
+                }
 
-            // Get Resident from UserId
-            var resident = await _residentService.GetResidentByUserIdAsync(userId);
-            if (resident == null)
-            {
-                return NotFound(new { message = "Không tìm thấy thông tin cư dân" });
+                // Get Resident from UserId
+                var resident = await _residentService.GetResidentByUserIdAsync(userId);
+                if (resident == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy thông tin cư dân" });
+                }
+                
+                var request = await _serviceRequestService.CreateRequestAsync(dto, resident.Id);
+                return Ok(request);
             }
-            
-            var request = await _serviceRequestService.CreateRequestAsync(dto, resident.Id);
-            return Ok(request);
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
         }
 
         /// <summary>

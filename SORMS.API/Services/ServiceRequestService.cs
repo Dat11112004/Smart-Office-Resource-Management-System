@@ -19,6 +19,18 @@
 
         public async Task<ServiceRequestDto> CreateRequestAsync(CreateServiceRequestDto dto, int residentId)
         {
+            // ✅ Kiểm tra Resident đã check-in chưa
+            var resident = await _context.Residents.FindAsync(residentId);
+            if (resident == null)
+                throw new Exception("Không tìm thấy thông tin cư dân");
+
+            // Kiểm tra có check-in record với status "CheckedIn"
+            var hasActiveCheckIn = await _context.CheckInRecords
+                .AnyAsync(c => c.ResidentId == residentId && c.Status == "CheckedIn");
+
+            if (!hasActiveCheckIn)
+                throw new Exception("Bạn phải check-in phòng trước khi gửi yêu cầu dịch vụ");
+
             var request = new ServiceRequest
             {
                 Title = dto.Title,
