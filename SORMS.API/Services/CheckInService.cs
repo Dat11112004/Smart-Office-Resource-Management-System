@@ -254,7 +254,7 @@
             var record = await _context.CheckInRecords
                 .Include(r => r.Resident)
                 .Include(r => r.Room)
-                .Include(r => r.ApprovedByUser)
+                // ❌ Bỏ Include ApprovedByUser vì không có ForeignKey relationship
                 .Where(r => r.ResidentId == residentId && 
                        (r.Status == "PendingCheckIn" || r.Status == "CheckedIn" || r.Status == "PendingCheckOut"))
                 .OrderByDescending(r => r.RequestTime)
@@ -272,7 +272,7 @@
             var records = await _context.CheckInRecords
                 .Include(r => r.Resident)
                 .Include(r => r.Room)
-                .Include(r => r.ApprovedByUser)
+                // ❌ Bỏ Include ApprovedByUser vì không có ForeignKey relationship
                 .Where(r => r.ResidentId == residentId)
                 .OrderByDescending(r => r.RequestTime)
                 .ToListAsync();
@@ -286,7 +286,7 @@
             var records = await _context.CheckInRecords
                 .Include(r => r.Resident)
                 .Include(r => r.Room)
-                .Include(r => r.ApprovedByUser)
+                // ❌ Bỏ Include ApprovedByUser vì không có ForeignKey relationship
                 .OrderByDescending(r => r.RequestTime)
                 .ToListAsync();
 
@@ -330,8 +330,21 @@
             if (record.Room == null)
                 record.Room = await _context.Rooms.FindAsync(record.RoomId);
 
-            if (record.ApprovedBy.HasValue && record.ApprovedByUser == null)
-                record.ApprovedByUser = await _context.Users.FindAsync(record.ApprovedBy.Value);
+            // ✅ Query ApprovedByName trực tiếp từ Users table
+            // Nếu ApprovedBy = 0 (Admin từ config), set name = "Admin"
+            string? approvedByName = null;
+            if (record.ApprovedBy.HasValue)
+            {
+                if (record.ApprovedBy.Value == 0)
+                {
+                    approvedByName = "Admin"; // Admin từ config không có trong database
+                }
+                else
+                {
+                    var approver = await _context.Users.FindAsync(record.ApprovedBy.Value);
+                    approvedByName = approver?.Username;
+                }
+            }
 
             return new CheckInRecordDto
             {
@@ -348,7 +361,7 @@
                 Status = record.Status,
                 RejectReason = record.RejectReason,
                 ApprovedBy = record.ApprovedBy,
-                ApprovedByName = record.ApprovedByUser?.Username ?? null,
+                ApprovedByName = approvedByName,
                 RequestType = record.RequestType
             };
         }

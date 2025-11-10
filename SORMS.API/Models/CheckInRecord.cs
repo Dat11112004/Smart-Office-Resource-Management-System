@@ -39,10 +39,11 @@ namespace SORMS.API.Models
         [MaxLength(500)]
         public string? RejectReason { get; set; } // Lý do từ chối
 
-        public int? ApprovedBy { get; set; } // Staff/Admin ID người phê duyệt
+        public int? ApprovedBy { get; set; } // Staff/Admin ID người phê duyệt (0 = Admin từ config, >0 = User trong DB)
 
-        [ForeignKey(nameof(ApprovedBy))]
-        public User? ApprovedByUser { get; set; }
+        // ❌ KHÔNG dùng ForeignKey vì Admin (Id=0) không tồn tại trong database
+        // [ForeignKey(nameof(ApprovedBy))]
+        // public User? ApprovedByUser { get; set; }
 
         [Required, MaxLength(20)]
         public string RequestType { get; set; } // CheckIn, CheckOut

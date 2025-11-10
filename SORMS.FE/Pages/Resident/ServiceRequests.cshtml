@@ -139,6 +139,39 @@
 <!-- Main Container -->
 <div style="max-width: 1400px; margin: 0 auto; padding: 2rem 1.5rem;">
     
+    <!-- Success/Error Message Alert -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 12px; border-left: 4px solid #28a745; background: linear-gradient(135deg, rgba(40,167,69,0.1) 0%, rgba(76,175,80,0.1) 100%); box-shadow: 0 4px 15px rgba(40,167,69,0.2); margin-bottom: 1.5rem;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 45px; height: 45px; border-radius: 50%; background: linear-gradient(135deg, #28a745 0%, #4caf50 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.25rem;">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div style="flex: 1;">
+                    <strong style="color: #155724; font-size: 1rem;">Thành công!</strong>
+                    <p style="margin: 0.25rem 0 0 0; color: #155724; font-size: 0.95rem;">@TempData["SuccessMessage"]</p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 12px; border-left: 4px solid #dc3545; background: linear-gradient(135deg, rgba(220,53,69,0.1) 0%, rgba(239,83,80,0.1) 100%); box-shadow: 0 4px 15px rgba(220,53,69,0.2); margin-bottom: 1.5rem;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 45px; height: 45px; border-radius: 50%; background: linear-gradient(135deg, #dc3545 0%, #ef5350 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.25rem;">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <div style="flex: 1;">
+                    <strong style="color: #721c24; font-size: 1rem;">Lỗi!</strong>
+                    <p style="margin: 0.25rem 0 0 0; color: #721c24; font-size: 0.95rem;">@TempData["ErrorMessage"]</p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    }
+
     <!-- Header -->
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2.5rem 2rem; border-radius: 20px; margin-bottom: 2rem; box-shadow: 0 10px 40px rgba(102,126,234,0.3);">
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
@@ -366,6 +399,15 @@
                     targetPane.classList.add('show', 'active');
                 }
             });
+        });
+
+        // Auto-hide alerts after 5 seconds
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }, 5000);
         });
     });
 
