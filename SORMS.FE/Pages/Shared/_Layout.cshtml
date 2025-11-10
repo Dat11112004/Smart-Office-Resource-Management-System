@@ -26,13 +26,13 @@
                         <span>Dashboard</span>
                     </a>
                 </li>
-                
+
                 @* ADMIN & STAFF: Residents Management *@
                 @await Component.InvokeAsync("MenuByRole", new { allowedRoles = new[] { 1, 2 }, menuId = "residents" })
-                
+
                 @* RESIDENT ONLY: My Profile *@
                 @await Component.InvokeAsync("MenuByRole", new { allowedRoles = new[] { 3 }, menuId = "myprofile" })
-                
+
                 @* ALL: Rooms Management (Resident can view and rent) *@
                 @await Component.InvokeAsync("MenuByRole", new { allowedRoles = new[] { 1, 2, 3 }, menuId = "rooms" })
 
@@ -70,6 +70,9 @@
                     </button>
 
                     <div class="navbar-nav ms-auto">
+                        @{
+                            var userRole = Context.Session.GetString("UserRole");
+                        }
                         <div class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
                                 <i class="fas fa-bell"></i>
@@ -77,11 +80,24 @@
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><h6 class="dropdown-header">Thông báo mới</h6></li>
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-circle text-success me-2"></i>Hóa đơn mới cần xử lý</a></li>
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-circle text-warning me-2"></i>Yêu cầu dịch vụ chờ duyệt</a></li>
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-circle text-info me-2"></i>Phòng mới được đăng ký</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item text-center" href="#">Xem tất cả</a></li>
+								@if (userRole == "Admin")
+								{
+									<li><a class="dropdown-item" href="NotificationHistory"><i class="fas fa-circle text-success me-2"></i>Thông báo của tôi</a></li>
+									<li><a class="dropdown-item" href="ServiceRequestManagement"><i class="fas fa-circle text-warning me-2"></i>Quản Lý dịch vụ </a></li>
+									<li><hr class="dropdown-divider"></li>
+								}
+                                @if (userRole == "Staff")
+                                {
+                                    <li><a class="dropdown-item" href="MyNotifications"><i class="fas fa-circle text-success me-2"></i>Thông báo của tôi</a></li>
+                                    <li><a class="dropdown-item" href="ServiceRequestManagement"><i class="fas fa-circle text-warning me-2"></i>Yêu cầu dịch vụ chờ duyệt</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                }
+								@if (userRole == "Resident")
+								{
+                                    <li><a class="dropdown-item" href="Notifications"><i class="fas fa-circle text-success me-2"></i>Thông báo của tôi</a></li>
+                                    <li><a class="dropdown-item" href="ServiceRequests"><i class="fas fa-circle text-warning me-2"></i>Yêu cầu dịch vụ chờ duyệt</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+								}
                             </ul>
                         </div>
 
