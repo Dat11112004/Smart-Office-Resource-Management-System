@@ -90,9 +90,13 @@ namespace SORMS.API.Controllers
         {
             try
             {
-                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
-                if (userId == 0)
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userIdClaim))
                     return BadRequest("Không tìm thấy thông tin user");
+
+                var userId = int.Parse(userIdClaim);
+                // ✅ Cho phép userId = 0 (Admin từ config)
+                // Không cần check userId == 0 vì Admin account hợp lệ có thể có Id = 0
 
                 var result = await _checkInService.ApproveCheckInRequestAsync(
                     request.RequestId, 
@@ -119,9 +123,13 @@ namespace SORMS.API.Controllers
         {
             try
             {
-                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
-                if (userId == 0)
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userIdClaim))
                     return BadRequest("Không tìm thấy thông tin user");
+
+                var userId = int.Parse(userIdClaim);
+                // ✅ Cho phép userId = 0 (Admin từ config)
+                // Không cần check userId == 0 vì Admin account hợp lệ có thể có Id = 0
 
                 var result = await _checkInService.ApproveCheckOutRequestAsync(
                     request.RequestId, 
@@ -198,6 +206,10 @@ namespace SORMS.API.Controllers
                     var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
                     Console.WriteLine($"[my-status] UserId from claim: {userId}");
                     
+                    // ✅ Check userId == 0 là HỢP LÝ ở đây vì:
+                    // 1. Endpoint này chỉ dành cho RESIDENT
+                    // 2. Admin (userId = 0) sẽ KHÔNG BAO GIỜ gọi endpoint này
+                    // 3. Resident PHẢI có userId > 0 (từ database)
                     if (userId == 0)
                     {
                         Console.WriteLine("[my-status] ERROR: UserId = 0");
@@ -247,6 +259,10 @@ namespace SORMS.API.Controllers
                 if (residentId == 0)
                 {
                     var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+                    // ✅ Check userId == 0 là HỢP LÝ ở đây vì:
+                    // 1. Endpoint này chỉ dành cho RESIDENT
+                    // 2. Admin (userId = 0) sẽ KHÔNG BAO GIỜ gọi endpoint này
+                    // 3. Resident PHẢI có userId > 0 (từ database)
                     if (userId == 0)
                         return BadRequest(new { success = false, message = "Không tìm thấy thông tin người dùng" });
                     
