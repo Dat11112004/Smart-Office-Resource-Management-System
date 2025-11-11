@@ -137,7 +137,28 @@ namespace SORMS.FE.Pages.Auth
                         Message = result.Message ?? "Đăng ký thành công!";
                         Token = result.Token;
 
+                        // Lưu token vào session
                         HttpContext.Session.SetString("JWTToken", result.Token);
+                        
+                        // Lưu thông tin user vào session (giống Login)
+                        if (!string.IsNullOrEmpty(result.UserRole))
+                        {
+                            HttpContext.Session.SetString("UserRole", result.UserRole);
+                            Console.WriteLine($"UserRole saved to session: {result.UserRole}");
+                        }
+                        
+                        if (result.UserId.HasValue)
+                        {
+                            HttpContext.Session.SetInt32("UserId", result.UserId.Value);
+                            Console.WriteLine($"UserId saved to session: {result.UserId.Value}");
+                        }
+                        
+                        if (!string.IsNullOrEmpty(result.Username))
+                        {
+                            HttpContext.Session.SetString("Username", result.Username);
+                        }
+                        
+                        Console.WriteLine($"Register successful - redirecting to Index with role: {result.UserRole}");
                         
                         return RedirectToPage("/Index");
                     }
@@ -163,5 +184,9 @@ namespace SORMS.FE.Pages.Auth
     {
         public string Message { get; set; } = string.Empty;
         public string Token { get; set; } = string.Empty;
+        public int? UserId { get; set; }
+        public string? UserRole { get; set; }
+        public string? Username { get; set; }
+        public string? Email { get; set; }
     }
 }

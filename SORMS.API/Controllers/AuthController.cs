@@ -80,9 +80,16 @@ namespace SORMS.API.Controllers
             if (token == null)
                 return Conflict("Tên hoặc Email đăng nhập đã tồn tại.");
 
+            // Lấy thông tin user vừa đăng ký để trả về Role
+            var user = await _authService.GetUserByEmailAsync(registerDto.Email);
+
             return Ok(new { 
                 Message = "Đăng ký thành công.", 
-                Token = token 
+                Token = token,
+                UserId = user?.Id,
+                UserRole = user?.RoleName,
+                Username = user?.Username,
+                Email = user?.Email
             });
         }
 
