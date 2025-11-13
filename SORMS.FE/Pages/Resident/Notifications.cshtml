@@ -423,7 +423,17 @@
 @functions {
     private string GetTimeAgo(DateTime dateTime)
     {
-        var timeSpan = DateTime.Now - dateTime;
+        // Ensure incoming DateTime is interpreted correctly.
+        // API stores timestamps in UTC. If the kind is Unspecified we assume UTC
+        // then convert to local time for display and relative calculations.
+        DateTime dt = dateTime;
+        if (dt.Kind == DateTimeKind.Unspecified)
+        {
+            dt = DateTime.SpecifyKind(dt, DateTimeKind.Utc);
+        }
+
+        var local = dt.Kind == DateTimeKind.Utc ? dt.ToLocalTime() : dt;
+        var timeSpan = DateTime.Now - local;
 
         if (timeSpan.TotalMinutes < 1)
             return "Vừa xong";
@@ -436,6 +446,6 @@
         if (timeSpan.TotalDays < 30)
             return $"{(int)(timeSpan.TotalDays / 7)} tuần trước";
         
-        return dateTime.ToString("dd/MM/yyyy HH:mm");
+        return local.ToString("dd/MM/yyyy HH:mm");
     }
 }
