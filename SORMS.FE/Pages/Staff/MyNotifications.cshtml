@@ -441,7 +441,15 @@
 @functions {
     private string GetTimeAgo(DateTime dateTime)
     {
-        var timeSpan = DateTime.Now - dateTime;
+        // Handle DateTime kinds: assume UTC when unspecified and convert to local time
+        DateTime dt = dateTime;
+        if (dt.Kind == DateTimeKind.Unspecified)
+        {
+            dt = DateTime.SpecifyKind(dt, DateTimeKind.Utc);
+        }
+
+        var local = dt.Kind == DateTimeKind.Utc ? dt.ToLocalTime() : dt;
+        var timeSpan = DateTime.Now - local;
 
         if (timeSpan.TotalMinutes < 1)
             return "Vừa xong";
@@ -454,6 +462,6 @@
         if (timeSpan.TotalDays < 30)
             return $"{(int)(timeSpan.TotalDays / 7)} tuần trước";
         
-        return dateTime.ToString("dd/MM/yyyy HH:mm");
+        return local.ToString("dd/MM/yyyy HH:mm");
     }
 }
