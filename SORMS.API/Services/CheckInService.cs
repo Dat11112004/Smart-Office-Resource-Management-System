@@ -342,7 +342,7 @@
                 else
                 {
                     var approver = await _context.Users.FindAsync(record.ApprovedBy.Value);
-                    approvedByName = approver?.Username;
+                    approvedByName = approver?.UserName;
                 }
             }
 

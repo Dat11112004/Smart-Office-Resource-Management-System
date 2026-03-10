@@ -48,7 +48,7 @@ namespace SORMS.API.Services
                 var adminUser = new User
                 {
                     Id = 0, // Admin ID đặc biệt
-                    Username = _adminConfig.Username,
+                    UserName = _adminConfig.Username,
                     Email = _adminConfig.Email,
                     RoleId = 1, // Admin role
                     IsActive = true,
@@ -72,7 +72,7 @@ namespace SORMS.API.Services
         public async Task<string> RegisterAsync(RegisterDto registerDto)
         {
             var existingUser = await _context.Users
-                .AnyAsync(u => u.Username == registerDto.Username || u.Email == registerDto.Email);
+                .AnyAsync(u => u.UserName == registerDto.FullName || u.Email == registerDto.Email);
 
             if (existingUser)
                 return null;
@@ -80,7 +80,7 @@ namespace SORMS.API.Services
             // Tạo User account
             var user = new User
             {
-                Username = registerDto.Username,
+                UserName = registerDto.UserName,
                 PasswordHash = HashPassword(registerDto.Password),
                 RoleId = registerDto.RoleId,
                 IsActive = true,
@@ -90,29 +90,13 @@ namespace SORMS.API.Services
             _context.Users.Add(user);
             await _context.SaveChangesAsync(); // Save để lấy user.Id
 
-            // ✅ TỰ ĐỘNG TẠO STAFF PROFILE nếu role = 2 (Staff)
-            if (user.RoleId == 2)
-            {
-                var staff = new Staff
-                {
-                    FullName = registerDto.FullName ?? user.Username,
-                    Email = user.Email,
-                    Phone = registerDto.Phone ?? ""
-                };
-
-                _context.Staffs.Add(staff);
-                await _context.SaveChangesAsync();
-
-                _logger.LogInformation($"Auto-created Staff profile for user: {user.Username} (ID: {user.Id})");
-            }
-
             // ✅ TỰ ĐỘNG TẠO RESIDENT PROFILE nếu role = 3 (Resident)
             if (user.RoleId == 3)
             {
                 var resident = new Resident
                 {
                     UserId = user.Id,
-                    FullName = registerDto.FullName ?? user.Username, // Nếu có FullName thì dùng, không thì dùng Username
+                    FullName = registerDto.FullName ?? user.UserName, // Nếu có FullName thì dùng, không thì dùng Username
                     Email = user.Email,
                     Phone = registerDto.Phone ?? "",
                     IdentityNumber = registerDto.IdentityNumber ?? "",
@@ -129,7 +113,7 @@ namespace SORMS.API.Services
                 _context.Residents.Add(resident);
                 await _context.SaveChangesAsync();
 
-                _logger.LogInformation($"Auto-created Resident profile for user: {user.Username} (ID: {user.Id})");
+                _logger.LogInformation($"Auto-created Resident profile for user: {user.UserName} (ID: {user.Id})");
             }
 
             // Tự động tạo token sau khi đăng ký thành công
@@ -141,14 +125,14 @@ namespace SORMS.API.Services
         {
             var user = await _context.Users
                 .Include(u => u.Role)
-                .FirstOrDefaultAsync(u => u.Username == username);
+                .FirstOrDefaultAsync(u => u.UserName == username);
 
             if (user == null) return null;
 
             return new UserDto
             {
                 Id = user.Id,
-                Username = user.Username,
+                Username = user.UserName,
                 RoleName = user.Role.Name,
                 Email = user.Email,
                 IsActive = user.IsActive
@@ -180,7 +164,7 @@ namespace SORMS.API.Services
             return new UserDto
             {
                 Id = user.Id,
-                Username = user.Username,
+                Username = user.UserName,
                 RoleName = user.Role.Name,
                 Email = user.Email,
                 IsActive = user.IsActive
@@ -249,7 +233,8 @@ namespace SORMS.API.Services
                     1 => "Admin",
                     2 => "Staff",
                     3 => "Resident",
-                    _ => "Resident" // mặc định nếu có lỗi hoặc null
+                    4 => "Guest",
+                    _ => "Guest" // mặc định nếu có lỗi hoặc null
                 };
 
                 // 2️⃣ Lấy secret key từ appsettings.json
@@ -267,7 +252,7 @@ namespace SORMS.API.Services
                 var claims = new List<Claim>
 {
                     new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),   // "sub"
-                    new Claim("username", user.Username),
+                    new Claim("username", user.UserName),
                     new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),     // name id
                     new Claim(ClaimTypes.Role, roleName),                         // schema role
@@ -312,7 +297,7 @@ namespace SORMS.API.Services
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var tokenString = tokenHandler.WriteToken(token);
 
-                _logger.LogInformation($"Token generated for user: {user.Username} with role {roleName}");
+                _logger.LogInformation($"Token generated for user: {user.UserName} with role {roleName}");
 
                 return tokenString;
             }
@@ -398,6 +383,47 @@ namespace SORMS.API.Services
             return true;
         }
 
+        // =================== CREATE STAFF ACCOUNT BY ADMIN ===================
+        public async Task<bool> CreateStaffAccountAsync(RegisterDto registerDto)
+        {
+            // Kiểm tra dữ liệu đầu vào
+            if (registerDto.RoleId != 2)
+                return false; // Chỉ cho phép tạo Staff
+
+            var existingUser = await _context.Users
+                .AnyAsync(u => u.UserName == registerDto.UserName || u.Email == registerDto.Email);
+
+            if (existingUser)
+                return false;
+
+            // Tạo User account
+            var user = new User
+            {
+                UserName = registerDto.UserName,
+                PasswordHash = HashPassword(registerDto.Password),
+                RoleId = 2, // Staff
+                IsActive = true,
+                Email = registerDto.Email
+            };
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync(); // Save để lấy user.Id
+
+            // Tạo Staff profile
+            var staff = new Staff
+            {
+                FullName = registerDto.FullName ?? user.UserName,
+                Email = user.Email,
+                Phone = registerDto.Phone ?? ""
+            };
+
+            _context.Staffs.Add(staff);
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation($"Admin created Staff account for user: {user.UserName} (ID: {user.Id})");
+            return true;
+        }
+
         // =================== SEED ADMIN USER ===================
         /// <summary>
         /// Tạo tài khoản Admin từ appsettings.json nếu chưa tồn tại
@@ -418,7 +444,7 @@ namespace SORMS.API.Services
                 // Tạo Admin user từ config
                 var adminUser = new User
                 {
-                    Username = _adminConfig.Username,
+                    UserName = _adminConfig.Username,
                     Email = _adminConfig.Email,
                     PasswordHash = HashPassword(_adminConfig.Password),
                     RoleId = 1, // Admin role

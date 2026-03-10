@@ -6,7 +6,6 @@ namespace SORMS.API.Interfaces
     {
         Task<IEnumerable<StaffDto>> GetAllStaffAsync();
         Task<StaffDto> GetStaffByIdAsync(int id);
-        Task<StaffDto> CreateStaffAsync(StaffDto staffDto);
         Task<bool> UpdateStaffAsync(int id, StaffDto staffDto);
         Task<bool> DeleteStaffAsync(int id);
     }

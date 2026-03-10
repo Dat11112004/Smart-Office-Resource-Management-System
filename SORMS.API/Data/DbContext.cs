@@ -12,11 +12,12 @@ namespace SORMS.API.Data
 
         // ===== DbSet cho các bảng =====
         public DbSet<Resident> Residents { get; set; }
+
+        public DbSet<User> Users { get; set; }
         public DbSet<Room> Rooms { get; set; }
         public DbSet<ServiceRequest> ServiceRequests { get; set; }
         public DbSet<Staff> Staffs { get; set; }
         public DbSet<Notification> Notifications { get; set; }
-        public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<CheckInRecord> CheckInRecords { get; set; }
         public DbSet<Report> Reports { get; set; }
@@ -89,7 +90,9 @@ namespace SORMS.API.Data
             modelBuilder.Entity<Role>().HasData(
                 new Role { Id = 1, Name = "Admin", Description = "System administrator" },
                 new Role { Id = 2, Name = "Staff", Description = "Staff member" },
-                new Role { Id = 3, Name = "Resident", Description = "Dormitory resident" }
+                new Role { Id = 3, Name = "Resident", Description = "Dormitory resident" },
+                // Khách (Guest) có thể tự đăng ký
+                new Role { Id = 4, Name = "Guest", Description = "External guest - allowed to self-register" }
             );
 
            

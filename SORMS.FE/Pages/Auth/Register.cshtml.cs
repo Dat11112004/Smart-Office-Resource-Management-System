@@ -102,7 +102,7 @@ namespace SORMS.FE.Pages.Auth
                 var registerDto = new RegisterDto
                 {
                     Email = Email,
-                    Username = Username,
+                    UserName = Username,
                     Password = Password,
                     RoleId = RoleId,
                     FullName = FullName,

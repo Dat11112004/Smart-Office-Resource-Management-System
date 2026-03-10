@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SORMS.API.DTOs;
 using SORMS.API.Interfaces;
@@ -44,7 +44,27 @@ namespace SORMS.API.Controllers
         }
 
         /// <summary>
-        /// Lấy thông tin profile của Resident hiện tại (dựa vào UserId từ JWT)
+        /// Cập nhật profile của Resident hiện tại
+        /// </summary>
+        [HttpPut("my-profile")]
+        [Authorize(Roles = "Resident")]
+        public async Task<IActionResult> UpdateMyProfile([FromBody] UpdateResidentProfileDto dto)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+            {
+                return Unauthorized("Không thể xác định người dùng.");
+            }
+
+            var success = await _residentService.UpdateResidentProfileAsync(userId, dto.Address, dto.EmergencyContact, dto.Notes);
+            if (!success)
+                return BadRequest("Không thể cập nhật profile.");
+
+            return Ok("Cập nhật profile thành công.");
+        }
+
+        /// <summary>
+        /// Lấy profile của Resident hiện tại
         /// </summary>
         [HttpGet("my-profile")]
         [Authorize(Roles = "Resident")]

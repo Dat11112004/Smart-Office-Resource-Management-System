@@ -47,7 +47,7 @@ namespace SORMS.API.Controllers
         }
 
         /// <summary>
-        /// Đăng ký tài khoản mới và nhận JWT token
+        /// Đăng ký tài khoản mới và nhận JWT token (Chỉ dành cho Resident)
         /// </summary>
         [AllowAnonymous]
         [HttpPost("register")]
@@ -56,22 +56,22 @@ namespace SORMS.API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            // ⛔ CHẶN ĐĂNG KÝ ADMIN (RoleId = 1)
-            if (registerDto.RoleId == 1)
+            // ⛔ CHẶN ĐĂNG KÝ ADMIN (1) và STAFF (2)
+            if (registerDto.RoleId == 1 || registerDto.RoleId == 2)
             {
                 return BadRequest(new 
                 { 
-                    Message = "Không thể đăng ký tài khoản Admin qua form đăng ký. Admin account được quản lý bởi hệ thống.",
-                    Error = "Admin registration is not allowed"
+                    Message = "Không thể đăng ký tài khoản Admin hoặc Staff qua form đăng ký. Tài khoản Admin được quản lý bởi hệ thống, tài khoản Staff được tạo bởi Admin.",
+                    Error = "Admin/Staff registration is not allowed"
                 });
             }
 
-            // ✅ CHỈ CHO PHÉP STAFF (RoleId = 2) VÀ RESIDENT (RoleId = 3)
-            if (registerDto.RoleId != 2 && registerDto.RoleId != 3)
+            // ✅ CHỈ CHO PHÉP RESIDENT (3) hoặc GUEST (4)
+            if (registerDto.RoleId != 3 && registerDto.RoleId != 4)
             {
                 return BadRequest(new 
                 { 
-                    Message = "Role không hợp lệ. Chỉ được đăng ký Staff hoặc Resident.",
+                    Message = "Role không hợp lệ. Chỉ được đăng ký Resident hoặc Guest.",
                     Error = "Invalid role"
                 });
             }
@@ -217,6 +217,33 @@ namespace SORMS.API.Controllers
             {
                 return BadRequest($"Error seeding admin: {ex.Message}");
             }
+        }
+
+        /// <summary>
+        /// Admin tạo tài khoản cho Staff
+        /// </summary>
+        [Authorize(Roles = "Admin")]
+        [HttpPost("create-staff")]
+        public async Task<IActionResult> CreateStaffAccount([FromBody] RegisterDto registerDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            // Chỉ cho phép tạo Staff
+            if (registerDto.RoleId != 2)
+            {
+                return BadRequest(new 
+                { 
+                    Message = "Chỉ được tạo tài khoản Staff.",
+                    Error = "Only Staff accounts can be created"
+                });
+            }
+
+            var success = await _authService.CreateStaffAccountAsync(registerDto);
+            if (!success)
+                return Conflict("Tên đăng nhập hoặc Email đã tồn tại.");
+
+            return Ok(new { Message = "Tạo tài khoản Staff thành công." });
         }
     }
 }

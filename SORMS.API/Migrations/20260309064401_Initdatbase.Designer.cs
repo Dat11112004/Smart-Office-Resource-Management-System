@@ -12,8 +12,8 @@ using SORMS.API.Data;
 namespace SORMS.API.Migrations
 {
     [DbContext(typeof(SormsDbContext))]
-    [Migration("20251109113900_UpdateNotificationForBroadcast")]
-    partial class UpdateNotificationForBroadcast
+    [Migration("20260309064401_Initdatbase")]
+    partial class Initdatbase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -72,8 +72,6 @@ namespace SORMS.API.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ApprovedBy");
 
                     b.HasIndex("ResidentId");
 
@@ -286,6 +284,12 @@ namespace SORMS.API.Migrations
                             Id = 3,
                             Description = "Dormitory resident",
                             Name = "Resident"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Description = "External guest - allowed to self-register",
+                            Name = "Guest"
                         });
                 });
 
@@ -480,10 +484,6 @@ namespace SORMS.API.Migrations
 
             modelBuilder.Entity("SORMS.API.Models.CheckInRecord", b =>
                 {
-                    b.HasOne("SORMS.API.Models.User", "ApprovedByUser")
-                        .WithMany()
-                        .HasForeignKey("ApprovedBy");
-
                     b.HasOne("SORMS.API.Models.Resident", "Resident")
                         .WithMany("CheckInRecords")
                         .HasForeignKey("ResidentId")
@@ -495,8 +495,6 @@ namespace SORMS.API.Migrations
                         .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("ApprovedByUser");
 
                     b.Navigation("Resident");
 

@@ -24,6 +24,11 @@ namespace SORMS.API.Interfaces
         /// </summary>
         Task SeedAdminUserAsync();
 
+        /// <summary>
+        /// Admin tạo tài khoản cho Staff
+        /// </summary>
+        Task<bool> CreateStaffAccountAsync(RegisterDto registerDto);
+
     }
 
 }

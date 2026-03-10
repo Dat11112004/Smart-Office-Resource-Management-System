@@ -42,22 +42,6 @@ namespace SORMS.API.Services
             };
         }
 
-        public async Task<StaffDto> CreateStaffAsync(StaffDto staffDto)
-        {
-            var staff = new Staff
-            {
-                FullName = staffDto.FullName,
-                Email = staffDto.Email,
-                Phone = staffDto.Phone
-            };
-
-            _context.Staffs.Add(staff);
-            await _context.SaveChangesAsync();
-
-            staffDto.Id = staff.Id;
-            return staffDto;
-        }
-
         public async Task<bool> UpdateStaffAsync(int id, StaffDto staffDto)
         {
             var staff = await _context.Staffs.FindAsync(id);

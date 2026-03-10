@@ -1,14 +1,15 @@
-﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Serilog;
+using SORMS.API.Configs;
+using SORMS.API.Data;
+using SORMS.API.Interfaces;
+using SORMS.API.Services;
+using System.IO;
+using System.Security.Claims;
 using System.Text;
-    using Microsoft.AspNetCore.Authentication.JwtBearer;
-    using Microsoft.EntityFrameworkCore;
-    using Microsoft.IdentityModel.Tokens;
-    using Microsoft.OpenApi.Models;
-    using Serilog;
-    using SORMS.API.Configs;
-    using SORMS.API.Data;
-    using SORMS.API.Interfaces;
-    using SORMS.API.Services;
 
 
 
@@ -22,12 +23,18 @@ using System.Text;
     builder.Services.Configure<EmailConfig>(builder.Configuration.GetSection("EmailConfig"));
     builder.Services.Configure<AdminConfig>(builder.Configuration.GetSection("AdminAccount"));
 
-    // 2. Cấu hình DbContext
-    builder.Services.AddDbContext<SormsDbContext>(options =>
-        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+// 2. Cấu hình DbContext: chỉ dùng SQL Server
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException("Missing ConnectionStrings:DefaultConnection");
+}
 
-    // 3. Đăng ký các service
-    builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddDbContext<SormsDbContext>(options =>
+    options.UseSqlServer(connectionString));
+
+// 3. Đăng ký các service
+builder.Services.AddScoped<IEmailService, EmailService>();
 
     builder.Services.AddScoped<IAuthService, AuthService>();
     builder.Services.AddScoped<IResidentService, ResidentService>();
@@ -111,6 +118,14 @@ builder.Services.AddEndpointsApiExplorer();
     {
         c.SwaggerDoc("v1", new OpenApiInfo { Title = "SORMS API", Version = "v1" });
 
+        // Include XML comments if the XML documentation file was generated
+        var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+        var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+        if (File.Exists(xmlPath))
+        {
+            c.IncludeXmlComments(xmlPath);
+        }
+
         c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
         {
             Description = "Nhập token dạng: Bearer {token}",
@@ -155,6 +170,7 @@ builder.Services.AddEndpointsApiExplorer();
     // 7. Middleware pipeline
     if (app.Environment.IsDevelopment())
     {
+        app.UseDeveloperExceptionPage();
         app.UseSwagger();
         app.UseSwaggerUI();
     }
@@ -171,6 +187,10 @@ builder.Services.AddEndpointsApiExplorer();
         var services = scope.ServiceProvider;
         try
         {
+            var dbContext = services.GetRequiredService<SormsDbContext>();
+            // Dùng Migrate để áp dụng migration + seed Roles (Admin/Staff/Resident/Guest), giúp đăng ký/đăng nhập và check-in/check-out lưu đúng DB
+            await dbContext.Database.MigrateAsync();
+
             var authService = services.GetRequiredService<IAuthService>();
             await authService.SeedAdminUserAsync();
             Log.Information("✅ Admin user seeding completed");

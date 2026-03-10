@@ -281,6 +281,12 @@ namespace SORMS.API.Migrations
                             Id = 3,
                             Description = "Dormitory resident",
                             Name = "Resident"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Description = "External guest - allowed to self-register",
+                            Name = "Guest"
                         });
                 });
 

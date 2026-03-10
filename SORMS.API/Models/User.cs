@@ -11,7 +11,7 @@ namespace SORMS.API.Models
         public int Id { get; set; }
 
         [Required, MaxLength(50)]
-        public string Username { get; set; }
+        public string UserName { get; set; }
 
         [Required, MaxLength(100), EmailAddress]
         public string Email { get; set; }
